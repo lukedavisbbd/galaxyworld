@@ -1,11 +1,11 @@
 ﻿using Dapper;
-using GalaxyWorld.Models.Dbos;
+using GalaxyWorld.Models;
 
 namespace GalaxyWorld.Database;
 
 public class UserRepository(DbContext db)
 {
-    public async Task<User> FetchOrInsertUser(string googleId)
+    public async Task<User> FetchOrInsert(string googleId)
     {
         var conn = db.Connection;
         var user = await conn.QueryFirstAsync<User>(
@@ -17,7 +17,7 @@ public class UserRepository(DbContext db)
         return user;
     }
 
-    public async Task<IEnumerable<string>> FetchUserRoles(int userId)
+    public async Task<IEnumerable<string>> FetchRoles(int userId)
     {
         var conn = db.Connection;
         var roles = await conn.QueryAsync<string>(

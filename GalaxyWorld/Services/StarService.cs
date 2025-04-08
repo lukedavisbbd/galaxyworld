@@ -1,28 +1,38 @@
 ﻿using GalaxyWorld.Database;
 using GalaxyWorld.Models;
-using GalaxyWorld.Models.Dbos;
+using GalaxyWorld.Models.Star;
 
 namespace GalaxyWorld.Services;
 
 public class StarService(StarRepository repo)
 {
-    public async Task<IEnumerable<Star>> GetStars(Page page)
+    public async Task<IEnumerable<Star>> Get(Page page, StarSort sort)
     {
-        return await repo.FetchStars(page);
+        return await repo.Fetch(page, sort);
     }
 
-    public async Task<Star?> GetStar(int id)
+    public async Task<IEnumerable<Star>> GetByConstellation(int constellation, Page page, StarSort sort)
     {
-        return await repo.FetchStarById(id);
+        return await repo.FetchByConstellation(constellation, page, sort);
     }
 
-    public async Task<Star> CreateStar(StarInsert insert)
+    public async Task<Star?> GetOne(int id)
     {
-        return await repo.InsertStar(insert);
+        return await repo.FetchOne(id);
     }
 
-    public async Task<Star?> PatchStar(int id, StarPatch patch)
+    public async Task<Star> Create(StarInsert insert)
     {
-        return await repo.UpdateStar(id, patch);
+        return await repo.Insert(insert);
+    }
+
+    public async Task<Star?> Patch(int id, StarPatch patch)
+    {
+        return await repo.Update(id, patch);
+    }
+
+    public async Task<Star?> Delete(int id)
+    {
+        return await repo.Delete(id);
     }
 }

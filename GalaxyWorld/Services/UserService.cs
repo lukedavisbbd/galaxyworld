@@ -1,17 +1,17 @@
 ﻿using GalaxyWorld.Database;
-using GalaxyWorld.Models.Dbos;
+using GalaxyWorld.Models;
 
 namespace GalaxyWorld.Services;
 
 public class UserService(UserRepository repo)
 {
-    public async Task<User> GetOrCreateUser(string googleId)
+    public async Task<User> GetOrCreate(string googleId)
     {
-        return await repo.FetchOrInsertUser(googleId);
+        return await repo.FetchOrInsert(googleId);
     }
 
-    public async Task<IEnumerable<string>> GetUserRoles(int userId)
+    public async Task<IEnumerable<string>> GetRoles(int userId)
     {
-        return await repo.FetchUserRoles(userId);
+        return await repo.FetchRoles(userId);
     }
 }

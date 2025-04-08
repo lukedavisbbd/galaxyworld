@@ -1,6 +1,6 @@
-﻿namespace GalaxyWorldCli;
+﻿namespace GalaxyWorldCli.Models;
 
-public class Star
+public class StarRecord
 {
     public int? AthygId { get; set; }
     public string? Tycho2Id { get; set; }

@@ -5,7 +5,10 @@ public static class ServiceConfiguration
     public static IServiceCollection ConfigureServices(this IServiceCollection services)
     {
         return services
+            .AddScoped<UserService>()
             .AddScoped<StarService>()
-            .AddScoped<UserService>();
+            .AddScoped<CatalogueService>()
+            .AddScoped<CatalogueStarEntryService>()
+            .AddScoped<ConstellationService>();
     }
 }

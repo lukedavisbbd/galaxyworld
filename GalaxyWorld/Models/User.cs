@@ -1,4 +1,4 @@
-﻿namespace GalaxyWorld.Models.Dbos;
+﻿namespace GalaxyWorld.Models;
 
 public class User
 {

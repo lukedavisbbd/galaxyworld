@@ -3,17 +3,23 @@
 public static class DbConstants
 {
     private static IDictionary<string, string> ConstraintNames = new Dictionary<string, string> {
-        { "stars_athyg_id_key", "ATHYG ID already taken." },
-        { "stars_bayer_id_key", "Bayer ID already taken." },
-        { "stars_flamsteed_id_key", "Flamsteed ID already taken." },
-        { "stars_gaia_dr3_id_key", "Gaia DR 3 ID already taken." },
-        { "stars_gliese_id_key", "Gliese ID already taken." },
-        { "stars_harvard_yale_id_key", "Harvard/Yale ID already taken." },
-        { "stars_henry_draper_id_key", "Henry Draper ID already taken." },
-        { "stars_hipparcos_id_key", "Hipparcos ID already taken." },
-        { "stars_hyg_v3_id_key", "Hyg V3 ID already taken." },
-        { "stars_proper_name_key", "proper name already taken." },
-        { "stars_tycho2_id_key", "Tycho-2 ID already taken." },
+        { "stars_proper_name_key", "Proper name already taken." },
+        { "stars_constellation_fkey", "Constellation does not exist." },
+
+        { "catalogues_cat_name_key", "Category name already taken." },
+        { "catalogues_cat_slug_key", "Category slug already taken." },
+        { "catalogues_cat_slug_check", "Category slug may only contain lowercase alphanumeric characters and underscores." },
+
+        { "constellations_con_name_key", "Constellation name already taken." },
+        { "constellations_iau_abbr_key", "Constellation IAU abbreviation already taken." },
+        { "constellations_iau_abbr_check", "Constellation IAU abbreviation must be exactly 3 letters." },
+        { "constellations_nasa_abbr_key", "Constellation NASA abbreviation already taken." },
+        { "constellations_nasa_abbr_check", "Constellation NASA abbreviation must be exactly 4 letters." },
+        
+        { "catalogue_star_entries_pkey", "Star already in category." },
+        { "catalogue_star_entries_cat_id_entry_id_key", "Entry ID already exists in category." },
+        { "catalogue_star_entries_cat_id_fkey", "Category does not exist." },
+        { "catalogue_star_entries_star_id_fkey", "Star does not exist." },
     };
 
     public static string MapConstraintName(string constraint)
@@ -25,6 +31,12 @@ public static class DbConstants
 
         if (constraint.EndsWith(" key"))
             constraint = constraint.Substring(0, constraint.Length - 4) + " already taken";
+
+        if (constraint.EndsWith(" pkey"))
+            constraint = constraint.Substring(0, constraint.Length - 4) + " already exists";
+
+        if (constraint.EndsWith(" fkey"))
+            constraint = constraint.Substring(0, constraint.Length - 4) + " mismatch";
 
         constraint = constraint.Substring(0, 1).ToUpper() + constraint.Substring(1) + '.';
 

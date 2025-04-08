@@ -19,13 +19,13 @@ public class RoleRequirementHandler(UserService service, IMemoryCache cache) : A
         var user = await cache.GetOrCreateAsync("user:google_id:" + googleId, async cache =>
         {
             cache.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-            return await service.GetOrCreateUser(googleId.Value);
+            return await service.GetOrCreate(googleId.Value);
         }) ?? throw new InvalidOperationException("user not found or able to be created or cached");
 
         var roles = await cache.GetOrCreateAsync("roles:user_id:" + user.UserId, async cache =>
         {
             cache.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-            return await service.GetUserRoles(user.UserId);
+            return await service.GetRoles(user.UserId);
         }) ?? throw new InvalidOperationException("user roles not found or able to be cached");
 
         if (!roles.Contains(requirement.RoleName))

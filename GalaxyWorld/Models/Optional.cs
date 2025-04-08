@@ -14,8 +14,6 @@ public struct Optional<T>
     }
     [JsonIgnore]
     public bool IsSome { get; private init; }
-    [JsonIgnore]
-    public T? ValueOrDefault => IsSome ? _value! : default;
 
     public Optional(T value) {
         Some = value;
@@ -36,5 +34,20 @@ public struct Optional<T>
             };
         else
             return new Optional<U>();
+    }
+
+    public T? Or()
+    {
+        return IsSome ? Some : default;
+    }
+
+    public T Or(T value)
+    {
+        return IsSome ? Some : value;
+    }
+
+    public Optional<T> Or(Optional<T> other)
+    {
+        return IsSome ? this : other;
     }
 }
