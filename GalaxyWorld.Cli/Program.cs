@@ -77,7 +77,16 @@ class Program
                     {
                         PropertyNameCaseInsensitive = true,
                     }) ?? throw new ArgumentNullException();
-                    DrawConstellation.DrawStars(stars);
+                    DrawConstellation.DrawStars(new Constellation
+                    {
+                        ConId = 30,
+                        ConName = "Crux",
+                        IauAbbr = "Cru",
+                        NasaAbbr = "Cruc",
+                        Genitive = "Crucis",
+                        Origin = "1589, Plancius, split from Centaurus",
+                        Meaning = "southern cross",
+                    }, stars);
                 }
             });
     }

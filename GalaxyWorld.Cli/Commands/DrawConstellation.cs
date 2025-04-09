@@ -1,4 +1,5 @@
-﻿using GalaxyWorld.Core.Models.Star;
+﻿using GalaxyWorld.Core.Models.Constellation;
+using GalaxyWorld.Core.Models.Star;
 
 namespace GalaxyWorld.Cli.Commands;
 
@@ -9,12 +10,27 @@ internal class DrawConstellation
         return $"\x1b[38;2;{greyness};{greyness};{greyness}m";
     }
 
+    static string Yellow()
+    {
+        return "\x1b[0;33m";
+    }
+
     static string Reset()
     {
         return $"\x1b[0m";
     }
 
-    public static void DrawStars(List<Star> stars)
+    static string MoveUp(int n)
+    {
+        return $"\x1b[{n}A";
+    }
+
+    static string MoveDown(int n)
+    {
+        return $"\x1b[{n}B";
+    }
+
+    public static void DrawStars(Constellation constellation, List<Star> stars)
     {
         var raMin = decimal.MaxValue;
         var raMax = decimal.MinValue;
@@ -68,16 +84,11 @@ internal class DrawConstellation
         {
             var x = (int)decimal.Round((star.RightAscension - raMin) / raDelta * width);
             var y = (int)decimal.Round((star.Declination - decMin) / decDelta * height);
-            x = int.Clamp(x, 0, width - 1);
-            y = int.Clamp(y, 0, height - 1);
+            if (x < 0 || y < 0 || x >= width || y >= height) continue;
 
             const string CHARSET = "X*.";
 
-            //const double BRIGHTNESS_MAX = 1.0e-1;
-            //const double BRIGHTNESS_MIN = 1.0e-10;
-            
-            //var brightness = double.Pow(2.5, -(double)star.Magnitude);
-
+            // max is lower than min because a higher magnitude star is dimmer
             const double BRIGHTNESS_MAX = 0.0;
             const double BRIGHTNESS_MIN = 8.0;
 
@@ -85,9 +96,7 @@ internal class DrawConstellation
 
             var lerp = (brightness - BRIGHTNESS_MIN) / (BRIGHTNESS_MAX - BRIGHTNESS_MIN);
             var i = (int)((1.0 - lerp) * CHARSET.Length);
-            var greyness = (byte)int.Clamp((int)(lerp * 196 + 59), 0, 255);
-            
-            //Console.WriteLine($"{brightness}, {i}, {lerp}, {lerp * CHARSET.Length}");
+            var greyness = (byte)int.Clamp((int)(lerp * 196 + (255 - 196)), 0, 255);
             
             i = int.Clamp(i, 0, CHARSET.Length - 1);
             if (CHARSET[i] != ' ')
@@ -102,6 +111,27 @@ internal class DrawConstellation
                 Console.Write(chars[x, y]);
             Console.WriteLine();
         }
+        Console.Write(MoveUp(height));
+
+        var infoWidth = int.Clamp(width / 3, 24, width);
+        
+        var info = WrapString($"Name: {constellation.ConName}", infoWidth) + '\n'
+            + WrapString($"IAU Abbr.: {constellation.IauAbbr}", infoWidth) + '\n'
+            + WrapString($"NASA Abbr.: {constellation.NasaAbbr}", infoWidth) + '\n'
+            + WrapString($"Genitive: {constellation.Genitive}", infoWidth) + '\n'
+            + WrapString($"Origin: {constellation.Origin}", infoWidth) + '\n'
+            + WrapString($"Meaning: {constellation.Meaning}", infoWidth);
+        var newLines = info.Count(c => c == '\n');
+
+        Console.WriteLine($"{Yellow()}{info}{Reset()}");
+        Console.Write(MoveDown(height - newLines));
+    }
+
+    public static string WrapString(string str, int width)
+    {
+        for (int i = (str.Length - 1) / width; i > 0; i--)
+            str = str.Insert(i * width, "\n");
+        return str;
     }
 
     public static char ToBrailleChar(bool[,] array)
