@@ -1,4 +1,5 @@
 ﻿using GalaxyWorld.Core.Models.Catalogue;
+using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Core.Models.Constellation;
 using GalaxyWorld.Core.Models.Star;
 
@@ -47,7 +48,7 @@ public static class PatchExt
         var changes =
             patch.CatName.Map(_ => "cat_name = @CatName,").Or() +
             patch.CatSlug.Map(_ => "cat_slug = @CatSlug,").Or();
-        return changes.Substring(0, int.Max(changes.Length - 1, 0));
+        return changes.TrimEnd(',');
     }
 
     public static string ToSql(this ConstellationPatch patch)
@@ -60,5 +61,13 @@ public static class PatchExt
             patch.Origin.Map(_ => "origin = @Origin,").Or() +
             patch.Meaning.Map(_ => "meaning = @Meaning,").Or();
         return changes.Substring(0, int.Max(changes.Length - 1, 0));
+    }
+
+    public static string ToSql(this CatalogueEntryPatch patch)
+    {
+        var changes =
+            patch.EntryId.Map(_ => "entry_id = @EntryId,").Or() +
+            patch.EntryDesignation.Map(_ => "entry_designation = @EntryDesignation,").Or();
+        return changes.TrimEnd(',');
     }
 }

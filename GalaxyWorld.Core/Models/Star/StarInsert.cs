@@ -28,5 +28,5 @@ public class StarInsert
     public decimal? VelocityZ { get; init; }
     public string? SpectralType { get; init; }
     public string? SpectralTypeSrc { get; init; }
-    public IEnumerable<CatalogueStarEntryStar>? CatalogueEntries { get; init; }
+    public IEnumerable<CatalogueEntryInsertWithStar>? CatalogueEntries { get; init; }
 }

@@ -39,12 +39,14 @@ public static class SortExt
         };
     }
 
-    public static string ToSql(this CatalogueStarEntrySort sort)
+    public static string ToSql(this CatalogueEntrySort sort)
     {
         return sort switch
         {
-            CatalogueStarEntrySort.EntryId => "ORDER BY entry_id",
-            CatalogueStarEntrySort.EntryIdDsc => "ORDER BY entry_id DESC",
+            CatalogueEntrySort.EntryId => "ORDER BY entry_id",
+            CatalogueEntrySort.EntryIdDsc => "ORDER BY entry_id DESC",
+            CatalogueEntrySort.EntryDesignation => "ORDER BY entry_designation",
+            CatalogueEntrySort.EntryDesignationDsc => "ORDER BY entry_designation DESC",
             _ => "",
         };
     }

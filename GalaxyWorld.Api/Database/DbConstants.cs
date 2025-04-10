@@ -15,9 +15,11 @@ public static class DbConstants
         { "constellations_nasa_abbr_key", "Constellation NASA abbreviation already taken." },
         { "constellations_nasa_abbr_check", "Constellation NASA abbreviation must be exactly 4 letters." },
         
-        { "catalogue_star_entries_pkey", "Star already in category." },
-        { "catalogue_star_entries_cat_id_fkey", "Category does not exist." },
-        { "catalogue_star_entries_star_id_fkey", "Star does not exist." },
+        { "catalogue_entries_pkey", "Star already in category." },
+        { "catalogue_entries_cat_id_fkey", "Category does not exist." },
+        { "catalogue_entries_star_id_fkey", "Star does not exist." },
+        { "catalogue_entries_entry_id_key", "Entry ID already taken." },
+        { "catalogue_entries_check", "Entry must have either a unique ID or a designation." },
     };
 
     public static string MapConstraintName(string constraint)

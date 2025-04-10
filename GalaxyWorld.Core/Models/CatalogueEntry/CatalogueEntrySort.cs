@@ -1,7 +1,9 @@
 ﻿namespace GalaxyWorld.Core.Models.CatalogueEntry;
 
-public enum CatalogueStarEntrySort
+public enum CatalogueEntrySort
 {
     EntryId,
     EntryIdDsc,
+    EntryDesignation,
+    EntryDesignationDsc,
 }

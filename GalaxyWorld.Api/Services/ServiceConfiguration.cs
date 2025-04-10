@@ -8,7 +8,7 @@ public static class ServiceConfiguration
             .AddScoped<UserService>()
             .AddScoped<StarService>()
             .AddScoped<CatalogueService>()
-            .AddScoped<CatalogueStarEntryService>()
+            .AddScoped<CatalogueEntryService>()
             .AddScoped<ConstellationService>();
     }
 }

@@ -5,7 +5,7 @@ using GalaxyWorld.Core.Models.Star;
 
 namespace GalaxyWorld.API.Database;
 
-public class StarRepository(DbContext db, CatalogueStarEntryRepository catalogueEntryRepo)
+public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntryRepo)
 {
     public async Task<IEnumerable<Star>> Fetch(Page page, StarSort sort)
     {
@@ -108,11 +108,10 @@ public class StarRepository(DbContext db, CatalogueStarEntryRepository catalogue
             {
                 foreach (var entry in insert.CatalogueEntries)
                 {
-                    await catalogueEntryRepo.Insert(new CatalogueStarEntry
+                    await catalogueEntryRepo.Insert(entry.CatId, star.StarId, new CatalogueEntryInsert
                     {
-                        CatId = entry.CatId,
-                        StarId = star.StarId,
                         EntryId = entry.EntryId,
+                        EntryDesignation = entry.EntryDesignation,
                     });
                 }
             }

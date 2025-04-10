@@ -17,16 +17,16 @@ public static class ConstellationEndpoints
         }, sort));
     }
 
-    public static async Task<IResult> GetConstellation(ConstellationService service, int id)
+    public static async Task<IResult> GetConstellation(ConstellationService service, int conId)
     {
-        var constellation = await service.GetOne(id);
+        var constellation = await service.GetOne(conId);
         if (constellation == null) return Results.NotFound();
         return Results.Ok(constellation);
     }
 
-    public static async Task<IResult> GetConstellationStars(StarService service, int id, int start = 0, int length = 100, StarSort sort = default)
+    public static async Task<IResult> GetConstellationStars(StarService service, int conId, int start = 0, int length = 100, StarSort sort = default)
     {
-        var stars = await service.GetByConstellation(id, new Page
+        var stars = await service.GetByConstellation(conId, new Page
         {
             Start = start,
             Length = length,
@@ -40,16 +40,16 @@ public static class ConstellationEndpoints
         return Results.Ok(constellation);
     }
     
-    public static async Task<IResult> PatchConstellation(ConstellationService service, int id, ConstellationPatch patch)
+    public static async Task<IResult> PatchConstellation(ConstellationService service, int conId, ConstellationPatch patch)
     {
-        var constellation = await service.Patch(id, patch);
+        var constellation = await service.Patch(conId, patch);
         if (constellation == null) return Results.NotFound();
         return Results.Ok(constellation);
     }
 
-    public static async Task<IResult> DeleteConstellation(ConstellationService service, int id)
+    public static async Task<IResult> DeleteConstellation(ConstellationService service, int conId)
     {
-        var constellation = await service.Delete(id);
+        var constellation = await service.Delete(conId);
         if (constellation == null) return Results.NotFound();
         return Results.Ok(constellation);
     }
@@ -57,24 +57,32 @@ public static class ConstellationEndpoints
     public static IEndpointRouteBuilder UseConstellationEndpoints(this IEndpointRouteBuilder routes)
     {
         routes.MapGet("/constellations", GetConstellations)
+            .Produces<IEnumerable<Constellation>>()
             .RequireAuthorization();
 
-        routes.MapGet("/constellations/{id:int}", GetConstellation)
-            .Produces(StatusCodes.Status404NotFound)
+        routes.MapGet("/constellations/{conId:int}", GetConstellation)
+            .Produces<Constellation>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization();
 
-        routes.MapGet("/constellations/{id:int}/stars", GetConstellationStars)
+        routes.MapGet("/constellations/{conId:int}/stars", GetConstellationStars)
+            .Produces<IEnumerable<Star>>()
             .RequireAuthorization();
 
         routes.MapPost("/constellations", PostConstellation)
+            .Produces<Constellation>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
         
-        routes.MapPatch("/constellations/{id:int}", PatchConstellation)
-            .Produces(StatusCodes.Status404NotFound)
+        routes.MapPatch("/constellations/{conId:int}", PatchConstellation)
+            .Produces<Constellation>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
 
-        routes.MapDelete("/constellations/{id:int}", DeleteConstellation)
-            .Produces(StatusCodes.Status404NotFound)
+        routes.MapDelete("/constellations/{conId:int}", DeleteConstellation)
+            .Produces<Constellation>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
 
         return routes;

@@ -7,6 +7,7 @@ public static class EndpointConfiguration
         return routes
             .UseStarEndpoints()
             .UseCatalogueEndpoints()
+            .UseCatalogueEntryEndpoints()
             .UseConstellationEndpoints();
     }
 }

@@ -12,7 +12,7 @@ public static class DbConfiguration
             .AddScoped<UserRepository>()
             .AddScoped<StarRepository>()
             .AddScoped<CatalogueRepository>()
-            .AddScoped<CatalogueStarEntryRepository>()
+            .AddScoped<CatalogueEntryRepository>()
             .AddScoped<ConstellationRepository>();
     }
 }

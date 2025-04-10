@@ -29,7 +29,7 @@ class Program
         public required string? DrawConstellationPath { get; init; }
     }
 
-    public const string ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM3ZTA0NDY1NjQ5ZmZhNjA2NTU3NjUwYzdlNjVmMGE4N2FlMDBmZTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIyNDk2MjE3MDQ0MjgzMTQ3OTIiLCJlbWFpbCI6Imx1a2UuZGF2aXNAYmJkLmNvLnphIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJMQjFHamlXa3liR20xSlB5UGpFWGxRIiwibmFtZSI6Ikx1a2UgRGF2aXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3VhaEdvQXo3RlNVYlpwcmhwSFV2NUlQMldTSmRjWlYyWWR1eEg1dWJnN2VZcXB3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ikx1a2UiLCJmYW1pbHlfbmFtZSI6IkRhdmlzIiwiaWF0IjoxNzQ0MTQxNTM2LCJleHAiOjE3NDQxNDUxMzZ9.bxGoMjgU_2tjAanZojyJIxcHUKh3RiZsp_5mGILwCYxB5F6EIH-AFuUmaQNXq9OnGh5do4WKVaM50plxjhGoCBmv_OFPzWbovbLNfbNeKtq68ne8SgYOepgbd43khivZrE--tDA0XN5txDMDcnbFZjACUJ_2hPYnsHK-IDjJ_OFw37O4lrVN1t_R7S2SeB6YuZxqMEs7R_wkYmX3b8Ty47niMRKaU0wHMetCxCqSzZlvt6r8hNbHdLsDZfnxYBNaCX9elhPRvdw3kw30vxO7IZOPpi2qyr1eVIBJV4tri9NMjhgYnWzviNL4QmW5uFX2uJHOHlBBk4ER7dvQkKpWgg";
+    public const string ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM3ZTA0NDY1NjQ5ZmZhNjA2NTU3NjUwYzdlNjVmMGE4N2FlMDBmZTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIyNDk2MjE3MDQ0MjgzMTQ3OTIiLCJlbWFpbCI6Imx1a2UuZGF2aXNAYmJkLmNvLnphIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJkMTZqRG8tdVVJWUdPczFXZmt2WUtnIiwibmFtZSI6Ikx1a2UgRGF2aXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3VhaEdvQXo3RlNVYlpwcmhwSFV2NUlQMldTSmRjWlYyWWR1eEg1dWJnN2VZcXB3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ikx1a2UiLCJmYW1pbHlfbmFtZSI6IkRhdmlzIiwiaWF0IjoxNzQ0Mjg5NDgyLCJleHAiOjE3NDQyOTMwODJ9.r82Y1dhxSqCaYjwkb2Z1CsVPScroxL8-ZoRQDI7_phGeXSHE7IG9QYInVfo-O2sR-kpPuwlq9h5LDp2jk5wrwKH2vGtUFBoLbgvc6okr89cuETXZzqF3N7ZOdEr8sQUq1IsF489ZBFU5OL0drWlV5bSjTW_DHP1QntJUqmDg8QBr8AJrEMzGqyll895bZco0_ceIQDVa76DQQZhTawvEWPISM72geOUik8F_upO00VJak77PaSLq9XacevQSyrHzY5KEdX13NZ0j38ivYjcnCISzf0slHd1zUVaNcNlBHuWzPtImkovtbwCwIN4nhcuPOJmoxYT1_fR3cqI3e9UPkQ";
 
     public static void Main(string[] args)
     {
@@ -152,23 +152,23 @@ class Program
 
             record.Tycho2Id = NormaliseNullableString(record.Tycho2Id);
             record.GlieseId = NormaliseNullableString(record.GlieseId);
-            record.BayerId = NormaliseNullableString(record.BayerId);
+            record.BayerDesignation = NormaliseNullableString(record.BayerDesignation);
 
             var constellationGenetive = constellation;
 
-            if (record.BayerId != null && constellation != null)
-                record.BayerId = $"{record.BayerId} {constellation.Genitive}";
+            if (record.BayerDesignation != null && constellation != null)
+                record.BayerDesignation = $"{record.BayerDesignation} {constellation.Genitive}";
             else
-                record.BayerId = null;
+                record.BayerDesignation = null;
 
-            string? flamsteedId = null;
-            if (record.FlamsteedId != null && constellation != null)
-                flamsteedId = $"{record.FlamsteedId} {constellation.Genitive}";
+            string? flamsteedDesignation = null;
+            if (record.FlamsteedDesignation != null && constellation != null)
+                flamsteedDesignation = $"{record.FlamsteedDesignation} {constellation.Genitive}";
 
-            var catEntries = new List<CatalogueStarEntryStar>();
+            var catEntries = new List<CatalogueEntryInsertWithStar>();
             if (record.AthygId.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = athygCatId,
                     EntryId = record.AthygId.ToString()!,
@@ -177,7 +177,7 @@ class Program
             }
             if (!string.IsNullOrWhiteSpace(record.Tycho2Id))
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = tycho2CatId,
                     EntryId = record.Tycho2Id,
@@ -186,7 +186,7 @@ class Program
             }
             if (record.GaiaDr3Id.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = gaiaDr3CatId,
                     EntryId = record.GaiaDr3Id.ToString()!,
@@ -195,7 +195,7 @@ class Program
             }
             if (record.HygV3Id.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = hygV3CatId,
                     EntryId = record.HygV3Id.ToString()!,
@@ -204,7 +204,7 @@ class Program
             }
             if (record.HipparcosId.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = hipparcosCatId,
                     EntryId = record.HipparcosId.ToString()!,
@@ -213,7 +213,7 @@ class Program
             }
             if (record.HenryDraperId.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = henryDraperCatId,
                     EntryId = record.HenryDraperId.ToString()!,
@@ -222,7 +222,7 @@ class Program
             }
             if (record.HarvardYaleId.HasValue)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = harvardYaleCatId,
                     EntryId = record.HarvardYaleId.ToString()!,
@@ -231,28 +231,28 @@ class Program
             }
             if (!string.IsNullOrWhiteSpace(record.GlieseId))
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = glieseCatId,
                     EntryId = record.GlieseId,
                 };
                 catEntries.Add(catEntry);
             }
-            if (!string.IsNullOrWhiteSpace(record.BayerId))
+            if (!string.IsNullOrWhiteSpace(record.BayerDesignation))
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = bayerCatId,
-                    EntryId = record.BayerId,
+                    EntryDesignation = record.BayerDesignation,
                 };
                 catEntries.Add(catEntry);
             }
-            if (flamsteedId != null)
+            if (flamsteedDesignation != null)
             {
-                var catEntry = new CatalogueStarEntryStar
+                var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = flamsteedCatId,
-                    EntryId = flamsteedId,
+                    EntryDesignation = flamsteedDesignation,
                 };
                 catEntries.Add(catEntry);
             }

@@ -10,8 +10,8 @@ public class StarRecord
     public int? HenryDraperId { get; set; }
     public int? HarvardYaleId { get; set; }
     public string? GlieseId { get; set; }
-    public string? BayerId { get; set; }
-    public int? FlamsteedId { get; set; }
+    public string? BayerDesignation { get; set; }
+    public int? FlamsteedDesignation { get; set; }
     public string? Constellation { get; set; }
     public string? ProperName { get; set; }
     public required decimal RightAscension { get; set; }
@@ -47,8 +47,8 @@ public class StarRecord
         { "HenryDraperId", "hd" },
         { "HarvardYaleId", "hr" },
         { "GlieseId", "gl" },
-        { "BayerId", "bayer" },
-        { "FlamsteedId", "flam" },
+        { "BayerDesignation", "bayer" },
+        { "FlamsteedDesignation", "flam" },
         { "Constellation", "con" },
         { "ProperName", "proper" },
         { "RightAscension", "ra" },
