@@ -9,7 +9,7 @@ public class CatalogueEntryRepository(DbContext db)
     public async Task<IEnumerable<CatalogueEntry>> FetchByStar(int starId, Page page, CatalogueEntrySort sort)
     {
         var conn = db.Connection;
-        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_star_entries WHERE star_id = @starId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
+        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE star_id = @starId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
         {
             starId,
             page.Start,
@@ -21,7 +21,7 @@ public class CatalogueEntryRepository(DbContext db)
     public async Task<IEnumerable<CatalogueEntry>> FetchByCatalogue(int catId, Page page, CatalogueEntrySort sort)
     {
         var conn = db.Connection;
-        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_star_entries WHERE cat_id = @catId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
+        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
         {
             catId,
             page.Start,
@@ -33,7 +33,7 @@ public class CatalogueEntryRepository(DbContext db)
     public async Task<CatalogueEntry?> FetchOne(int catId, int starId)
     {
         var conn = db.Connection;
-        var starCatalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>($"SELECT * FROM catalogue_star_entries WHERE cat_id = @catId AND star_id = @starId", new
+        var starCatalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId AND star_id = @starId", new
         {
             catId,
             starId,
@@ -46,7 +46,7 @@ public class CatalogueEntryRepository(DbContext db)
         var conn = db.Connection;
         var catalogue = await conn.QueryFirstAsync<CatalogueEntry>(
             """
-            INSERT INTO catalogue_star_entries (
+            INSERT INTO catalogue_entries (
                 cat_id,
                 star_id,
                 entry_id,
@@ -73,7 +73,7 @@ public class CatalogueEntryRepository(DbContext db)
     {
         var conn = db.Connection;
         var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>(
-            $"UPDATE catalogue_star_entries SET {patch.ToSql()} WHERE cat_id = @catId AND star_id = @starId RETURNING *",
+            $"UPDATE catalogue_entries SET {patch.ToSql()} WHERE cat_id = @catId AND star_id = @starId RETURNING *",
             new
             {
                 catId,
@@ -88,7 +88,7 @@ public class CatalogueEntryRepository(DbContext db)
     public async Task<CatalogueEntry?> Delete(int catId, int starId)
     {
         var conn = db.Connection;
-        var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>("DELETE FROM catalogue_star_entries WHERE cat_id = @catId AND star_id = @starId RETURNING *", new
+        var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>("DELETE FROM catalogue_entries WHERE cat_id = @catId AND star_id = @starId RETURNING *", new
         {
             starId,
             catId,

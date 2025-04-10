@@ -31,8 +31,9 @@ CREATE TABLE stars (
 CREATE TABLE catalogue_entries (
     cat_id int not null references catalogues(cat_id) on update cascade,
     star_id int not null references stars(star_id) on update cascade on delete cascade,
-    entry_id varchar(32) unique,
+    entry_id varchar(32),
     entry_designation varchar(32),
     primary key (cat_id, star_id),
-    check (entry_id IS NOT NULL OR entry_designation IS NOT NULL)
+    check (entry_id IS NOT NULL OR entry_designation IS NOT NULL),
+    unique (cat_id, entry_id)
 );

@@ -22,13 +22,24 @@ public static class ErrorHandlingConfiguration
                     return new ProblemDetails
                     {
                         Status = StatusCodes.Status400BadRequest,
+                        Title = "Constraint Failed",
                         Detail = DbConstants.MapConstraintName(ex.ConstraintName),
                     };
                 }
                 logger.LogError($"DB query failed: {ex}");
                 return new ProblemDetails
                 {
+                    Title = "Internal Server Error",
                     Status = StatusCodes.Status500InternalServerError,
+                };
+            });
+            options.Map<BadHttpRequestException>(ex =>
+            {
+                return new ProblemDetails
+                {
+                    Title = "Bad Request",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = ex.Message,
                 };
             });
         });

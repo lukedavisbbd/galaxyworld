@@ -18,7 +18,7 @@ public static class DbConstants
         { "catalogue_entries_pkey", "Star already in category." },
         { "catalogue_entries_cat_id_fkey", "Category does not exist." },
         { "catalogue_entries_star_id_fkey", "Star does not exist." },
-        { "catalogue_entries_entry_id_key", "Entry ID already taken." },
+        { "catalogue_entries_cat_id_entry_id_key", "Entry ID already taken." },
         { "catalogue_entries_check", "Entry must have either a unique ID or a designation." },
     };
 

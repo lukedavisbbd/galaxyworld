@@ -32,10 +32,10 @@ internal class DrawConstellation
 
     public static void DrawStars(Constellation constellation, List<Star> stars)
     {
-        var raMin = decimal.MaxValue;
-        var raMax = decimal.MinValue;
-        var decMin = decimal.MaxValue;
-        var decMax = decimal.MinValue;
+        var raMin = double.MaxValue;
+        var raMax = double.MinValue;
+        var decMin = double.MaxValue;
+        var decMax = double.MinValue;
 
         foreach (var star in stars)
         {
@@ -55,16 +55,16 @@ internal class DrawConstellation
         var width = Console.WindowWidth;
         var height = Console.WindowHeight;
 
-        var newRaDelta = (decimal)width / height * decDelta / 16;
+        var newRaDelta = (double)width / height * decDelta / 16;
         raMin -= (newRaDelta - raDelta) / 2;
         raMax += (newRaDelta - raDelta) / 2;
         raDelta = newRaDelta;
 
         //// add 10% space on each side
-        raMin -= raDelta * 0.1m;
-        raMax += raDelta * 0.1m;
-        decMin -= decDelta * 0.1m;
-        decMax += decDelta * 0.1m;
+        raMin -= raDelta * 0.1;
+        raMax += raDelta * 0.1;
+        decMin -= decDelta * 0.1;
+        decMax += decDelta * 0.1;
         raDelta = raMax - raMin;
         decDelta = decMax - decMin;
 
@@ -82,8 +82,8 @@ internal class DrawConstellation
 
         foreach (var star in stars)
         {
-            var x = (int)decimal.Round((star.RightAscension - raMin) / raDelta * width);
-            var y = (int)decimal.Round((star.Declination - decMin) / decDelta * height);
+            var x = (int)double.Round((star.RightAscension - raMin) / raDelta * width);
+            var y = (int)double.Round((star.Declination - decMin) / decDelta * height);
             if (x < 0 || y < 0 || x >= width || y >= height) continue;
 
             const string CHARSET = "X*.";

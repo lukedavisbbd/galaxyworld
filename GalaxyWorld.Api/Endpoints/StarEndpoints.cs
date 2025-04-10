@@ -2,6 +2,8 @@
 using GalaxyWorld.Core.Models.Star;
 using GalaxyWorld.API.Services;
 using GalaxyWorld.Core.Models;
+using Npgsql;
+using GalaxyWorld.API.Database;
 
 namespace GalaxyWorld.API.Endpoints;
 
@@ -29,15 +31,34 @@ public static class StarEndpoints
         return Results.Ok(star);
     }
 
-    public static async Task<IResult> PostStars(StarService service, List<StarInsert> inserts)
+    public static async Task<IResult> PostStarsBulk(StarService service, List<StarInsert> inserts, ILogger<Star> logger)
     {
-        var stars = new List<Star>();
-        foreach (var insert in inserts)
+        logger.LogDebug($"received bulk insert request for {inserts.Count} stars");
+        var stars = new List<StarBulkResponse>();
+        for (var i = 0; i < inserts.Count; i++)
         {
-            var star = await service.Create(insert);
-            stars.Add(star);
+            var insert = inserts[i];
+            try
+            {
+                var star = await service.Create(insert);
+                stars.Add(new StarBulkResponse
+                {
+                    Status = Status.Success,
+                    Star = star,
+                });
+                logger.LogTrace($"inserted star {i}/{inserts.Count}");
+            }
+            catch (PostgresException e) when (e.ConstraintName != null)
+            {
+                stars.Add(new StarBulkResponse
+                {
+                    Status = Status.Failure,
+                    Error = DbConstants.MapConstraintName(e.ConstraintName),
+                });
+                logger.LogTrace($"star {i}/{inserts.Count} failed constraint {e.ConstraintName}: {e}");
+            }
         }
-        return Results.Ok(stars);
+        return Results.Json(stars, statusCode: StatusCodes.Status207MultiStatus);
     }
 
     public static async Task<IResult> PatchStar(StarService service, int starId, StarPatch patch)
@@ -70,8 +91,8 @@ public static class StarEndpoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
         
-        routes.MapPost("/stars/bulk", PostStars)
-            .Produces<IEnumerable<Star>>()
+        routes.MapPost("/stars/bulk", PostStarsBulk)
+            .Produces<StarBulkResponse>(StatusCodes.Status207MultiStatus)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
 

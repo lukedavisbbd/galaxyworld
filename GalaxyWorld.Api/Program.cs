@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using GalaxyWorld.API.Auth;
 using GalaxyWorld.API.Database;
 using GalaxyWorld.API.Endpoints;
@@ -16,6 +17,10 @@ builder.Logging.ClearProviders()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMvcCore();
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.ConfigureAuth(builder.Configuration)
     .ConfigureDb(builder.Configuration)
     .ConfigureServices()
@@ -29,13 +34,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    //builder.Configuration.AddJsonFile("")
 }
 
 app.UseHttpsRedirection()
+    .UseProblemDetails()
     .UseAuthentication()
-    .UseAuthorization()
-    .UseProblemDetails();
+    .UseAuthorization();
 
 app.ConfigureEndpoints();
 

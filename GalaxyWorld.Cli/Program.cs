@@ -1,12 +1,15 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CommandLine;
 using CsvHelper;
 using CsvHelper.Configuration;
 using GalaxyWorld.Cli.Commands;
 using GalaxyWorld.Cli.Models;
+using GalaxyWorld.Core.Models;
 using GalaxyWorld.Core.Models.Catalogue;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Core.Models.Constellation;
@@ -17,26 +20,36 @@ namespace GalaxyWorld.Cli;
 class Program
 {
     public const string BASE_URL = "https://localhost:4433";
-    public const int BATCH_SIZE = 500;
+    public const int BATCH_SIZE = 100;
 
     private static HttpClient client = new HttpClient();
+    private static JsonSerializerOptions JsonOptions { get {
+            var options = new JsonSerializerOptions {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
+        }
+    }
 
     private class Options
     {
-        [Option("uploadCsv", HelpText = "Upload CSV file of containing stars in the ATHYG database format.")]
-        public required string? UploadCsvPath { get; init; }
-        [Option("drawConstellation", HelpText = "Draw.")]
+        [Option("uploadAthygCsv", HelpText = "Upload CSV file of containing stars in the ATHYG database format.")]
+        public required string? UploadAthygCsvPath { get; init; }
+        [Option("skipFailures", HelpText = "For bulk operations, do not print or take action on failures.")]
+        public required bool SkipFailures { get; init; } = false;
+        [Option("drawConstellation", HelpText = "Draw constellation.")]
         public required string? DrawConstellationPath { get; init; }
     }
 
-    public const string ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM3ZTA0NDY1NjQ5ZmZhNjA2NTU3NjUwYzdlNjVmMGE4N2FlMDBmZTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIyNDk2MjE3MDQ0MjgzMTQ3OTIiLCJlbWFpbCI6Imx1a2UuZGF2aXNAYmJkLmNvLnphIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiJkMTZqRG8tdVVJWUdPczFXZmt2WUtnIiwibmFtZSI6Ikx1a2UgRGF2aXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3VhaEdvQXo3RlNVYlpwcmhwSFV2NUlQMldTSmRjWlYyWWR1eEg1dWJnN2VZcXB3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ikx1a2UiLCJmYW1pbHlfbmFtZSI6IkRhdmlzIiwiaWF0IjoxNzQ0Mjg5NDgyLCJleHAiOjE3NDQyOTMwODJ9.r82Y1dhxSqCaYjwkb2Z1CsVPScroxL8-ZoRQDI7_phGeXSHE7IG9QYInVfo-O2sR-kpPuwlq9h5LDp2jk5wrwKH2vGtUFBoLbgvc6okr89cuETXZzqF3N7ZOdEr8sQUq1IsF489ZBFU5OL0drWlV5bSjTW_DHP1QntJUqmDg8QBr8AJrEMzGqyll895bZco0_ceIQDVa76DQQZhTawvEWPISM72geOUik8F_upO00VJak77PaSLq9XacevQSyrHzY5KEdX13NZ0j38ivYjcnCISzf0slHd1zUVaNcNlBHuWzPtImkovtbwCwIN4nhcuPOJmoxYT1_fR3cqI3e9UPkQ";
+    public const string ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM3ZTA0NDY1NjQ5ZmZhNjA2NTU3NjUwYzdlNjVmMGE4N2FlMDBmZTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIyNDk2MjE3MDQ0MjgzMTQ3OTIiLCJlbWFpbCI6Imx1a2UuZGF2aXNAYmJkLmNvLnphIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiI5NjhGWDJvZUtTRm93NXVYcHlkZ3d3IiwibmFtZSI6Ikx1a2UgRGF2aXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3VhaEdvQXo3RlNVYlpwcmhwSFV2NUlQMldTSmRjWlYyWWR1eEg1dWJnN2VZcXB3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ikx1a2UiLCJmYW1pbHlfbmFtZSI6IkRhdmlzIiwiaWF0IjoxNzQ0MzAyOTQwLCJleHAiOjE3NDQzMDY1NDB9.dP8R1TXQg6BL4LDqNezXvbFRfEZ_E-3-ddEa2G04H5m1tsE1hvhdLDBQ79m39INOTVl7CsvHi3ajR9g_FIGsb6UK_BhmNcCvymC22-iF0L5OfHBlUdHlMBqJIrKw8xEw4dLmsENpG_WKPr-5aSP3FvDzebUPJHzHOIFtsgrfRZ94xFC4DwaYXhPeFGzoSqMzDs-vqLeZvg0PO6gWs-0DFgMIs9i1rYHvVBFE1PLzoejofZqf93IswyGSDNK2QqFZoh-QKocS5KCi_kiQ2S-pTQarBbS2ur24k6O8Vsm37nz6RzylmegMzBhgXmeH4MXhIUjQRlaXZ9l4Xztgg3bMqg";
 
     public static void Main(string[] args)
     {
         Parser.Default.ParseArguments<Options>(args)
             .WithParsed(options =>
             {
-                if (options.UploadCsvPath != null)
+                if (options.UploadAthygCsvPath != null)
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ID_TOKEN);
 
@@ -44,7 +57,7 @@ class Program
                     
                     try
                     {
-                        reader = new StreamReader(options.UploadCsvPath);
+                        reader = new StreamReader(options.UploadAthygCsvPath);
                     }
                     catch (IOException ex)
                     {
@@ -68,7 +81,7 @@ class Program
                     var csv = new CsvReader(reader, config);
                     var records = csv.GetRecords<StarRecord>();
 
-                    AddStars(records).Wait();
+                    AddStars(records, options.SkipFailures).Wait();
                 }
                 if (options.DrawConstellationPath != null)
                 {
@@ -91,7 +104,7 @@ class Program
             });
     }
 
-    static async Task AddStars(IEnumerable<StarRecord> starRecords)
+    static async Task AddStars(IEnumerable<StarRecord> starRecords, bool skipFailures)
     {
         var constellations = await client.GetFromJsonAsync<List<Constellation>>($"{BASE_URL}/constellations")
             ?? throw new ArgumentNullException();
@@ -103,23 +116,44 @@ class Program
         var batches = starRecords.Chunk(BATCH_SIZE);
 
         var i = 0;
+
+        var totalFailures = 0;
+
         foreach (var batch in batches)
         {
+            Console.WriteLine($"Uploading star batch #{i} of {batch.Length} stars");
             try
             {
-                await UploadBatch(batch, constellations, catalogues);
+                var stars = await UploadBatch(batch, constellations, catalogues);
+                
+                var successes = stars.Where(s => s.Status == Status.Success).Count();
+                var failures = stars.Where(s => s.Status == Status.Failure).Count();
+                var failureReasons = stars.Select((star, index) => (star, index)).Where((s) => s.star.Status == Status.Failure)
+                    .Select(s => $"#{s.index + i * BATCH_SIZE}: {s.star.Error}");
+                
+                totalFailures += failures;
+
+                Console.Write($"Added {successes} stars");
+
+                if (failures > 0 && !skipFailures)
+                    Console.Write($", failed to add {failures} stars\n{string.Join("\n", failureReasons)}");
+
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Batch error: {ex}");
+                Console.WriteLine($"All {BATCH_SIZE} stars failed, upload error: {ex}");
+                
+                totalFailures += BATCH_SIZE;
+                
                 throw;
             }
-            Console.WriteLine($"uploaded batch {i}");
+
             i++;
         }
     }
 
-    static async Task UploadBatch(IEnumerable<StarRecord> starRecords, List<Constellation> constellations, List<Catalogue> catalogues)
+    static async Task<IEnumerable<StarBulkResponse>> UploadBatch(IEnumerable<StarRecord> starRecords, List<Constellation> constellations, List<Catalogue> catalogues)
     {
         var athygCatId = catalogues.First(c => c.CatSlug == "athyg").CatId;
         var tycho2CatId = catalogues.First(c => c.CatSlug == "tycho2").CatId;
@@ -189,7 +223,7 @@ class Program
                 var catEntry = new CatalogueEntryInsertWithStar
                 {
                     CatId = gaiaDr3CatId,
-                    EntryId = record.GaiaDr3Id.ToString()!,
+                    EntryDesignation = record.GaiaDr3Id.ToString()!,
                 };
                 catEntries.Add(catEntry);
             }
@@ -290,19 +324,10 @@ class Program
         }).ToList();
 
         var response = await client.PostAsJsonAsync($"{BASE_URL}/stars/bulk", starInserts);
-        var stars = await response.Content.ReadFromJsonAsync<List<Star>>()
+        var stars = await response.Content.ReadFromJsonAsync<List<StarBulkResponse>>(JsonOptions)
             ?? throw new ArgumentNullException();
 
-        // AthygId athyg
-        // Tycho2Id tycho2
-        // GaiaDr3Id gaia3
-        // HygV3Id hyg
-        // HipparcosId hipparcos
-        // HenryDraperId hd
-        // HarvardYaleId ybs
-        // GlieseId gliese
-        // BayerId bayer
-        // FlamsteedId flamsteed
+        return stars;
     }
 
     static string? NormaliseNullableString(string? str)
