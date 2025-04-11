@@ -6,10 +6,14 @@ namespace GalaxyWorld.API.Database;
 
 public class CatalogueRepository(DbContext db)
 {
-    public async Task<IEnumerable<Catalogue>> Fetch(Page page, CatalogueSort sort)
+    public async Task<IEnumerable<Catalogue>> Fetch(Page page, CatalogueSort sort, Filter<Catalogue>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.AddDynamicParams(filters.ToParams());
+        
         var conn = db.Connection;
-        var catalogues = await conn.QueryAsync<Catalogue>($"SELECT * FROM catalogues {sort.ToSql()} LIMIT @Length OFFSET @Start", page);
+        var catalogues = await conn.QueryAsync<Catalogue>($"SELECT * FROM catalogues {filters.ToSql(FilterPrepend.Where)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
+        
         return catalogues;
     }
 

@@ -42,4 +42,19 @@ public static class DbConstants
 
         return constraint;
     }
+
+    public static string MapPropertyName(string pascalCase)
+    {
+        var snakeCase = "";
+
+        foreach (var c in pascalCase.ToCharArray())
+        {
+            if (char.IsUpper(c))
+                snakeCase += '_';
+            
+            snakeCase += char.ToLower(c);
+        }
+
+        return snakeCase.TrimStart('_');
+    }
 }

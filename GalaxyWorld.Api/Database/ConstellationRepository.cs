@@ -6,10 +6,14 @@ namespace GalaxyWorld.API.Database;
 
 public class ConstellationRepository(DbContext db)
 {
-    public async Task<IEnumerable<Constellation>> Fetch(Page page, ConstellationSort sort)
+    public async Task<IEnumerable<Constellation>> Fetch(Page page, ConstellationSort sort, Filter<Constellation>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.AddDynamicParams(filters.ToParams());
+
         var conn = db.Connection;
-        var constellations = await conn.QueryAsync<Constellation>($"SELECT * FROM constellations {sort.ToSql()} LIMIT @Length OFFSET @Start", page);
+        var constellations = await conn.QueryAsync<Constellation>($"SELECT * FROM constellations {filters.ToSql(FilterPrepend.Where)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
+        
         return constellations;
     }
 

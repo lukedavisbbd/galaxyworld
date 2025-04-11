@@ -6,9 +6,9 @@ namespace GalaxyWorld.API.Services;
 
 public class CatalogueService(CatalogueRepository repo)
 {
-    public async Task<IEnumerable<Catalogue>> Get(Page page, CatalogueSort sort)
+    public async Task<IEnumerable<Catalogue>> Get(Page page, CatalogueSort sort, Filter<Catalogue>[] filters)
     {
-        return await repo.Fetch(page, sort);
+        return await repo.Fetch(page, sort, filters);
     }
 
     public async Task<Catalogue?> GetOne(int id)

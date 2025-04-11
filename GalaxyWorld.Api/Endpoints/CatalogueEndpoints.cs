@@ -3,18 +3,19 @@ using GalaxyWorld.Core.Models.Catalogue;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.API.Services;
 using GalaxyWorld.Core.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyWorld.API.Endpoints;
 
 public static class CatalogueEndpoints
 {
-    public static async Task<IResult> GetCatalogues(CatalogueService service, int start = 0, int length = 100, CatalogueSort sort = default)
+    public static async Task<IResult> GetCatalogues(CatalogueService service, [FromQuery] Filter<Catalogue>[] filter, int start = 0, int length = 100, CatalogueSort sort = default)
     {
         return Results.Ok(await service.Get(new Page
         {
             Length = int.Max(length, 0),
             Start = int.Max(start, 0),
-        }, sort));
+        }, sort, filter));
     }
 
     public static async Task<IResult> GetCatalogue(CatalogueService service, int catId)

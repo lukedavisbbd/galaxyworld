@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Text.Json;
+using Dapper;
 using GalaxyWorld.Core.Models;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Core.Models.Star;
@@ -7,22 +8,25 @@ namespace GalaxyWorld.API.Database;
 
 public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntryRepo)
 {
-    public async Task<IEnumerable<Star>> Fetch(Page page, StarSort sort)
+    public async Task<IEnumerable<Star>> Fetch(Page page, StarSort sort, Filter<Star>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.AddDynamicParams(filters.ToParams());
+        
         var conn = db.Connection;
-        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars {sort.ToSql()} LIMIT @Length OFFSET @Start", page);
+        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars {filters.ToSql(FilterPrepend.Where)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
+        
         return stars;
     }
 
-    public async Task<IEnumerable<Star>> FetchByConstellation(int constellation, Page page, StarSort sort)
+    public async Task<IEnumerable<Star>> FetchByConstellation(int constellation, Page page, StarSort sort, Filter<Star>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.Add("constellation", constellation);
+        parameters.AddDynamicParams(filters.ToParams());
+
         var conn = db.Connection;
-        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars WHERE constellation = @constellation {sort.ToSql()} LIMIT @Length OFFSET @Start", new
-        {
-            constellation,
-            page.Start,
-            page.Length,
-        });
+        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars WHERE constellation = @constellation {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
         return stars;
     }
 

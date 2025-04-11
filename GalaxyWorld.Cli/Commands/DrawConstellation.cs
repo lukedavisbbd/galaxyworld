@@ -60,7 +60,7 @@ internal class DrawConstellation
         raMax += (newRaDelta - raDelta) / 2;
         raDelta = newRaDelta;
 
-        //// add 10% space on each side
+        // add 10% space on each side
         raMin -= raDelta * 0.1;
         raMax += raDelta * 0.1;
         decMin -= decDelta * 0.1;

@@ -6,9 +6,9 @@ namespace GalaxyWorld.API.Services;
 
 public class ConstellationService(ConstellationRepository repo)
 {
-    public async Task<IEnumerable<Constellation>> Get(Page page, ConstellationSort sort)
+    public async Task<IEnumerable<Constellation>> Get(Page page, ConstellationSort sort, Filter<Constellation>[] filters)
     {
-        return await repo.Fetch(page, sort);
+        return await repo.Fetch(page, sort, filters);
     }
 
     public async Task<Constellation?> GetOne(int id)

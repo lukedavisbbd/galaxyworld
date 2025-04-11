@@ -4,18 +4,19 @@ using GalaxyWorld.API.Services;
 using GalaxyWorld.Core.Models;
 using Npgsql;
 using GalaxyWorld.API.Database;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyWorld.API.Endpoints;
 
 public static class StarEndpoints
 {
-    public static async Task<IResult> GetStars(StarService service, int start = 0, int length = 100, StarSort sort = default)
+    public static async Task<IResult> GetStars(StarService service, [FromQuery] Filter<Star>[] filter, int start = 0, int length = 100, StarSort sort = default)
     {
         return Results.Ok(await service.Get(new Page
         {
             Length = int.Max(length, 0),
             Start = int.Max(start, 0),
-        }, sort));
+        }, sort, filter));
     }
 
     public static async Task<IResult> GetStar(StarService service, int starId)

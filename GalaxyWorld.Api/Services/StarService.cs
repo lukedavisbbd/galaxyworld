@@ -6,14 +6,14 @@ namespace GalaxyWorld.API.Services;
 
 public class StarService(StarRepository repo)
 {
-    public async Task<IEnumerable<Star>> Get(Page page, StarSort sort)
+    public async Task<IEnumerable<Star>> Get(Page page, StarSort sort, Filter<Star>[] filters)
     {
-        return await repo.Fetch(page, sort);
+        return await repo.Fetch(page, sort, filters);
     }
 
-    public async Task<IEnumerable<Star>> GetByConstellation(int constellation, Page page, StarSort sort)
+    public async Task<IEnumerable<Star>> GetByConstellation(int constellation, Page page, StarSort sort, Filter<Star>[] filters)
     {
-        return await repo.FetchByConstellation(constellation, page, sort);
+        return await repo.FetchByConstellation(constellation, page, sort, filters);
     }
 
     public async Task<Star?> GetOne(int id)

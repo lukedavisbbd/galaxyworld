@@ -6,27 +6,25 @@ namespace GalaxyWorld.API.Database;
 
 public class CatalogueEntryRepository(DbContext db)
 {
-    public async Task<IEnumerable<CatalogueEntry>> FetchByStar(int starId, Page page, CatalogueEntrySort sort)
+    public async Task<IEnumerable<CatalogueEntry>> FetchByStar(int starId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.Add("starId", starId);
+        parameters.AddDynamicParams(filters.ToParams());
+
         var conn = db.Connection;
-        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE star_id = @starId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
-        {
-            starId,
-            page.Start,
-            page.Length,
-        });
+        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE star_id = @starId {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
         return starCatalogues;
     }
 
-    public async Task<IEnumerable<CatalogueEntry>> FetchByCatalogue(int catId, Page page, CatalogueEntrySort sort)
+    public async Task<IEnumerable<CatalogueEntry>> FetchByCatalogue(int catId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
+        var parameters = new DynamicParameters(page);
+        parameters.Add("catId", catId);
+        parameters.AddDynamicParams(filters.ToParams());
+
         var conn = db.Connection;
-        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId {sort.ToSql()} LIMIT @Length OFFSET @Start", new
-        {
-            catId,
-            page.Start,
-            page.Length,
-        });
+        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
         return starCatalogues;
     }
 

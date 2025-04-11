@@ -6,14 +6,14 @@ namespace GalaxyWorld.API.Services;
 
 public class CatalogueEntryService(CatalogueEntryRepository repo)
 {
-    public async Task<IEnumerable<CatalogueEntry>> GetByStar(int star, Page page, CatalogueEntrySort sort)
+    public async Task<IEnumerable<CatalogueEntry>> GetByStar(int star, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
-        return await repo.FetchByStar(star, page, sort);
+        return await repo.FetchByStar(star, page, sort, filters);
     }
 
-    public async Task<IEnumerable<CatalogueEntry>> GetByCatalogue(int catId, Page page, CatalogueEntrySort sort)
+    public async Task<IEnumerable<CatalogueEntry>> GetByCatalogue(int catId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
-        return await repo.FetchByCatalogue(catId, page, sort);
+        return await repo.FetchByCatalogue(catId, page, sort, filters);
     }
 
     public async Task<CatalogueEntry?> GetOne(int catId, int starId)

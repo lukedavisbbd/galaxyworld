@@ -2,29 +2,30 @@
 using GalaxyWorld.API.Services;
 using GalaxyWorld.Core.Models;
 using GalaxyWorld.Core.Models.CatalogueEntry;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GalaxyWorld.API.Endpoints;
 
 public static class CatalogueEntryEndpoints
 {
-    public static async Task<IResult> GetCatalogueEntries(CatalogueEntryService service, int catId, int start = 0, int length = 100, CatalogueEntrySort sort = default)
+    public static async Task<IResult> GetCatalogueEntries(CatalogueEntryService service, int catId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
     {
         var entries = await service.GetByCatalogue(catId, new Page
         {
             Start = start,
             Length = length,
-        }, sort);
+        }, sort, filter);
         if (entries == null) return Results.NotFound();
         return Results.Ok(entries);
     }
 
-    public static async Task<IResult> GetStarEntries(CatalogueEntryService service, int starId, int start = 0, int length = 100, CatalogueEntrySort sort = default)
+    public static async Task<IResult> GetStarEntries(CatalogueEntryService service, int starId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
     {
         var star = await service.GetByStar(starId, new Page
         {
             Start = start,
             Length = length,
-        }, sort);
+        }, sort, filter);
         if (star == null) return Results.NotFound();
         return Results.Ok(star);
     }
