@@ -4,6 +4,7 @@ public static class ServiceConfiguration
 {
     public static IServiceCollection ConfigureServices(this IServiceCollection services)
     {
+        services.AddHttpClient<AuthService>();
         return services
             .AddScoped<UserService>()
             .AddScoped<StarService>()

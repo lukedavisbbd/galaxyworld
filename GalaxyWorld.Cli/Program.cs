@@ -9,6 +9,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using GalaxyWorld.Cli.Commands;
 using GalaxyWorld.Cli.Models;
+using GalaxyWorld.Cli.Services;
 using GalaxyWorld.Core.Models;
 using GalaxyWorld.Core.Models.Catalogue;
 using GalaxyWorld.Core.Models.CatalogueEntry;
@@ -23,7 +24,7 @@ class Program
     public const int BATCH_SIZE = 100;
 
     private static HttpClient client = new HttpClient();
-    private static JsonSerializerOptions JsonOptions { get {
+    public static JsonSerializerOptions JsonOptions { get {
             var options = new JsonSerializerOptions {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
@@ -42,16 +43,20 @@ class Program
         public required string? DrawConstellationPath { get; init; }
     }
 
-    public const string ID_TOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImM3ZTA0NDY1NjQ5ZmZhNjA2NTU3NjUwYzdlNjVmMGE4N2FlMDBmZTgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMzg1ODk0ODg4MjYtcm01MG50djN0N2Q2a2k1MzlkYzdlZTJqamY2azViaGsuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTIyNDk2MjE3MDQ0MjgzMTQ3OTIiLCJlbWFpbCI6Imx1a2UuZGF2aXNAYmJkLmNvLnphIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImF0X2hhc2giOiI5NjhGWDJvZUtTRm93NXVYcHlkZ3d3IiwibmFtZSI6Ikx1a2UgRGF2aXMiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3VhaEdvQXo3RlNVYlpwcmhwSFV2NUlQMldTSmRjWlYyWWR1eEg1dWJnN2VZcXB3PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6Ikx1a2UiLCJmYW1pbHlfbmFtZSI6IkRhdmlzIiwiaWF0IjoxNzQ0MzAyOTQwLCJleHAiOjE3NDQzMDY1NDB9.dP8R1TXQg6BL4LDqNezXvbFRfEZ_E-3-ddEa2G04H5m1tsE1hvhdLDBQ79m39INOTVl7CsvHi3ajR9g_FIGsb6UK_BhmNcCvymC22-iF0L5OfHBlUdHlMBqJIrKw8xEw4dLmsENpG_WKPr-5aSP3FvDzebUPJHzHOIFtsgrfRZ94xFC4DwaYXhPeFGzoSqMzDs-vqLeZvg0PO6gWs-0DFgMIs9i1rYHvVBFE1PLzoejofZqf93IswyGSDNK2QqFZoh-QKocS5KCi_kiQ2S-pTQarBbS2ur24k6O8Vsm37nz6RzylmegMzBhgXmeH4MXhIUjQRlaXZ9l4Xztgg3bMqg";
-
     public static void Main(string[] args)
     {
+        AuthService.LoginOAuth2();
+
+        Console.WriteLine(AuthService.AuthToken);
+
+        return;
+
         Parser.Default.ParseArguments<Options>(args)
             .WithParsed(options =>
             {
                 if (options.UploadAthygCsvPath != null)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ID_TOKEN);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.AuthToken);
 
                     StreamReader reader;
                     

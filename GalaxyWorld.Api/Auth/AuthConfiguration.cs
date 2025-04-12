@@ -7,7 +7,7 @@ public static class AuthConfiguration
 {
     public static IServiceCollection ConfigureAuth(this IServiceCollection services, IConfiguration config)
     {
-        services.AddOptions<AuthOptions>();
+        services.AddOptions<AuthOptions>().BindConfiguration(AuthOptions.Section);
         
         var options = config.GetRequiredSection(AuthOptions.Section).Get<AuthOptions>()
             ?? throw new InvalidOperationException("missing google jwt options");
