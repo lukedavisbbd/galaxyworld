@@ -3,6 +3,7 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using ConstellationModel = GalaxyWorld.Core.Models.Constellation.Constellation;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -17,24 +18,27 @@ namespace GalaxyWorld.Cli.Commands.Constellation
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var constellation = await client.GetAsync<ConstellationModel>($"/constellations/{settings.Id}");
-
-            if (constellation is null)
+            
+            try
             {
-                AnsiConsole.MarkupLine("[yellow]No constellation found.[/]");
+                var constellation = await client.GetConstellation(settings.Id);
+
+                var table = new Table().Title("[bold]Constellation Details[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(ConstellationModel).GetProperties())
+                {
+                    var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Constellation Details[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(ConstellationModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

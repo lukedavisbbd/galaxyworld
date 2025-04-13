@@ -2,7 +2,8 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
-using ConstellationModel = GalaxyWorld.Core.Models.Constellation.Constellation;
+using CoreModels = GalaxyWorld.Core.Models;
+using ConstellationModels = GalaxyWorld.Core.Models.Constellation;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -20,27 +21,37 @@ namespace GalaxyWorld.Cli.Commands.Constellation
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var constellation = await client.PatchAsync<object>($"/constellations/{settings.Id}", new
+            
+            try
             {
-                name = settings.Name
-            });
+                var catNameOpt = string.IsNullOrWhiteSpace(settings.Name) ?
+                    new CoreModels::Optional<string>() :
+                    new CoreModels::Optional<string>(catName);
+                var catSlugOpt = string.IsNullOrWhiteSpace(settings.Slug) ?
+                    new CoreModels::Optional<string>() :
+                    new CoreModels::Optional<string>(catSlug);
+                var catalogue = await client.PatchCatalogue(new CatalogueModels::CataloguePatch
+                {
+                    CatName = catNameOpt,
+                    CatSlug = catSlugOpt,
+                });
 
-            if (constellation is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No constellation updated.[/]");
+                var table = new Table().Title("[bold]Catalogue Updated[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(CatalogueModels::Catalogue).GetProperties())
+                {
+                    var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Constellation Updated[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(ConstellationModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

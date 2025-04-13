@@ -2,6 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using ConstellationModel = GalaxyWorld.Core.Models.Constellation.Constellation;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -10,29 +11,38 @@ namespace GalaxyWorld.Cli.Commands.Constellation
         public override async Task<int> ExecuteAsync(CommandContext context)
         {
             var client = new ApiClient();
-            var constellations = await client.GetAsync<List<ConstellationModel>>("/constellations");
 
-            if (constellations is null || constellations.Count == 0)
+            try
             {
-                AnsiConsole.MarkupLine("[yellow]No constellations found.[/]");
+                var constellations = await client.GetConstellations();
+
+                if (constellations.Count == 0)
+                {
+                    AnsiConsole.MarkupLine("[yellow]No constellations found.[/]");
+                    return 0;
+                }
+
+                var table = new Table().Title("[bold]Constellations[/]").AddColumns("ID", "Name", "IauAbbr", "NasaAbbr", "Genitive", "Origin", "Meaning");
+
+                foreach (var constellation in constellations)
+                {
+                    table.AddRow(constellation.ConId.ToString(), 
+                    constellation.ConName, 
+                    constellation.IauAbbr, 
+                    constellation.NasaAbbr, 
+                    constellation.Genitive, 
+                    constellation.Origin, 
+                    constellation.Meaning);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Constellations[/]").AddColumns("ID", "Name", "IauAbbr", "NasaAbbr", "Genitive", "Origin", "Meaning");
-
-            foreach (var constellation in constellations)
+            catch (CliException e)
             {
-                table.AddRow(constellation.ConId.ToString(), 
-                constellation.ConName, 
-                constellation.IauAbbr, 
-                constellation.NasaAbbr, 
-                constellation.Genitive, 
-                constellation.Origin, 
-                constellation.Meaning);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "No constellations found."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

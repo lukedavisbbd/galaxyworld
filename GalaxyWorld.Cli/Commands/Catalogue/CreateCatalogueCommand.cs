@@ -2,46 +2,46 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
-using CatalogueModel = GalaxyWorld.Core.Models.Catalogue.Catalogue;
+using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
+using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue
 {
-    public class CreateCatalogueCommand : AsyncCommand<CreateCatalogueCommand.Settings>
+    public class CreateCatalogueCommand : AsyncCommand
     {
-        public class Settings : CommandSettings
-        {
-            [CommandOption("-n|--name <NAME>")]
-            public string Name { get; set; } = "";
-
-            [CommandOption("-d|--description <DESCRIPTION>")]
-            public string Description { get; set; } = "";
-        }
-
-        public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context)
         {
             var client = new ApiClient();
-            var catalogue = await client.PostAsync<object>("/catalogues", new
-            {
-                name = settings.Name,
-                description = settings.Description
-            });
 
-            if (catalogue is null)
+            var catName = InputHelper.Prompt<string>("Catalogue Name");
+            var defaultSlug = string.Concat(catName.ToLower().Where(c => char.IsAsciiLetter(c) || char.IsAsciiDigit(c) || c == '_'));
+            var catSlug = InputHelper.Prompt<string>("Catalogue Slug", defaultSlug);
+
+            try
             {
-                AnsiConsole.MarkupLine("[yellow]No catalogue created.[/]");
+                var catalogue = await client.PostCatalogue(new CatalogueModels::CatalogueInsert
+                {
+                    CatName = catName,
+                    CatSlug = catSlug,
+                });
+
+                var table = new Table().Title("[bold]Catalogue Created[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(CatalogueModels::Catalogue).GetProperties())
+                {
+                    var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Catalogue Created[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create catalogue."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

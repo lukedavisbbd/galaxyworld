@@ -3,7 +3,8 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Helper;
-using ConstellationModel = GalaxyWorld.Core.Models.Constellation.Constellation;
+using ConstellationModels = GalaxyWorld.Core.Models.Constellation;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -19,29 +20,36 @@ namespace GalaxyWorld.Cli.Commands.Constellation
         {
             var client = new ApiClient();
 
-            // var payload = new ConstellationModel::ConstellationInsert 
-
-            var constellation = await client.PostAsync<object>("/constellations", new
+            try
             {
-                name = settings.Name
-            });
+                var payload = new ConstellationModels::ConstellationInsert
+                {
+                    ConName = InputHelper.Prompt<string>("Constellation Name"),
+                    Genitive = InputHelper.Prompt<string>("Genitive Form"),
+                    IauAbbr = InputHelper.Prompt<string>("IAU Abbreviation"),
+                    Meaning = InputHelper.Prompt<string>("Meaning"),
+                    NasaAbbr = InputHelper.Prompt<string>("NASA Abbreviation"),
+                    Origin = InputHelper.Prompt<string>("Origin")
+                };
 
-            if (constellation is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No constellation created.[/]");
+                var constellation = await client.PostConstellation(payload);
+
+                var table = new Table().Title("[bold]Constellation Created[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(ConstellationModels::Constellation).GetProperties())
+                {
+                    var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Constellation Created[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(ConstellationModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create constellation."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

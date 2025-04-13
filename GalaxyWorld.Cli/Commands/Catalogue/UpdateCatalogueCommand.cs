@@ -2,7 +2,8 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
-using CatalogueModel = GalaxyWorld.Core.Models.Catalogue.Catalogue;
+using CoreModels = GalaxyWorld.Core.Models;
+using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue
 {
@@ -16,35 +17,44 @@ namespace GalaxyWorld.Cli.Commands.Catalogue
             [CommandOption("-n|--name <NAME>")]
             public string? Name { get; set; }
 
-            [CommandOption("-d|--description <DESCRIPTION>")]
-            public string? Description { get; set; }
+            [CommandOption("-d|--slug <SLUG>")]
+            public string? Slug { get; set; }
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var catalogue = await client.PatchAsync<object>($"/catalogues/{settings.Id}", new
+            
+            try
             {
-                name = settings.Name,
-                description = settings.Description
-            });
+                var catNameOpt = string.IsNullOrWhiteSpace(settings.Name) ?
+                    new CoreModels::Optional() :
+                    new CoreModels::Optional<string>(catName);
+                var catSlugOpt = string.IsNullOrWhiteSpace(settings.Slug) ?
+                    new CoreModels::Optional() :
+                    new CoreModels::Optional<string>(catSlug);
+                var catalogue = await client.PatchCatalogue(new CatalogueModels::CataloguePatch
+                {
+                    CatName = catNameOpt,
+                    CatSlug = catSlugOpt,
+                });
 
-            if (catalogue is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No catalogue updated.[/]");
+                var table = new Table().Title("[bold]Catalogue Updated[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(CatalogueModels::Catalogue).GetProperties())
+                {
+                    var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Catalogue Updated[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

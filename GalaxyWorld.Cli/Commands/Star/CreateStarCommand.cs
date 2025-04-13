@@ -6,6 +6,7 @@ using GalaxyWorld.Cli.Helper;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
 using StarModels = GalaxyWorld.Core.Models.Star;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Star
 {
@@ -23,6 +24,17 @@ namespace GalaxyWorld.Cli.Commands.Star
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
+
+            var entries = new List<CatalogueEntryInsertWithStar>();
+            while (AnsiConsole.Confirm("Add a catalogue entry?"))
+            {
+                entries.Add(new CatalogueEntryInsertWithStar
+                {
+                    CatId = InputHelper.PromptInt("Catalogue Entry - Cat ID"),
+                    EntryId = InputHelper.PromptString("Catalogue Entry - Entry ID"),
+                    EntryDesignation = InputHelper.PromptString("Catalogue Entry - Designation")
+                });
+            }
 
             var payload = new StarModels::StarInsert
             {
@@ -50,34 +62,34 @@ namespace GalaxyWorld.Cli.Commands.Star
                 VelocityZ = InputHelper.Prompt<double>("Velocity Z"),
                 SpectralType = InputHelper.Prompt<string>("Spectral Type"),
                 SpectralTypeSrc = InputHelper.Prompt<string>("Spectral Type Source"),
-                CatalogueEntries = new CatalogueEntryInsertWithStar[]
-                {
-                    // new {
-                    //     catId = InputHelper.Prompt<int>("Catalogue Entry 1 - Cat ID"),
-                    //     entryId = InputHelper.Prompt<string>("Catalogue Entry 1 - Entry ID"),
-                    //     entryDesignation = InputHelper.Prompt<string>("Catalogue Entry 1 - Designation")
-                    // }
-                }
+                CatalogueEntries = entries
             };
 
-            var star = await client.PostAsync<object>("/stars", payload);
+            try {
+                var star = await client.PostStar(payload);
 
-            if (star is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No star created.[/]");
+                if (star is null)
+                {
+                    AnsiConsole.MarkupLine("[yellow]No star created.[/]");
+                    return 0;
+                }
+
+                var table = new Table().Title("[bold]Star Created[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(StarModels::Star).GetProperties())
+                {
+                    var value = prop.GetValue(star)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Star Created[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(StarModels::Star).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(star)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star"}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

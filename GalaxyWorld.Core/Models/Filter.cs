@@ -26,6 +26,10 @@ public class Filter<T> : IParsable<Filter<T>>
     public required FilterOp FilterOp { get; init; }
     public required object? Value { get; init; }
 
+    public override string ToString() {
+        return $"{PropName}.{FilterOp}.{Value}";
+    }
+
     public static Filter<T> Parse(string s, IFormatProvider? provider)
     {
         if (s == null)

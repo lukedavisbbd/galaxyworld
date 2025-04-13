@@ -17,24 +17,27 @@ namespace GalaxyWorld.Cli.Commands.Catalogue
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var catalogue = await client.GetAsync<CatalogueModel>($"/catalogues/{settings.Id}");
 
-            if (catalogue is null)
+            try
             {
-                AnsiConsole.MarkupLine("[yellow]No catalogue found.[/]");
+                var catalogue = await client.GetCatalogue(settings.Id);
+
+                var table = new Table().Title("[bold]Catalogue Details[/]").AddColumns("Field", "Value");
+
+                foreach (var prop in typeof(CatalogueModel).GetProperties())
+                {
+                    var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
+                    table.AddRow(prop.Name, value);
+                }
+
+                AnsiConsole.Write(table);
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Catalogue Details[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueModel).GetProperties())
+            catch (CliException e)
             {
-                var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

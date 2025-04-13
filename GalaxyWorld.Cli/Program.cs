@@ -5,6 +5,15 @@ using GalaxyWorld.Cli.Commands.Star;
 using GalaxyWorld.Cli.Commands.Constellation;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Commands;
+using GalaxyWorld.Cli.Models;
+using GalaxyWorld.Cli.Services;
+using GalaxyWorld.Core.Models;
+using GalaxyWorld.Core.Models.Catalogue;
+using GalaxyWorld.Core.Models.CatalogueEntry;
+using GalaxyWorld.Core.Models.Constellation;
+using GalaxyWorld.Core.Models.Star;
+
+namespace GalaxyWorld.Cli;
 
 class Program
 {
