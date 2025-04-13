@@ -1,0 +1,61 @@
+name: Build and push
+
+on:
+  push:
+    # branches:
+      # - master
+      # - fix-imports
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./galaxyworld
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./galaxyworld
+
+      - name: Publish
+        run: dotnet publish --configuration Release --no-build --output ./publish
+        working-directory: ./galaxyworld
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: galaxyworld
+          path: ./galaxyworld/publish
+          retention-days: 7
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./galaxyworld/publish
+          asset_name: galaxyworld.zip
+          asset_content_type: application/zip
