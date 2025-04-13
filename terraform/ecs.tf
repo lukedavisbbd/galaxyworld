@@ -1,21 +1,13 @@
 # Data source to get the current AWS account ID
 data "aws_caller_identity" "current" {}
 
-# Data source to get the Secrets Manager secret
-data "aws_secretsmanager_secret" "my_secret" {
-  name = "galaxyworld-gemini-key"
-}
 
-# Data source to get the latest version of the secret
-data "aws_secretsmanager_secret_version" "my_secret_version" {
-  secret_id = data.aws_secretsmanager_secret.my_secret.id
-}
 
-# Local variable to decode the secret string
-locals {
-  db_creds = jsondecode(aws_secretsmanager_secret_version.s-version.secret_string)
-  geminiKey = jsondecode(data.aws_secretsmanager_secret_version.my_secret_version.secret_string)
-}
+
+
+
+
+
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
@@ -43,16 +35,13 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
       },
       {
         name  = "DB_USERNAME"
-        value = local.db_creds.username
+        value = var.rds_db_name
       },
       {
         name  = "DB_PASSWORD"
-        value = local.db_creds.password
+        value = var.rds_db_password
       },
-      {
-        name  = "GEMINI_KEY"
-        value = local.geminiKey.geminiApiKey
-      }
+
     ]
     secrets: [
     ]
