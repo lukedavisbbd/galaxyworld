@@ -5,57 +5,76 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Models;
 
-namespace GalaxyWorld.Cli.ApiHandler
+namespace GalaxyWorld.Cli.ApiHandler;
+
+public class ApiClient
 {
-    public class ApiClient
+    private readonly HttpClient _httpClient;
+    private string baseUrl = ApiStore.BaseUrl;
+
+    public ApiClient()
     {
-        private readonly HttpClient _httpClient;
-        private string baseUrl = ApiStore.BaseUrl;
-        private string token = ApiStore.AccessToken;
-
-        public ApiClient()
+        _httpClient = new HttpClient
         {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(baseUrl)
-            };
+            BaseAddress = new Uri(baseUrl)
+        };
 
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+    }
+
+    public async Task<T?> GetAsync<T>(string endpoint)
+    {
+        var response = await _httpClient.GetAsync(endpoint);
+        
+        if (!response.IsSuccessStatusCode) {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            throw new CliException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        public async Task<T?> GetAsync<T>(string endpoint)
-        {
-            var response = await _httpClient.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
+        return await response.Content.ReadFromJsonAsync<T>();
+    }
+
+    public async Task<T?> PostAsync<T, P>(string endpoint, P payload)
+    {
+        var response = await _httpClient.PostAsJsonAsync(endpoint, payload);
+        
+        if (!response.IsSuccessStatusCode) {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            throw new CliException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        public async Task<T?> PostAsync<T>(string endpoint, object payload)
-        {
-            var response = await _httpClient.PostAsJsonAsync(endpoint, payload);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
+        return await response.Content.ReadFromJsonAsync<T>();
+    }
+
+    public async Task<T?> PatchAsync<T, P>(string endpoint, P payload)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Patch, endpoint);
+        request.Content = JsonContent.Create(payload);
+        var response = await _httpClient.SendAsync(request);
+        
+        if (!response.IsSuccessStatusCode) {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            throw new CliException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        public async Task<T?> PatchAsync<T>(string endpoint, object payload)
-        {
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var method = new HttpMethod("PATCH");
-            var request = new HttpRequestMessage(method, endpoint) { Content = content };
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<T>();
+        return await response.Content.ReadFromJsonAsync<T>();
+    }
+
+    public async Task<bool> DeleteAsync(string endpoint)
+    {
+        var response = await _httpClient.DeleteAsync(endpoint);
+
+        if (!response.IsSuccessStatusCode) {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            throw new CliException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        public async Task<bool> DeleteAsync(string endpoint)
-        {
-            var response = await _httpClient.DeleteAsync(endpoint);
-            return response.IsSuccessStatusCode;
-        }
+        return response.IsSuccessStatusCode;
     }
 }

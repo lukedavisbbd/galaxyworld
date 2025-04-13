@@ -2,6 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
+using CatalogueModel = GalaxyWorld.Core.Models.Catalogue.Catalogue;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue
 {
@@ -16,10 +17,23 @@ namespace GalaxyWorld.Cli.Commands.Catalogue
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var result = await client.GetAsync<object>($"/catalogues/{settings.Id}");
+            var catalogue = await client.GetAsync<CatalogueModel>($"/catalogues/{settings.Id}");
 
-            AnsiConsole.MarkupLine("[bold green]Catalogue Details:[/]");
-            AnsiConsole.WriteLine(result?.ToString() ?? "Not found.");
+            if (catalogue is null)
+            {
+                AnsiConsole.MarkupLine("[yellow]No catalogue found.[/]");
+                return 0;
+            }
+
+            var table = new Table().Title("[bold]Catalogue Details[/]").AddColumns("Field", "Value");
+
+            foreach (var prop in typeof(CatalogueModel).GetProperties())
+            {
+                var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
+                table.AddRow(prop.Name, value);
+            }
+
+            AnsiConsole.Write(table);
             return 0;
         }
     }

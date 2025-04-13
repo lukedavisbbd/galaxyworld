@@ -18,5 +18,12 @@ namespace GalaxyWorld.Cli.Helper
                 new TextPrompt<int>($"[green]{label}[/]")
                     .DefaultValue(defaultValue));
         }
+
+        public static T Prompt<T>(string label, T defaultValue = default) {
+            return AnsiConsole.Prompt(
+                new TextPrompt<T>($"[green]{label}[/]")
+                    .DefaultValue(defaultValue)
+            );
+        }
     }
 }

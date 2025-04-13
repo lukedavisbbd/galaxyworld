@@ -2,6 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
+using StarModel = GalaxyWorld.Core.Models.Star.Star;
 
 namespace GalaxyWorld.Cli.Commands.Star
 {
@@ -22,14 +23,27 @@ namespace GalaxyWorld.Cli.Commands.Star
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var result = await client.PatchAsync<object>($"/stars/{settings.Id}", new
+            var star = await client.PatchAsync<object>($"/stars/{settings.Id}", new
             {
                 name = settings.Name,
                 catalogueId = settings.CatalogueId
             });
 
-            AnsiConsole.MarkupLine("[green]Star updated:[/]");
-            AnsiConsole.WriteLine(result?.ToString());
+            if (star is null)
+            {
+                AnsiConsole.MarkupLine("[yellow]No star updated.[/]");
+                return 0;
+            }
+
+            var table = new Table().Title("[bold]Star Updated[/]").AddColumns("Field", "Value");
+
+            foreach (var prop in typeof(StarModel).GetProperties())
+            {
+                var value = prop.GetValue(star)?.ToString() ?? "[grey]null[/]";
+                table.AddRow(prop.Name, value);
+            }
+
+            AnsiConsole.Write(table);
             return 0;
         }
     }

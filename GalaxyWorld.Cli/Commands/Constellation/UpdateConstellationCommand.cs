@@ -2,6 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
+using ConstellationModel = GalaxyWorld.Core.Models.Constellation.Constellation;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -19,13 +20,26 @@ namespace GalaxyWorld.Cli.Commands.Constellation
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var result = await client.PatchAsync<object>($"/constellations/{settings.Id}", new
+            var constellation = await client.PatchAsync<object>($"/constellations/{settings.Id}", new
             {
                 name = settings.Name
             });
 
-            AnsiConsole.MarkupLine("[green]Constellation updated:[/]");
-            AnsiConsole.WriteLine(result?.ToString());
+            if (constellation is null)
+            {
+                AnsiConsole.MarkupLine("[yellow]No constellation updated.[/]");
+                return 0;
+            }
+
+            var table = new Table().Title("[bold]Constellation Updated[/]").AddColumns("Field", "Value");
+
+            foreach (var prop in typeof(ConstellationModel).GetProperties())
+            {
+                var value = prop.GetValue(constellation)?.ToString() ?? "[grey]null[/]";
+                table.AddRow(prop.Name, value);
+            }
+
+            AnsiConsole.Write(table);
             return 0;
         }
     }
