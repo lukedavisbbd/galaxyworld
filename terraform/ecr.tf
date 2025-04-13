@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "default" {
+resource "aws_ecr_repository" "gw_ecr" {
   name = var.ecr_repo_name
   image_tag_mutability = "MUTABLE"
 }
@@ -14,6 +14,6 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 
 
 output "repository_url" {
-  value = aws_ecr_repository.default.repository_url
+  value = aws_ecr_repository.gw_ecr.repository_url
   sensitive = true
 }

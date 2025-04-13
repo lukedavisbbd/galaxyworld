@@ -7,7 +7,7 @@ resource "random_password" "password" {
 
 # Create a Secrets Manager secret
 resource "aws_secretsmanager_secret" "galaxyworld-secret" {
-  name = "galaxyworld-rds-db-secretss"
+  name = "galaxyworld-rds-db-secrets"
 }
 
 # Create a new version of the secret with the generated password

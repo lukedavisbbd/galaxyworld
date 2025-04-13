@@ -17,3 +17,13 @@ variable "database_name" {
     type = string
     default = "gwdatabase"
 }
+
+variable "ecs_cluster_name" {
+  type = string
+  default = "gw_ecs_cluster"
+}
+
+variable "ecr_repo_name" {
+  type = string
+  default = "galaxy_ecr"
+}
