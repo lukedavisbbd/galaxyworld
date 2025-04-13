@@ -37,7 +37,7 @@ jobs:
         working-directory: ./GalaxyWorld.Cli
 
       - name: Zip Published Output
-        run: zip -r galaxyworld.zip ./GalaxyWorld/publish
+        run: zip -r galaxyworld.zip ./GalaxyWorld.Cli/publish
 
       - name: Upload Artifact (Optional)
         uses: actions/upload-artifact@v4
