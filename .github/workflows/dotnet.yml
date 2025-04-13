@@ -26,15 +26,15 @@ jobs:
         run: ls -R
       - name: Restore Dependencies
         run: dotnet restore
-        working-directory: ./GalaxyWorld/galaxyworld
+        working-directory: ./GalaxyWorld/galaxyworld/GalaxyWorld.Cli
 
       - name: Build Solution
         run: dotnet build --configuration Release --no-restore
-        working-directory: ./GalaxyWorld/galaxyworld
+        working-directory: ./GalaxyWorld/galaxyworld/GalaxyWorld.Cli
 
       - name: Publish App
         run: dotnet publish --configuration Release --no-build --output ./publish
-        working-directory: ./GalaxyWorld/galaxyworld
+        working-directory: ./GalaxyWorld/galaxyworld/GalaxyWorld.Cli
 
       - name: Zip Published Output
         run: zip -r galaxyworld.zip ./GalaxyWorld/publish
