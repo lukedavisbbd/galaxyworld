@@ -1,4 +1,4 @@
-name: Build and Push Docker image to ECR 🚀
+name: Build and Push Docker image to ECR
 
 on:
   push:
@@ -29,15 +29,15 @@ jobs:
 
       - name: Restore Dependencies
         run: dotnet restore
-        working-directory: ./GalaxyWorld
+        working-directory: ./GalaxyWorld/galaxyworld
 
       - name: Build Solution
         run: dotnet build --configuration Release --no-restore
-        working-directory: ./GalaxyWorld
+        working-directory: ./GalaxyWorld/galaxyworld
 
       - name: Publish for Docker
         run: dotnet publish --configuration Release --no-build --output ./publish
-        working-directory: ./GalaxyWorld
+        working-directory: ./GalaxyWorld/galaxyworld
 
       - name: 🔧 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
