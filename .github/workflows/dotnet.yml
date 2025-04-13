@@ -22,9 +22,11 @@ jobs:
         with:
           dotnet-version: '7.0.x'
 
+      - name: Debug folder tree
+        run: ls -R
       - name: Restore Dependencies
         run: dotnet restore
-        working-directory: ./GalaxyWorld
+        working-directory: ./galaxyworld
 
       - name: Build Solution
         run: dotnet build --configuration Release --no-restore
@@ -37,7 +39,7 @@ jobs:
       - name: Zip Published Output
         run: zip -r galaxyworld.zip ./GalaxyWorld/publish
 
-      - name: ⬆️ Upload Artifact (Optional)
+      - name: Upload Artifact (Optional)
         uses: actions/upload-artifact@v4
         with:
           name: galaxyworld
