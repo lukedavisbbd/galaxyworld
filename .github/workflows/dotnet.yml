@@ -1,10 +1,10 @@
-name: Build and push
+name: Build and Release .NET App
 
 on:
   push:
-    # branches:
-      # - master
-      # - fix-imports
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -20,28 +20,33 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
+      - name: Debug folder tree
+        run: ls -R
+      - name: Restore Dependencies
         run: dotnet restore
-        working-directory: ./galaxyworld
+        working-directory: ./GalaxyWorld.Cli
 
-      - name: Build
+      - name: Build Solution
         run: dotnet build --configuration Release --no-restore
-        working-directory: ./galaxyworld
+        working-directory: ./GalaxyWorld.Cli
 
-      - name: Publish
+      - name: Publish App
         run: dotnet publish --configuration Release --no-build --output ./publish
-        working-directory: ./galaxyworld
+        working-directory: ./GalaxyWorld.Cli
 
-      - name: Upload Artifact
+      - name: Zip Published Output
+        run: zip -r galaxyworld.zip ./GalaxyWorld/publish
+
+      - name: Upload Artifact (Optional)
         uses: actions/upload-artifact@v4
         with:
           name: galaxyworld
-          path: ./galaxyworld/publish
+          path: galaxyworld.zip
           retention-days: 7
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: actions/create-release@v1
         id: create_release
         env:
@@ -56,6 +61,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./galaxyworld/publish
+          asset_path: galaxyworld.zip
           asset_name: galaxyworld.zip
           asset_content_type: application/zip
