@@ -1,14 +1,6 @@
 # Data source to get the current AWS account ID
 data "aws_caller_identity" "current" {}
 
-
-
-
-
-
-
-
-
 # ECS Task Definition
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family                   = "fargate-task"

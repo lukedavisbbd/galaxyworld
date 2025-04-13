@@ -17,3 +17,8 @@ output "repository_url" {
   value = aws_ecr_repository.gw_ecr.repository_url
   sensitive = true
 }
+
+output "db_endpoint" {
+  description = "RDS instance endpoint"
+  value       = aws_db_instance.galaxyworld_db_instance.endpoint
+}
