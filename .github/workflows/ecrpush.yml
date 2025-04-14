@@ -14,7 +14,7 @@ jobs:
 
     env:
       IMAGE_TAG: latest
-      AWS_ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }.amazonaws.com$/{{ vars.ecr_repo_name }}
+      AWS_ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }.amazonaws.com/${{ vars.ecr_repo_name }}
       AWS_ECR_REPOSITORY_NAME: ${{ vars.ecr_repo_name }}
 
     steps:
