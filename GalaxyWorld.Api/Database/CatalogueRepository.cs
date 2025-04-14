@@ -56,8 +56,8 @@ public class CatalogueRepository(DbContext db)
             changes + " WHERE cat_id = @catId RETURNING *", new
             {
                 catId,
-                CatName = patch.CatName.Or(),
-                CatSlug = patch.CatSlug.Or(),
+                CatName = patch.CatName.OrDefault(),
+                CatSlug = patch.CatSlug.OrDefault(),
             }
         );
         return catalogue;

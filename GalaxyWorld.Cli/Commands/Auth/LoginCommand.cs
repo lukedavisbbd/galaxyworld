@@ -1,47 +1,79 @@
-﻿using System.Security.Authentication;
+﻿using GalaxyWorld.Cli.ApiHandler;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Properties;
+using GalaxyWorld.Core.Models;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
-using System.Web;
-using System.Diagnostics;
+using System.Security.Authentication;
 using System.Text;
-using System.Text.Json;
-using GalaxyWorld.Core.Models;
-using GalaxyWorld.Cli.Properties;
-using System.Net.Http.Json;
+using System.Web;
+using Spectre.Console;
+using Spectre.Console.Cli;
 
-namespace GalaxyWorld.Cli.Services;
+namespace GalaxyWorld.Cli.Commands.Auth;
 
-public class AuthService
+public class LoginCommand : AsyncCommand
 {
-    public static string AuthToken { get; private set; } = "";
-
     private const string CLIENT_ID = "238589488826-vte0lmfp1tnvfacd9gpfndtme3rgd527.apps.googleusercontent.com";
-    private const string BASE_URL = "https://localhost:4433";
-    private const string BLUE = "";
-    private const string RED = "";
-    private const string GREEN = "";
-    private const string RESET = "";
+    
+    private static string configPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GalaxyWorld");
+    private static string idTokenPath = Path.Join(configPath, "id_token");
 
-    public static bool LoginOAuth2() {
+    public override async Task<int> ExecuteAsync(CommandContext context)
+    {
+        try
+        {
+            await LoginOAuth2();
+            return 0;
+        }
+        catch (AuthenticationException e)
+        {
+            AnsiConsole.MarkupLine(e.Message);
+            return 1;
+        }
+    }
+
+    public static async Task<string?> LoginFromFile()
+    {
+        try
+        {
+            var idToken = await File.ReadAllTextAsync(idTokenPath);
+            var client = new ApiClient(idToken);
+
+            var roles = (await client.GetAuth()).Roles.Select(role => $"'{role}'").ToArray();
+            
+            return idToken;
+        }
+        catch (Exception) {
+            return null;
+        }
+    }
+
+    public static async Task LoginOAuth2()
+    {
+        var token = await LoginFromFile();
+
+        if (token != null) return;
+
         var server = new Socket(SocketType.Stream, ProtocolType.Tcp);
         server.Bind(new IPEndPoint(IPAddress.Loopback, 0));
         server.Listen();
 
-        var port = (server.LocalEndPoint as IPEndPoint)?.Port ?? throw new AuthenticationException("Failed to bind socket.");
+        var port = (server.LocalEndPoint as IPEndPoint)?.Port ?? throw new AppException("Failed to bind socket.");
         var securityToken = Random.Shared.NextInt64(int.MaxValue, long.MaxValue);
         var callbackUri = $"http://{IPAddress.Loopback}:{port}";
 
         string errorMessage = "";
 
         Socket? socket = null;
-        
+
         try
         {
             RequestOAuth2(callbackUri, securityToken);
-            socket = server.Accept();
-            var code = ExtractCode(socket, securityToken);
-            var token = RequestIdToken(code, callbackUri);
-            AuthToken = token;
+            socket = await server.AcceptAsync();
+            var code = await ExtractCode(socket, securityToken);
+            token = await RequestIdToken(code, callbackUri);
         }
         catch (AuthenticationException e)
         {
@@ -53,14 +85,15 @@ public class AuthService
         if (errorMessage.Length > 0)
         {
             responseBytes = (byte[]?)Resources.ResourceManager.GetObject("AuthFailure");
-            Console.WriteLine(RED + "Signed in failed." + RESET);
-        } else
+            AnsiConsole.MarkupLine("[red]Sign in failed.[/]");
+        }
+        else
         {
             responseBytes = (byte[]?)Resources.ResourceManager.GetObject("AuthSuccess");
-            Console.WriteLine(GREEN + "Succesfully signed in!" + RESET);
+            AnsiConsole.MarkupLine("[green]Successfully signed in![/]");
         }
 
-        if (responseBytes == null) throw new InvalidOperationException("response html missing");
+        if (responseBytes == null) throw new AppException("Response HTML missing.");
 
         var responseHtml = Encoding.UTF8.GetString(responseBytes);
 
@@ -72,12 +105,20 @@ public class AuthService
                         "Content-Length: " + responseHtml.Length + "\r\n" +
                         "Content-Type: text/html\r\n" +
                         "Connection: Closed\r\n\r\n";
-        
+
         socket?.Send(Encoding.UTF8.GetBytes(responseHeaders + responseHtml));
         socket?.Close();
         server.Close();
 
-        return errorMessage.Length == 0;
+        if (errorMessage.Length > 0)
+            throw new AppException(errorMessage);
+
+        try
+        {
+            Directory.CreateDirectory(configPath);
+            File.WriteAllText(idTokenPath, token);
+        }
+        catch (IOException) { }
     }
 
     private static void RequestOAuth2(string callbackUri, long securityToken)
@@ -91,22 +132,19 @@ public class AuthService
                 "&redirect_uri=" + callbackUriEncoded +
                 "&client_id=" + CLIENT_ID;
 
-        Console.WriteLine(BLUE + "If the browser has not opened, please use this link to sign in: " + RESET + oauth2RequestUri);
+        AnsiConsole.MarkupLine("[blue]If the browser has not opened, please use this link to sign in: [/]" + oauth2RequestUri);
 
         try
         {
             Process.Start(new ProcessStartInfo(oauth2RequestUri) { UseShellExecute = true });
         }
-        catch (Exception)
-        {
-            Console.WriteLine(RED + "Failed to open browser." + RESET);
-        }
+        catch (Exception) { }
     }
 
-    private static string ExtractCode(Socket socket, long securityToken)
+    private static async Task<string> ExtractCode(Socket socket, long securityToken)
     {
         var buffer = new byte[1024];
-        var count = socket.Receive(buffer);
+        var count = await socket.ReceiveAsync(buffer);
         var input = Encoding.UTF8.GetString(buffer, 0, count);
 
         var callbackRoute = input.Split("\r\n", 2)[0];
@@ -126,9 +164,9 @@ public class AuthService
         }
 
         bool foundSecurityToken = false;
-        
+
         string code = "";
-        
+
         for (int i = 0; i < queryParams.Length; i++)
         {
             if (queryParams[i].Equals("/?state=fupboard%3Asecurity_token%3A" + securityToken))
@@ -144,51 +182,30 @@ public class AuthService
 
         if (code == null)
             throw new AuthenticationException("Code not found.");
-        
+
         if (!foundSecurityToken)
             throw new AuthenticationException("Missing/incorrect security token.");
 
         return code;
     }
 
-    public static string RequestIdToken(string code, string callbackUri)
+    public static async Task<string> RequestIdToken(string code, string callbackUri)
     {
-        // Make request to F-Up Board API with auth code to receive JWT
-        var client = new HttpClient();
-        var request = new HttpRequestMessage(HttpMethod.Post, BASE_URL + "/auth");
-        request.Content = JsonContent.Create(new AuthRequest
-        {
-            Code = code,
-            Uri = callbackUri,
-        });
+        var client = new ApiClient();
 
-        string responseBody;
-        
         try
         {
-            var response = client.Send(request);
-            responseBody = new StreamReader(response.Content.ReadAsStream(), Encoding.UTF8).ReadToEnd();
-        }
-        catch (HttpRequestException)
-        {
-            throw new AuthenticationException("Failed to request Google JWT.");
-        }
+            var response = await client.PostAuth(new AuthRequest
+            {
+                Code = code,
+                Uri = callbackUri,
+            });
 
-        AuthResponse authResponse;
-        try
-        {
-            var authResp = JsonSerializer.Deserialize<AuthResponse>(responseBody, Program.JsonOptions);
-            
-            if (authResp == null)
-                throw new JsonException();
-            
-            authResponse = authResp;
+            return response.IdToken;
         }
-        catch (JsonException)
+        catch (AppException e)
         {
-            throw new AuthenticationException("Failed to parse response from Google.");
+            throw new AuthenticationException("Failed to request Google JWT. " + e.Message);
         }
-
-        return authResponse.IdToken;
     }
 }
