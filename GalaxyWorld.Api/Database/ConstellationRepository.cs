@@ -64,12 +64,12 @@ public class ConstellationRepository(DbContext db)
             changes + " WHERE con_id = @conId RETURNING *", new
             {
                 conId,
-                ConName = patch.ConName.Or(),
-                IauAbbr = patch.IauAbbr.Or(),
-                NasaAbbr = patch.NasaAbbr.Or(),
-                Genitive = patch.Genitive.Or(),
-                Origin = patch.Origin.Or(),
-                Meaning = patch.Meaning.Or(),
+                ConName = patch.ConName.OrDefault(),
+                IauAbbr = patch.IauAbbr.OrDefault(),
+                NasaAbbr = patch.NasaAbbr.OrDefault(),
+                Genitive = patch.Genitive.OrDefault(),
+                Origin = patch.Origin.OrDefault(),
+                Meaning = patch.Meaning.OrDefault(),
             }
         );
         return constellation;

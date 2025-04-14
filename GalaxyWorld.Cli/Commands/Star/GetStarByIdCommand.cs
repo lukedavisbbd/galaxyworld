@@ -3,6 +3,8 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using StarModel = GalaxyWorld.Core.Models.Star.Star;
+using GalaxyWorld.Cli.Util;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Star
 {
@@ -17,24 +19,19 @@ namespace GalaxyWorld.Cli.Commands.Star
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            var star = await client.GetAsync<StarModel>($"/stars/{settings.Id}");
 
-            if (star is null)
+            try
             {
-                AnsiConsole.MarkupLine("[yellow]No star found.[/]");
+                var star = await client.GetStar(settings.Id);
+
+                AnsiConsole.Write(ModelUtil.ModelToTable(star, "Details"));
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Star Details[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(StarModel).GetProperties())
+            catch (AppException e)
             {
-                var value = prop.GetValue(star)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }

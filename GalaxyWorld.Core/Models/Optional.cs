@@ -5,13 +5,15 @@ namespace GalaxyWorld.Core.Models;
 public struct Optional<T>
 {
     private T? _value;
+
     public T Some {
-        get => IsSome ? _value! : throw new InvalidOperationException();
+        get => IsSome ? _value! : throw new NullReferenceException();
         init {
             _value = value;
             IsSome = true;
         }
     }
+    
     [JsonIgnore]
     public bool IsSome { get; private init; }
 
@@ -36,7 +38,7 @@ public struct Optional<T>
             return new Optional<U>();
     }
 
-    public T? Or()
+    public T? OrDefault()
     {
         return IsSome ? Some : default;
     }

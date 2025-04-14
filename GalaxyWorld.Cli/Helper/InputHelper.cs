@@ -4,26 +4,11 @@ namespace GalaxyWorld.Cli.Helper
 {
     public static class InputHelper
     {
-        public static string PromptString(string label, string defaultValue = "")
+        public static T Prompt<T>(string label, T defaultValue = default)
         {
-            return AnsiConsole.Prompt(
-                new TextPrompt<string>($"[green]{label}[/]")
-                    .DefaultValue(defaultValue)
-                    .AllowEmpty());
-        }
-
-        public static int PromptInt(string label, int defaultValue = 0)
-        {
-            return AnsiConsole.Prompt(
-                new TextPrompt<int>($"[green]{label}[/]")
-                    .DefaultValue(defaultValue));
-        }
-
-        public static T Prompt<T>(string label, T defaultValue = default) {
             return AnsiConsole.Prompt(
                 new TextPrompt<T>($"[green]{label}[/]")
-                    .DefaultValue(defaultValue)
-            );
+                    .DefaultValue(defaultValue));
         }
     }
 }

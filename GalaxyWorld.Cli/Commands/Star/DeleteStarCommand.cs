@@ -24,7 +24,7 @@ namespace GalaxyWorld.Cli.Commands.Star
                 AnsiConsole.MarkupLine("[green]Star deleted successfully.[/]");
                 return 0;
             }
-            catch (CliException e) 
+            catch (AppException e) 
             {
                 AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete star."}[/]");
                 return 1;

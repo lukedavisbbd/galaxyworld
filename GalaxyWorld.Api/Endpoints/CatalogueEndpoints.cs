@@ -1,6 +1,5 @@
 ﻿using GalaxyWorld.API.Auth;
 using GalaxyWorld.Core.Models.Catalogue;
-using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.API.Services;
 using GalaxyWorld.Core.Models;
 using Microsoft.AspNetCore.Mvc;

@@ -1,8 +1,11 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
-using StarModel = GalaxyWorld.Core.Models.Star;
+using CoreModels = GalaxyWorld.Core.Models;
+using StarModels = GalaxyWorld.Core.Models.Star;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Util;
+using System.Text.Json;
 
 namespace GalaxyWorld.Cli.Commands.Star
 {
@@ -12,41 +15,29 @@ namespace GalaxyWorld.Cli.Commands.Star
         {
             [CommandArgument(0, "<id>")]
             public int Id { get; set; }
-
-            [CommandOption("-n|--name <NAME>")]
-            public string? Name { get; set; }
-
-            [CommandOption("-c|--catalogueId <CATALOGUE_ID>")]
-            public int? CatalogueId { get; set; }
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
             var client = new ApiClient();
-            
 
-            var star = await client.PatchAsync<StarModel::Star>($"/stars/{settings.Id}", new
+            try
             {
-                name = settings.Name,
-                catalogueId = settings.CatalogueId
-            });
+                var patch = ModelUtil.PromptModel<StarModels::StarPatch>();
 
-            if (star is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No star updated.[/]");
+                Console.WriteLine(JsonSerializer.Serialize(patch.Constellation));
+                Console.WriteLine(JsonSerializer.Serialize(patch));
+
+                var star = await client.PatchStar(settings.Id, patch);
+
+                AnsiConsole.Write(ModelUtil.ModelToTable(star, "Updated"));
                 return 0;
             }
-
-            var table = new Table().Title("[bold]Star Updated[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(StarModel::Star).GetProperties())
+            catch (AppException e)
             {
-                var value = prop.GetValue(star)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
+                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update constellation."}[/]");
+                return 1;
             }
-
-            AnsiConsole.Write(table);
-            return 0;
         }
     }
 }
