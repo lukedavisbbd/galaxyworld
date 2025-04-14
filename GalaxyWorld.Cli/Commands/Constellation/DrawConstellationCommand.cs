@@ -2,7 +2,6 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
 using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Constellation;
