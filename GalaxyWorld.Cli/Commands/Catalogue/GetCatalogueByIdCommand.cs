@@ -3,6 +3,7 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using CatalogueModel = GalaxyWorld.Core.Models.Catalogue.Catalogue;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue
 {

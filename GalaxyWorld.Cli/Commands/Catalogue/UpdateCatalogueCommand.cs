@@ -4,6 +4,8 @@ using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using CoreModels = GalaxyWorld.Core.Models;
 using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue
 {
@@ -27,13 +29,10 @@ namespace GalaxyWorld.Cli.Commands.Catalogue
             
             try
             {
-                var catNameOpt = string.IsNullOrWhiteSpace(settings.Name) ?
-                    new CoreModels::Optional() :
-                    new CoreModels::Optional<string>(catName);
-                var catSlugOpt = string.IsNullOrWhiteSpace(settings.Slug) ?
-                    new CoreModels::Optional() :
-                    new CoreModels::Optional<string>(catSlug);
-                var catalogue = await client.PatchCatalogue(new CatalogueModels::CataloguePatch
+                var catNameOpt = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Catalogue Name"));
+                var catSlugOpt = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Catalogue Slug"));
+
+                var catalogue = await client.PatchCatalogue(settings.Id, new CatalogueModels::CataloguePatch
                 {
                     CatName = catNameOpt,
                     CatSlug = catSlugOpt,

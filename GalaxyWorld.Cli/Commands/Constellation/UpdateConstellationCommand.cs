@@ -4,6 +4,8 @@ using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
 using CoreModels = GalaxyWorld.Core.Models;
 using ConstellationModels = GalaxyWorld.Core.Models.Constellation;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Constellation
 {
@@ -24,21 +26,21 @@ namespace GalaxyWorld.Cli.Commands.Constellation
             
             try
             {
-                var catNameOpt = string.IsNullOrWhiteSpace(settings.Name) ?
-                    new CoreModels::Optional<string>() :
-                    new CoreModels::Optional<string>(catName);
-                var catSlugOpt = string.IsNullOrWhiteSpace(settings.Slug) ?
-                    new CoreModels::Optional<string>() :
-                    new CoreModels::Optional<string>(catSlug);
-                var catalogue = await client.PatchCatalogue(new CatalogueModels::CataloguePatch
+                var payload = new ConstellationModels::ConstellationPatch
                 {
-                    CatName = catNameOpt,
-                    CatSlug = catSlugOpt,
-                });
+                    ConName = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Constellation Name")),
+                    Genitive = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Genitive Form")),
+                    IauAbbr = new CoreModels::Optional<string>(InputHelper.Prompt<string>("IAU Abbreviation")),
+                    Meaning = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Meaning")),
+                    NasaAbbr = new CoreModels::Optional<string>(InputHelper.Prompt<string>("NASA Abbreviation")),
+                    Origin = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Origin"))
+                };
+
+                var catalogue = await client.PatchConstellation(settings.Id, payload);
 
                 var table = new Table().Title("[bold]Catalogue Updated[/]").AddColumns("Field", "Value");
 
-                foreach (var prop in typeof(CatalogueModels::Catalogue).GetProperties())
+                foreach (var prop in typeof(ConstellationModels::Constellation).GetProperties())
                 {
                     var value = prop.GetValue(catalogue)?.ToString() ?? "[grey]null[/]";
                     table.AddRow(prop.Name, value);

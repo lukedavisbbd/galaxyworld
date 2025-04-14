@@ -10,7 +10,7 @@ using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Star
 {
-    public class CreateStarCommand : AsyncCommand<CreateStarCommand.Settings>
+    public class CreateStarCommand :  AsyncCommand<CreateStarCommand.Settings>
     {
         public class Settings : CommandSettings
         {

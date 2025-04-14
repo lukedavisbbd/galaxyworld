@@ -24,7 +24,7 @@ public class StarInsert
     public double? ProperMotionDeclination { get; init; }
     public string? ProperMotionSrc { get; init; }
     public double? VelocityX { get; init; }
-    public double? VelocityY { get; init; }
+    public double? VelocityY { get; init; } 
     public double? VelocityZ { get; init; }
     public string? SpectralType { get; init; }
     public string? SpectralTypeSrc { get; init; }
