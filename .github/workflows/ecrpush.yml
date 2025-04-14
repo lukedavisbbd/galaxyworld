@@ -14,8 +14,8 @@ jobs:
 
     env:
       IMAGE_TAG: latest
-      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
-      ECR_REPOSITORY: ${{ vars.ECR_REPO_NAME }}
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }}.amazonaws.com
+      ECR_REPOSITORY: ${{ vars.ecr_repo_name }}
 
     steps:
       - name: Checkout Repo
@@ -69,6 +69,6 @@ jobs:
       - name: Force Fargate Service Update
         run: |
           aws ecs update-service \
-            --cluster ${{ vars.CLUSTER_NAME }} \
+            --cluster ${{ vars.ecs_cluster_name }} \
             --service ${{ vars.SERVICE_NAME }} \
             --force-new-deployment
