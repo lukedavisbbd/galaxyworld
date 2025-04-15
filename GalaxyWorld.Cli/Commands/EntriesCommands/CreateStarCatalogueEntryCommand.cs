@@ -1,13 +1,9 @@
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Services;
-using GalaxyWorld.Cli.Helper;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using GalaxyWorld.Cli.ApiHandler;
-using Microsoft.VisualBasic;
-using CoreModels = GalaxyWorld.Core.Models;
 using Spectre.Console;
 using GalaxyWorld.Core.Models.CatalogueEntry;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Util;
 
 namespace GalaxyWorld.Cli.Commands.EntriesCommands;
 
@@ -26,35 +22,15 @@ public class CreateStarCatalogueEntryCommand : AsyncCommand<CreateStarCatalogueE
         
         try
         {
-            var EntryId = InputHelper.Prompt<string>("Entry Id");
-            var EntryDesignation = InputHelper.Prompt<string>("Entry Designation");
+            var insert = ModelUtil.PromptModel<CatalogueEntryInsert>();
+            var star = await client.PostStarCatalogueEntry(settings.starId, insert);
 
-            var result = await client.PostStarCatalogueEntry(settings.starId, new CatalogueEntryInsert
-            {
-                EntryId = EntryId,
-                EntryDesignation = EntryDesignation,
-            });
-
-            if (result is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No entries found.[/]");
-                return 0;
-            }
-            
-            var table = new Table().Title("[bold]Entries[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueEntry).GetProperties())
-            {
-                var value = prop.GetValue(result)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
-            }
-
-            AnsiConsole.Write(table);
+            AnsiConsole.Write(ModelUtil.ModelToTable(star, "Created"));
             return 0;
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red] Failed to create star entry: {ex.Message}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star entry."}[/]");
             return 1;
         }
     }

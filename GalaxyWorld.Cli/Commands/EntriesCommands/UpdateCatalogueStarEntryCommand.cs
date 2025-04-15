@@ -1,12 +1,9 @@
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Services;
-using GalaxyWorld.Cli.Helper;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
 using GalaxyWorld.Core.Models.CatalogueEntry;
-using CoreModels = GalaxyWorld.Core.Models;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Util;
 
 namespace GalaxyWorld.Cli.Commands.EntriesCommands;
 
@@ -30,35 +27,15 @@ public class UpdateCatalogueStarEntryCommand : AsyncCommand<UpdateCatalogueStarE
 
         try
         {
-            var EntryId = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Entry Id"));
-            var EntryDesignation = new CoreModels::Optional<string>(InputHelper.Prompt<string>("Entry Designation"));
+            var patch = ModelUtil.PromptModel<CatalogueEntryPatch>();
+            var star = await client.PatchCatalogueStarEntry(settings.CatalogueId, settings.StarId, patch);
 
-            var result = await client.PatchCatalogueStarEntry(settings.CatalogueId, settings.StarId, new CatalogueEntryPatch
-            {
-                EntryId = EntryId,
-                EntryDesignation = EntryDesignation,
-            });
-
-            if (result is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No entries found.[/]");
-                return 0;
-            }
-            
-            var table = new Table().Title("[bold]Entries[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueEntry).GetProperties())
-            {
-                var value = prop.GetValue(result)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
-            }
-
-            AnsiConsole.Write(table);
+            AnsiConsole.Write(ModelUtil.ModelToTable(star, "Updated"));
             return 0;
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            Console.WriteLine($"[red] Failed to patch entry: {ex.Message}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue entry."}[/]");
             return 1;
         }
     }

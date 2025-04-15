@@ -1,11 +1,8 @@
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Services;
-using GalaxyWorld.Cli.Helper;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
-using GalaxyWorld.Core.Models.CatalogueEntry;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Util;
 
 namespace GalaxyWorld.Cli.Commands.EntriesCommands;
 
@@ -24,28 +21,14 @@ public class GetCatalogueStarEntryCommand : AsyncCommand<GetCatalogueStarEntryCo
 
         try
         {
-            var result = await client.GetCatalogueStarEntry(settings.catalogueId, settings.starId);
-            
-            if (result is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No entries found.[/]");
-                return 0;
-            }
-            
-            var table = new Table().Title("[bold]Entries[/]").AddColumns("Field", "Value");
+            var catalogue = await client.GetCatalogueStarEntry(settings.catalogueId, settings.starId);
 
-            foreach (var prop in typeof(CatalogueEntry).GetProperties())
-            {
-                var value = prop.GetValue(result)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
-            }
-
-            AnsiConsole.Write(table);
+            AnsiConsole.Write(ModelUtil.ModelToTable(catalogue, "Details"));
             return 0;
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red] Failed to fetch catalogue entries: {ex.Message}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
             return 1;
         }
     }

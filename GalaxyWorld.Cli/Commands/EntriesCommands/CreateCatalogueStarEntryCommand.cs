@@ -1,13 +1,10 @@
 using GalaxyWorld.Cli.ApiHandler;
-using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Util;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace GalaxyWorld.Cli.Commands.EntriesCommands;
 
@@ -30,35 +27,15 @@ public class CreateCatalogueStarEntryCommand : AsyncCommand<CreateCatalogueStarE
 
         try
         {
-            var EntryId = InputHelper.Prompt<string>("Entry Id");
-            var EntryDesignation = InputHelper.Prompt<string>("Entry Designation");
-            
-            var result = await client.PostCatalogueStarEntry(settings.CatalogueId, new CatalogueEntryInsert
-            {
-                EntryId = EntryId,
-                EntryDesignation = EntryDesignation,
-            });
+            var insert = ModelUtil.PromptModel<CatalogueEntryInsert>();
+            var catalogue = await client.PostCatalogueStarEntry(settings.CatalogueId, insert);
 
-            if (result is null)
-            {
-                AnsiConsole.MarkupLine("[yellow]No entries found.[/]");
-                return 0;
-            }
-            
-            var table = new Table().Title("[bold]Entries[/]").AddColumns("Field", "Value");
-
-            foreach (var prop in typeof(CatalogueEntry).GetProperties())
-            {
-                var value = prop.GetValue(result)?.ToString() ?? "[grey]null[/]";
-                table.AddRow(prop.Name, value);
-            }
-
-            AnsiConsole.Write(table);
+            AnsiConsole.Write(ModelUtil.ModelToTable(catalogue, "Created"));
             return 0;
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red] Failed to create catalogue entry: {ex.Message}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create catalogue entry."}[/]");
             return 1;
         }
     }

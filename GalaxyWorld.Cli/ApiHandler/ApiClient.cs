@@ -14,7 +14,7 @@ public class ApiClient
 {
     private readonly HttpClient _httpClient;
 
-    public const string BASE_URL = "https://localhost:4433";
+    public const string BASE_URL = "http://localhost:8080";
 
     public static string? DefaultAuthToken { get; set; }
 

@@ -1,10 +1,7 @@
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Services;
-using GalaxyWorld.Cli.Helper;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
+using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.EntriesCommands;
 
@@ -24,12 +21,12 @@ public class DeleteCatalogueStarEntryCommand : AsyncCommand<DeleteCatalogueStarE
         try
         {
             var result = await client.DeleteCatalogueStarEntry(settings.catalogueId, settings.starId);
-            AnsiConsole.MarkupLine("[green]Catalogue star entry deleted successfully.[/]");
+            AnsiConsole.MarkupLine("[green]Catalogue entry deleted successfully.[/]");
             return 0;
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red] Failed to execute DeleteCatalogueStarEntryCommand: {ex.Message}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete catalogue entry."}[/]");
             return 1;
         }
     }
