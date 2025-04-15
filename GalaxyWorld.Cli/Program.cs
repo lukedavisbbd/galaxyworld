@@ -44,6 +44,9 @@ public static class Program
         ApiClient.DefaultAuthToken = token;
 
         WelcomeMessage();
+        if (token == null) {
+            AnsiConsole.MarkupLine($"[red]Not logged in. Login with the 'login' command.[/]");
+        }
 
         var app = new CommandApp();
         app.Configure(config =>

@@ -56,6 +56,7 @@ public class LoginCommand : AsyncCommand
 
         if (token != null) {
             ApiClient.DefaultAuthToken = token;
+            AnsiConsole.MarkupLine($"[green]Logged in.[/]");
             return;
         }
 
