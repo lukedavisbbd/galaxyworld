@@ -7,39 +7,38 @@ using StarModels = GalaxyWorld.Core.Models.Star;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Util;
 
-namespace GalaxyWorld.Cli.Commands.Star
+namespace GalaxyWorld.Cli.Commands.Star;
+
+public class CreateStarCommand : AsyncCommand
 {
-    public class CreateStarCommand : AsyncCommand
+    public override async Task<int> ExecuteAsync(CommandContext context)
     {
-        public override async Task<int> ExecuteAsync(CommandContext context)
+        var client = new ApiClient();
+
+        var insert = ModelUtil.PromptModel<StarModels::StarInsert>([nameof(StarModels::StarInsert.CatalogueEntries)]);
+
+        var entries = new List<CatalogueEntryInsertWithStar>();
+        
+        while (AnsiConsole.Confirm("Add a catalogue entry?"))
         {
-            var client = new ApiClient();
-
-            var insert = ModelUtil.PromptModel<StarModels::StarInsert>([nameof(StarModels::StarInsert.CatalogueEntries)]);
-
-            var entries = new List<CatalogueEntryInsertWithStar>();
-            
-            while (AnsiConsole.Confirm("Add a catalogue entry?"))
+            entries.Add(new CatalogueEntryInsertWithStar
             {
-                entries.Add(new CatalogueEntryInsertWithStar
-                {
-                    CatId = InputHelper.Prompt<int>("Catalogue ID"),
-                    EntryId = InputHelper.Prompt<string>("Catalogue Entry ID (Unique)"),
-                    EntryDesignation = InputHelper.Prompt<string>("Catalogue Entry Designation (Non-unique)")
-                });
-            }
+                CatId = InputHelper.Prompt<int>("Catalogue ID"),
+                EntryId = InputHelper.Prompt<string>("Catalogue Entry ID (Unique)"),
+                EntryDesignation = InputHelper.Prompt<string>("Catalogue Entry Designation (Non-unique)")
+            });
+        }
 
-            try {
-                var star = await client.PostStar(insert);
+        try {
+            var star = await client.PostStar(insert);
 
-                AnsiConsole.Write(ModelUtil.ModelToTable(star, "Created"));
-                return 0;
-            }
-            catch (AppException e)
-            {
-                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star"}[/]");
-                return 1;
-            }
+            ModelUtil.PrintModel(star);
+            return 0;
+        }
+        catch (AppException e)
+        {
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star"}[/]");
+            return 1;
         }
     }
 }

@@ -8,17 +8,18 @@ namespace GalaxyWorld.Cli.Util;
 
 public static class ModelUtil
 {
-    public static Table ModelToTable<T>(T model, string suffix)
+    public static void PrintModel<T>(T model, string[]? excludedProperties = null)
     {
-        var table = new Table().Title($"[bold]{FormatUtil.PascalToTitleCase(typeof(T).Name)} {suffix}[/]").AddColumns("Field", "Value");
-        
+        excludedProperties ??= [];
+
         foreach (var prop in typeof(T).GetProperties())
         {
+            if (excludedProperties.Contains(prop.Name))
+                continue;
+
             var value = prop.GetValue(model)?.ToString() ?? "";
-            table.AddRow(FormatUtil.PascalToTitleCase(prop.Name), value);
+            AnsiConsole.MarkupLine($"[grey]{FormatHelper.PascalToTitleCase(prop.Name)}:[/] {value}");
         }
-        
-        return table;
     }
 
     public static T PromptModel<T>(string[]? excludedProperties = null)
@@ -32,7 +33,7 @@ public static class ModelUtil
             if (excludedProperties.Contains(prop.Name))
                 continue;
 
-            var label = FormatUtil.PascalToTitleCase(prop.Name);
+            var label = FormatHelper.PascalToTitleCase(prop.Name);
 
             var type = prop.PropertyType;
 

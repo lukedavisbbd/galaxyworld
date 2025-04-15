@@ -11,11 +11,6 @@ namespace GalaxyWorld.Cli;
 
 class Program
 {
-    public static JsonSerializerOptions JsonOptions { get; } = new JsonSerializerOptions
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
-
     static async Task Main(string[] args)
     {
         var token = await LoginCommand.LoginFromFile();
@@ -49,8 +44,12 @@ class Program
                     .WithDescription("List all stars");
                 config.AddCommand<GetStarByIdCommand>("get")
                     .WithDescription("Fetch a star by ID");
+                config.AddCommand<GetStarPlanetsCommand>("planets")
+                    .WithDescription("Fetch star planetary system information");
                 config.AddCommand<CreateStarCommand>("create")
-                    .WithDescription("Create a new star in a catalogue");
+                    .WithDescription("Register a star");
+                config.AddCommand<StarBulkUploadCommand>("upload-bulk")
+                    .WithDescription("Upload a ATHYG format CSV file of stars");
                 config.AddCommand<UpdateStarCommand>("update")
                     .WithDescription("Update a star by ID");
                 config.AddCommand<DeleteStarCommand>("delete")
@@ -64,6 +63,8 @@ class Program
                     .WithDescription("List all catalogues");
                 config.AddCommand<GetCatalogueByIdCommand>("get")
                     .WithDescription("Fetch a specific catalogue by ID");
+                config.AddCommand<GetCatalogueStarsCommand>("stars")
+                    .WithDescription("List all star entries");
                 config.AddCommand<CreateCatalogueCommand>("create")
                     .WithDescription("Create a new catalogue");
                 config.AddCommand<UpdateCatalogueCommand>("update")
@@ -80,7 +81,7 @@ class Program
                 config.AddCommand<GetConstellationByIdCommand>("get")
                     .WithDescription("Fetch a constellation by ID");
                 config.AddCommand<DrawConstellationCommand>("draw")
-                    .WithDescription("Drawa constellation by ID");
+                    .WithDescription("Draw a constellation by ID");
                 config.AddCommand<CreateConstellationCommand>("create")
                     .WithDescription("Create a new constellation");
                 config.AddCommand<UpdateConstellationCommand>("update")

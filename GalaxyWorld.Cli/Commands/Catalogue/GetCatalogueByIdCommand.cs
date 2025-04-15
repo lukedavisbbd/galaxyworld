@@ -22,7 +22,8 @@ public class GetCatalogueByIdCommand : AsyncCommand<GetCatalogueByIdCommand.Sett
         {
             var catalogue = await client.GetCatalogue(settings.Id);
 
-            AnsiConsole.Write(ModelUtil.ModelToTable(catalogue, "Details"));
+            ModelUtil.PrintModel(catalogue);
+            
             return 0;
         }
         catch (AppException e)

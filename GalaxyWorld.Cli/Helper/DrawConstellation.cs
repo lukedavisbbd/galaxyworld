@@ -53,7 +53,7 @@ internal class DrawConstellation
         var decDelta = decMax - decMin;
 
         var width = Console.WindowWidth;
-        var height = Console.WindowHeight;
+        var height = Console.WindowHeight - 1;
 
         var newRaDelta = (double)width / height * decDelta / 16;
         raMin -= (newRaDelta - raDelta) / 2;
@@ -67,10 +67,6 @@ internal class DrawConstellation
         decMax += decDelta * 0.1;
         raDelta = raMax - raMin;
         decDelta = decMax - decMin;
-
-        Console.WriteLine($"W: {width}, H: {height}");
-        Console.WriteLine($"RA_min: {raMin}, RA_max: {raMax}, RA_delta: {raDelta}");
-        Console.WriteLine($"DEC_min: {decMin}, DEC_max: {decMax}, DEC_delta: {decDelta}");
 
         var chars = new string[width, height];
 
@@ -96,7 +92,7 @@ internal class DrawConstellation
 
             var lerp = (brightness - BRIGHTNESS_MIN) / (BRIGHTNESS_MAX - BRIGHTNESS_MIN);
             var i = (int)((1.0 - lerp) * CHARSET.Length);
-            var greyness = (byte)int.Clamp((int)(lerp * 196 + (255 - 196)), 0, 255);
+            var greyness = (byte)int.Clamp((int)(lerp * 255), 0, 255);
 
             i = int.Clamp(i, 0, CHARSET.Length - 1);
             if (CHARSET[i] != ' ')

@@ -18,7 +18,8 @@ public class CreateConstellationCommand : AsyncCommand
             var insert = ModelUtil.PromptModel<ConstellationModels::ConstellationInsert>();
             var constellation = await client.PostConstellation(insert);
 
-            AnsiConsole.Write(ModelUtil.ModelToTable(constellation, "Created"));
+            ModelUtil.PrintModel(constellation);
+
             return 0;
         }
         catch (AppException e)

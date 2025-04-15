@@ -18,7 +18,7 @@ public class CreateCatalogueCommand : AsyncCommand
             var insert = ModelUtil.PromptModel<CatalogueModels::CatalogueInsert>();
             var catalogue = await client.PostCatalogue(insert);
 
-            AnsiConsole.Write(ModelUtil.ModelToTable(catalogue, "Created"));
+            ModelUtil.PrintModel(catalogue);
             return 0;
         }
         catch (AppException e)

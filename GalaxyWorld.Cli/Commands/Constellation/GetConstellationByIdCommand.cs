@@ -22,7 +22,8 @@ public class GetConstellationByIdCommand : AsyncCommand<GetConstellationByIdComm
         {
             var constellation = await client.GetConstellation(settings.Id);
 
-            AnsiConsole.Write(ModelUtil.ModelToTable(constellation, "Details"));
+            ModelUtil.PrintModel(constellation);
+
             return 0;
         }
         catch (AppException e)

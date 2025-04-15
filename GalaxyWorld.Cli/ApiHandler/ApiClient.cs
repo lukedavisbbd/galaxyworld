@@ -6,13 +6,27 @@ using CoreModels = GalaxyWorld.Core.Models;
 using StarModels = GalaxyWorld.Core.Models.Star;
 using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
 using ConstellationModels = GalaxyWorld.Core.Models.Constellation;
+using PlanetModels = GalaxyWorld.Core.Models.Planets;
 using EntryModels = GalaxyWorld.Core.Models.CatalogueEntry;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Net;
 
 namespace GalaxyWorld.Cli.ApiHandler;
 
 public class ApiClient
 {
     private readonly HttpClient _httpClient;
+    private static JsonSerializerOptions JsonOptions { get
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
+        }
+    }
 
     public const string BASE_URL = "https://localhost:4433";
 
@@ -43,7 +57,23 @@ public class ApiClient
             throw new AppException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new AppException();
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
+    }
+
+    private async Task<T?> GetDefaultAsync<T>(string endpoint)
+    {
+        var response = await _httpClient.GetAsync(endpoint);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return default;
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>();
+            throw new AppException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
+        }
+
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
     private async Task<T> PostAsync<T, P>(string endpoint, P payload)
@@ -57,7 +87,7 @@ public class ApiClient
             throw new AppException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new AppException();
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
     private async Task<T> PatchAsync<T, P>(string endpoint, P payload)
@@ -71,7 +101,7 @@ public class ApiClient
             throw new AppException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new AppException();
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
     private async Task<T> DeleteAsync<T>(string endpoint)
@@ -83,7 +113,7 @@ public class ApiClient
             throw new AppException(error?.Detail ?? error?.Title ?? response.StatusCode.ToString());
         }
 
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new AppException();
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
     private static string FormatQuery<S, T>(int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
@@ -132,8 +162,14 @@ public class ApiClient
         return await PostAsync<List<StarModels::StarBulkResponse>, IEnumerable<StarModels::StarInsert>>($"/stars/bulk", inserts);
     }
 
-    public async Task<StarModels::Star> GetStar(int starId) {
+    public async Task<StarModels::Star> GetStar(int starId)
+    {
         return await GetAsync<StarModels::Star>($"/stars/{starId}");
+    }
+
+    public async Task<PlanetModels::PlanetarySystem?> GetStarPlanets(int starId)
+    {
+        return await GetDefaultAsync<PlanetModels::PlanetarySystem>($"/stars/{starId}/planets");
     }
 
     public async Task<StarModels::Star> PatchStar(int starId, StarModels::StarPatch patch) {

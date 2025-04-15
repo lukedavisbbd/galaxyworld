@@ -3,6 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Core.Models.Star;
 
 namespace GalaxyWorld.Cli.Commands.Constellation;
 
@@ -21,7 +22,7 @@ public class DrawConstellationCommand : AsyncCommand<DrawConstellationCommand.Se
         try
         {
             var constellation = await client.GetConstellation(settings.Id);
-            var stars = await client.GetConstellationStars(settings.Id);
+            var stars = await client.GetConstellationStars(settings.Id, 0, 500, StarSort.Magnitude);
 
             DrawConstellation.DrawStars(constellation, stars);
             return 0;

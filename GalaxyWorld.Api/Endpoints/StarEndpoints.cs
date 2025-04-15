@@ -5,6 +5,7 @@ using GalaxyWorld.Core.Models;
 using Npgsql;
 using GalaxyWorld.API.Database;
 using Microsoft.AspNetCore.Mvc;
+using GalaxyWorld.Core.Models.Planets;
 
 namespace GalaxyWorld.API.Endpoints;
 
@@ -24,6 +25,13 @@ public static class StarEndpoints
         var star = await service.GetOne(starId);
         if (star == null) return Results.NotFound();
         return Results.Ok(star);
+    }
+
+    public static async Task<IResult> GetStarPlanets(PlanetService planetService, int starId)
+    {
+        var planets = await planetService.GetPlanetarySystem(starId);
+        if (planets == null) return Results.NotFound();
+        return Results.Ok(planets);
     }
 
     public static async Task<IResult> PostStar(StarService service, StarInsert insert)
@@ -84,6 +92,11 @@ public static class StarEndpoints
 
         routes.MapGet("/stars/{starId:int}", GetStar)
             .Produces<Star>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
+
+        routes.MapGet("/stars/{starId:int}/planets", GetStarPlanets)
+            .Produces<IEnumerable<Planet>>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization();
 

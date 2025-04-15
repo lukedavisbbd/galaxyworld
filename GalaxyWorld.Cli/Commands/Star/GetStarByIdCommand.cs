@@ -1,37 +1,46 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.ComponentModel;
 using GalaxyWorld.Cli.ApiHandler;
-using StarModel = GalaxyWorld.Core.Models.Star.Star;
 using GalaxyWorld.Cli.Util;
 using GalaxyWorld.Cli.Exceptions;
+using StarModels = GalaxyWorld.Core.Models.Star;
 
-namespace GalaxyWorld.Cli.Commands.Star
+namespace GalaxyWorld.Cli.Commands.Star;
+
+public class GetStarByIdCommand : AsyncCommand<GetStarByIdCommand.Settings>
 {
-    public class GetStarByIdCommand : AsyncCommand<GetStarByIdCommand.Settings>
+    public class Settings : CommandSettings
     {
-        public class Settings : CommandSettings
+        [CommandArgument(0, "<id>")]
+        public int Id { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var client = new ApiClient();
+
+        try
         {
-            [CommandArgument(0, "<id>")]
-            public int Id { get; set; }
+            var star = await client.GetStar(settings.Id);
+
+            ModelUtil.PrintModel(star);
+
+            var catalogues = await client.GetCatalogues();
+            var entries = await client.GetStarCatalogueEntries(settings.Id, 0, 999);
+
+            AnsiConsole.MarkupLine($"[bold]Catalogue Entries:[/]");
+            foreach (var entry in entries)
+            {
+                var catalogue = catalogues.First(cat => cat.CatId == entry.CatId);
+                AnsiConsole.MarkupLine($"[yellow]{catalogue.CatName}:[/] {entry.EntryId} {entry.EntryDesignation}");
+            }
+
+            return 0;
         }
-
-        public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+        catch (AppException e)
         {
-            var client = new ApiClient();
-
-            try
-            {
-                var star = await client.GetStar(settings.Id);
-
-                AnsiConsole.Write(ModelUtil.ModelToTable(star, "Details"));
-                return 0;
-            }
-            catch (AppException e)
-            {
-                AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
-                return 1;
-            }
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+            return 1;
         }
     }
 }

@@ -24,7 +24,8 @@ public class UpdateCatalogueCommand : AsyncCommand<UpdateCatalogueCommand.Settin
             var patch = ModelUtil.PromptModel<CatalogueModels::CataloguePatch>();
             var catalogue = await client.PatchCatalogue(settings.Id, patch);
 
-            AnsiConsole.Write(ModelUtil.ModelToTable(catalogue, "Updated"));
+            ModelUtil.PrintModel(catalogue);
+
             return 0;
         }
         catch (AppException e)
