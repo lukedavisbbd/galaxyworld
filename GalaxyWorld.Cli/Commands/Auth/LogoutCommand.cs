@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using GalaxyWorld.Cli.ApiHandler;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace GalaxyWorld.Cli.Commands.Auth;
@@ -17,11 +18,13 @@ public class LogoutCommand : Command
                 throw new FileNotFoundException();
 
             File.Delete(idTokenPath);
+            ApiClient.DefaultAuthToken = null;
             AnsiConsole.MarkupLine("[green]Logout successful.[/]");
             return 0;
         }
         catch (FileNotFoundException)
         {
+            ApiClient.DefaultAuthToken = null;
             AnsiConsole.MarkupLine("[green]No session.[/]");
             return 1;
         }
