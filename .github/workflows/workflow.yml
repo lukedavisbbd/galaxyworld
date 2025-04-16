@@ -97,17 +97,17 @@ jobs:
       - name: Get Version
         run: echo "VERSION=$(date +'%Y.%m.%d-%H.%M.%S')" >> $GITHUB_ENV
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          name: "Release v${{ env.VERSION }}"
-          body: "Automated release for commit ${{ github.sha }}"
-          draft: false
-          prerelease: false
-          files: GalaxyWorld.Cli/out/GalaxyWorld.Cli.exe
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: v${{ env.VERSION }}
+      #     name: "Release v${{ env.VERSION }}"
+      #     body: "Automated release for commit ${{ github.sha }}"
+      #     draft: false
+      #     prerelease: false
+      #     files: GalaxyWorld.Cli/out/GalaxyWorld.Cli.exe
  
   deploy:
     name: Deploy
