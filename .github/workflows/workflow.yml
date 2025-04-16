@@ -119,7 +119,7 @@ jobs:
       - name: Download API Artifact for Deployment
         uses: actions/download-artifact@v4
         with:
-          name: Galaxyworld.Api
+          name: GalaxyWorld.Api
       
       - name: Deploy to EC2
         run: |
