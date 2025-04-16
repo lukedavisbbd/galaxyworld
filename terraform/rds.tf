@@ -5,12 +5,12 @@ resource "aws_db_subnet_group" "db-subnet" {
 
 resource "aws_db_instance" "galaxyworld_db_instance" {
   allocated_storage = 20
-  identifier = var.database_name
-  db_name = var.database_name
+  identifier = var.db_name
+  db_name = var.db_name
   instance_class = "db.t3.micro"
   engine = "postgres"
-  username = var.rds_db_name
-  password = var.rds_db_password
+  username = var.db_username
+  password = var.db_password
   skip_final_snapshot = true
   publicly_accessible = true
   multi_az= false

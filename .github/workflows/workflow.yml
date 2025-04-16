@@ -21,7 +21,7 @@ jobs:
       TF_VAR_key_name: galaxyworldkey
     defaults:
       run:
-        working-directory: terraform_ec2
+        working-directory: terraform
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,10 +71,10 @@ jobs:
           mkdir out
           file=out/local.conf
           echo "[Service]" > $file
-          echo "Environment=\"ASPNETCORE_URLS=\\\"http://*:8080\\\"\"" >> $file
-          echo "Environment=\"DBCONNECTIONSTRING=\\\"Server=${{ needs.terraform.outputs.dbhost }};Port=5432;Database=galaxyworld;User Id=${{ secrets.TF_VAR_DB_USERNAME }};Password=${{ secrets.TF_VAR_DB_PASSWORD }};Include Error Detail=true\\\"\"" >> $file
-          echo "Environment=\"AUTH__CLIENTID=\\\"${{ secrets.CLIENT_ID }}\\\"\"" >> $file
-          echo "Environment=\"AUTH__CLIENTSECRET=\\\"${{ secrets.CLIENT_SECRET }}\\\"\"" >> $file
+          echo "Environment=\"ASPNETCORE_URLS=http://*:8080\"" >> $file
+          echo "Environment=\"DBCONNECTIONSTRING=Server=${{ needs.terraform.outputs.dbhost }};Port=5432;Database=galaxyworld;User Id=${{ secrets.TF_VAR_DB_USERNAME }};Password=${{ secrets.TF_VAR_DB_PASSWORD }};Include Error Detail=true\"" >> $file
+          echo "Environment=\"AUTH__CLIENTID=${{ secrets.CLIENT_ID }}\"" >> $file
+          echo "Environment=\"AUTH__CLIENTSECRET=${{ secrets.CLIENT_SECRET }}\"" >> $file
 
       - name: Build API EXE
         working-directory: ./GalaxyWorld.Api
@@ -127,7 +127,7 @@ jobs:
           chmod 0500 privatekey.pem
           EC2_HOST=${{ needs.terraform.outputs.ec2host }}
           scp -o StrictHostKeyChecking=no -i privatekey.pem ./api.tar.gz "ec2-user@$EC2_HOST:api.tar.gz"
-          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && sudo systemctl restart galaxyworld.service"
+          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl restart galaxyworld.service"
   flyway:
     needs:
       - terraform
