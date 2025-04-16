@@ -64,15 +64,13 @@ jobs:
         run: dotnet publish --configuration Release --no-build --output ./publish
         working-directory: ./GalaxyWorld.Cli
         
-      - name: Install Flyway
+      - name: Set up DB connection string
         run: |
-            curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.11.0/flyway-commandline-10.11.0-linux-x64.tar.gz | tar xz
-            sudo mv flyway-*/flyway /usr/local/bin
-
-      - name: Run Flyway Migrations
+            echo "DB_CONNECTION_STRING=Host=$DB_ENDPOINT;Username=DB_USERNAME;Password=DB_PASSWORD;Database=gwdatabase" >> $GITHUB_ENV
+            
+      - name: Run EF Core Migrations
         run: |
-            flyway migrate -url=jdbc:postgresql://$DB_ENDPOINT:5432/gwdatabase -user=DB_USERNAME -password=DB_PASSWORD -locations=filesystem:./migrations
-
+           dotnet ef database update --project ./GalaxyWorld.Cli/GalaxyWorld.Cli.csproj --startup-project ./GalaxyWorld.Cli/GalaxyWorld.Cli.csproj --connection "$DB_CONNECTION_STRING"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
