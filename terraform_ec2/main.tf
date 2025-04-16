@@ -98,7 +98,7 @@ resource "aws_instance" "galaxyworld_ec2_instance" {
   user_data = <<-EOF
     #!/bin/bash
     # Install necessary packages
-    dnf install -y java-23-amazon-corretto nginx
+    dnf install -y aspnetcore-runtime-8.0 nginx
 
     # Setup Systemd Service
     file="/etc/systemd/system/galaxyworld.service"
