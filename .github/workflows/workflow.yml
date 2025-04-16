@@ -97,17 +97,15 @@ jobs:
       - name: Get Version
         run: echo "VERSION=$(date +'%Y.%m.%d-%H.%M.%S')" >> $GITHUB_ENV
 
-      # - name: Create Release
-      #   uses: softprops/action-gh-release@v2
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: v${{ env.VERSION }}
-      #     name: "Release v${{ env.VERSION }}"
-      #     body: "Automated release for commit ${{ github.sha }}"
-      #     draft: false
-      #     prerelease: false
-      #     files: GalaxyWorld.Cli/out/GalaxyWorld.Cli.exe
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: "Release v${{ env.VERSION }}"
+          body: "Automated release for commit ${{ github.sha }}"
+          draft: false
+          prerelease: false
+          files: GalaxyWorld.Cli/out/GalaxyWorld.Cli.exe
  
   deploy:
     name: Deploy
@@ -127,7 +125,7 @@ jobs:
           chmod 0500 privatekey.pem
           EC2_HOST=${{ needs.terraform.outputs.ec2host }}
           scp -o StrictHostKeyChecking=no -i privatekey.pem ./api.tar.gz "ec2-user@$EC2_HOST:api.tar.gz"
-          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && sudo mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl restart galaxyworld.service"
+          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && sudo mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl daemon-reload && sudo systemctl restart galaxyworld.service"
   flyway:
     needs:
       - terraform
