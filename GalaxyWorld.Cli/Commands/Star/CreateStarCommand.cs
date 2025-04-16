@@ -31,6 +31,7 @@ public class CreateStarCommand : AsyncCommand
         try {
             var star = await client.PostStar(insert);
 
+            AnsiConsole.MarkupLine($"[green]Created Star[/]");
             ModelHelper.PrintModel(star);
             return 0;
         }

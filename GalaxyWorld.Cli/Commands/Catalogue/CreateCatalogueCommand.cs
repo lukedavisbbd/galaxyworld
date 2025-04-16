@@ -18,6 +18,7 @@ public class CreateCatalogueCommand : AsyncCommand
             var insert = ModelHelper.PromptModel<CatalogueModels::CatalogueInsert>();
             var catalogue = await client.PostCatalogue(insert);
 
+            AnsiConsole.MarkupLine($"[green]Created Catalogue[/]");
             ModelHelper.PrintModel(catalogue);
             return 0;
         }

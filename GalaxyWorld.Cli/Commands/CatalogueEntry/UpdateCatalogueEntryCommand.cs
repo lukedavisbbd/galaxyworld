@@ -27,6 +27,7 @@ public class UpdateCatalogueEntryCommand : AsyncCommand<UpdateCatalogueEntryComm
             var patch = ModelHelper.PromptModel<CatalogueEntryPatch>();
             var entry = await client.PatchCatalogueEntry(settings.CatalogueId, settings.StarId, patch);
 
+            AnsiConsole.MarkupLine($"[green]Updated Entry[/]");
             ModelHelper.PrintModel(entry);
             return 0;
         }
