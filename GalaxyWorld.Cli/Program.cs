@@ -96,8 +96,6 @@ public static class Program
 
                 config.AddBranch("entries", config =>
                 {
-                    config.AddCommand<GetCatalogueStarEntriesCommand>("get-all")
-                        .WithDescription("Get all star entries for a catalogue");
                     config.AddCommand<GetCatalogueEntryCommand>("get")
                         .WithDescription("Get a specific entry for catalogue ID and star ID");
                     config.AddCommand<CreateCatalogueEntryCommand>("create")

@@ -1,20 +1,21 @@
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
+using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Helper;
 
-namespace GalaxyWorld.Cli.Commands.EntriesCommands;
+namespace GalaxyWorld.Cli.Commands.CatalogueEntry;
 
-public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Settings>
+public class UpdateCatalogueEntryCommand : AsyncCommand<UpdateCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
         [CommandArgument(0, "<catalogue_id>")]
         public int CatalogueId { get; set; }
+
         [CommandArgument(1, "<star_id>")]
         public int StarId { get; set; }
-        
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -23,15 +24,15 @@ public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Se
 
         try
         {
-            var entry = await client.GetCatalogueEntry(settings.CatalogueId, settings.StarId);
+            var patch = ModelHelper.PromptModel<CatalogueEntryPatch>();
+            var entry = await client.PatchCatalogueEntry(settings.CatalogueId, settings.StarId, patch);
 
             ModelHelper.PrintModel(entry);
-            
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue entry."}[/]");
             return 1;
         }
     }
