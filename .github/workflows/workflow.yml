@@ -21,7 +21,7 @@ jobs:
       TF_VAR_key_name: galaxyworldkey
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform_ec2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
