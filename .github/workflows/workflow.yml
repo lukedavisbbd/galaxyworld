@@ -34,7 +34,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" -backend-config="key=${{ secrets.AWS_BUCKET_KEY }}" -backend-config="region=af-south-1"
+        run: terraform init -backend-config="bucket=${{ vars.AWS_BUCKET_NAME }}" -backend-config="key=${{ vars.AWS_BUCKET_KEY }}" -backend-config="region=af-south-1"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
