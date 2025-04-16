@@ -48,7 +48,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: af-south-1
+          aws-region: eu-west-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -65,7 +65,7 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: |
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPO_NAME }}:latestatest
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.ECR_REPO_NAME }}:latest
 
       - name: Force Fargate Service Update
         run: |
