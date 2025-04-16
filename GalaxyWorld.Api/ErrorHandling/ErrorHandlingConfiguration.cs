@@ -1,6 +1,7 @@
 ﻿using GalaxyWorld.API.Database;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace GalaxyWorld.API.ErrorHandling;
@@ -15,23 +16,7 @@ public static class ErrorHandlingConfiguration
         {
             options.Map<PostgresException>(ex =>
             {
-                var logger = loggerFactory.CreateLogger<Program>();
-                if (ex.ConstraintName != null)
-                {
-                    logger.LogError($"DB query failed constraint '{ex.ConstraintName}': {ex}");
-                    return new ProblemDetails
-                    {
-                        Status = StatusCodes.Status400BadRequest,
-                        Title = "Constraint Failed",
-                        Detail = DbConstants.MapConstraintName(ex.ConstraintName),
-                    };
-                }
-                logger.LogError($"DB query failed: {ex}");
-                return new ProblemDetails
-                {
-                    Title = "Internal Server Error",
-                    Status = StatusCodes.Status500InternalServerError,
-                };
+                return MapDbError(ex);
             });
             options.Map<BadHttpRequestException>(ex =>
             {
@@ -44,5 +29,68 @@ public static class ErrorHandlingConfiguration
             });
         });
         return services;
+    }
+
+    private static ProblemDetails MapDbError(PostgresException ex)
+    {
+        var logger = loggerFactory.CreateLogger<Program>();
+
+        if (ex.SqlState == "23502")
+        {
+            var detail = string.IsNullOrEmpty(ex.ColumnName) ? "Unexpected null value." : DbConstants.MapConstraintName($"{ex.ColumnName}_null");
+            return new ProblemDetails
+            {
+                Title = "Null Constraint Failed",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = detail,
+            };
+        }
+
+        if (ex.ConstraintName != null)
+        {
+            return new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Constraint Failed",
+                Detail = DbConstants.MapConstraintName(ex.ConstraintName),
+            };
+        }
+
+        if (ex.SqlState.Substring(0, 2) == "23")
+        {
+            return new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Constraint Failed",
+                Detail = "Operation would leave database in an inconsistent state.",
+            };
+        }
+
+        if (ex.SqlState == "22001") {
+            var detail = string.IsNullOrEmpty(ex.ColumnName) ? "String too long." : DbConstants.MapConstraintName($"{ex.ColumnName}_length");
+            return new ProblemDetails
+            {
+                Title = "Invalid Data",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = detail,
+            };
+        }
+
+        if (ex.SqlState.Substring(0, 2) == "22")
+        {
+            var detail = string.IsNullOrEmpty(ex.ColumnName) ? "Invalid data." : DbConstants.MapConstraintName($"{ex.ColumnName}_invalid");
+            return new ProblemDetails
+            {
+                Title = "Invalid Data",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = detail,
+            };
+        }
+
+        return new ProblemDetails
+        {
+            Title = "Internal Server Error",
+            Status = StatusCodes.Status500InternalServerError,
+        };
     }
 }

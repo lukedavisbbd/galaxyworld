@@ -1,6 +1,6 @@
 CREATE TABLE constellations (
     con_id serial primary key,
-    con_name varchar(64) unique not null,
+    con_name varchar(64) unique not null check (TRIM(con_name) = con_name AND LENGTH(con_name) > 0),
     iau_abbr char(3) unique not null check (regexp_like(iau_abbr, '^[a-zA-Z]{3}$')),
     nasa_abbr char(4) unique not null check (regexp_like(nasa_abbr, '^[a-zA-Z]{4}$')),
     genitive varchar(64) not null,

@@ -45,7 +45,16 @@ public class LoginCommand : AsyncCommand
             
             return idToken;
         }
-        catch (Exception) {
+        catch (AppException ex) when (ex.Message == "Unauthorized")
+        {
+            return null;
+        }
+        catch (FileNotFoundException)
+        {
+            return null;
+        }
+        catch (DirectoryNotFoundException)
+        {
             return null;
         }
     }
