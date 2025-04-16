@@ -65,7 +65,7 @@ jobs:
         working-directory: ./GalaxyWorld.Cli
         
       - name: Run Flyway Migrations
-        uses: flyway/flyway-action@v3
+        uses: flyway/flyway-action@v2
         with:
           version: '10.11.0'
           url: jdbc:postgresql://$DB_ENDPOINT:5432/gwdatabase
