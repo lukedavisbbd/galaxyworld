@@ -16,7 +16,7 @@ jobs:
       IMAGE_TAG: latest
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_REGION: eu-west-1
-      AWS_ECR_REPOSITORY_NAME: ${{ vars.ecr_repo_name }}
+      AWS_ECR_REPOSITORY_NAME: ${{ var.ecr_repo_name }}
 
     steps:
       - name: Checkout Repo
@@ -58,15 +58,6 @@ jobs:
         id: get-commit-sha
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      # - name: Push Docker image
-        # uses: docker/build-push-action@v5
-        # with:
-        #   context: .
-        #   file: ./docker/Dockerfile
-        #   push: true
-        #   tags: |
-        #     ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }}.amazonaws.com/${{ vars.ecr_repo_name }}:latest
-
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -79,6 +70,6 @@ jobs:
       - name: Force Fargate Service Update
         run: |
           aws ecs update-service \
-            --cluster ${{ vars.ecs_cluster_name }} \
-            --service ${{ vars.SERVICE_NAME }} \
+            --cluster ${{ var.ecs_cluster_name }} \
+            --service ${{ var.SERVICE_NAME }} \
             --force-new-deployment
