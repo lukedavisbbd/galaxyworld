@@ -11,12 +11,12 @@ public static class FilterExt
         {
             case FilterOp.Eq:
                 if (filter.Value?.GetType() == typeof(string))
-                    return $"{columnName} LIKE @filter{index}";
+                    return $"{columnName} ILIKE @filter{index}";
                 else
                     return $"{columnName} = @filter{index}";
             case FilterOp.Neq:
                 if (filter.Value?.GetType() == typeof(string))
-                    return $"{columnName} NOT LIKE @filter{index}";
+                    return $"{columnName} NOT ILIKE @filter{index}";
                 else
                     return $"{columnName} != @filter{index}";
             case FilterOp.Gt:

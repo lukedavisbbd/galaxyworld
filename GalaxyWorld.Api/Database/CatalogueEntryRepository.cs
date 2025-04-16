@@ -76,8 +76,8 @@ public class CatalogueEntryRepository(DbContext db)
             {
                 catId,
                 starId,
-                EntryId = patch.EntryId.Or(),
-                EntryDesignation = patch.EntryDesignation.Or(),
+                EntryId = patch.EntryId.OrDefault(),
+                EntryDesignation = patch.EntryDesignation.OrDefault(),
             }
         );
         return catalogue;

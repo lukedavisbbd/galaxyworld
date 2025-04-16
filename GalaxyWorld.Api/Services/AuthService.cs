@@ -6,12 +6,22 @@ using Microsoft.Extensions.Options;
 
 namespace GalaxyWorld.API.Services;
 
-public class AuthService(HttpClient client, IOptions<AuthOptions> options)
+public class AuthService(HttpClient client, UserService userService, IOptions<AuthOptions> options)
 {
     private static JsonSerializerOptions JsonOptions { get; } = new JsonSerializerOptions
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
     };
+
+    public async Task<GetAuthResponse> GetAuth(string googleId)
+    {
+        var user = await userService.GetOrCreate(googleId);
+        var roles = await userService.GetRoles(user.UserId);
+        return new GetAuthResponse
+        {
+            Roles = roles.ToList(),
+        };
+    }
 
     public async Task<AuthResponse> PostAuth(AuthRequest request)
     {

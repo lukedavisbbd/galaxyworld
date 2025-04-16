@@ -16,13 +16,16 @@ public class RoleRequirementHandler(UserService service, IMemoryCache cache) : A
             return;
         }
 
-        var user = await cache.GetOrCreateAsync("user:google_id:" + googleId, async cache =>
+        // var sessionCacheKey = context.User.FindFirstValue(...);
+        var sessionCacheKey = "";
+
+        var user = await cache.GetOrCreateAsync($"{sessionCacheKey}:user:google_id:{googleId}", async cache =>
         {
             cache.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
             return await service.GetOrCreate(googleId.Value);
         }) ?? throw new InvalidOperationException("user not found or able to be created or cached");
 
-        var roles = await cache.GetOrCreateAsync("roles:user_id:" + user.UserId, async cache =>
+        var roles = await cache.GetOrCreateAsync($"{sessionCacheKey}:roles:user_id:{user.UserId}", async cache =>
         {
             cache.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
             return await service.GetRoles(user.UserId);
