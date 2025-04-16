@@ -22,8 +22,20 @@ resource "aws_default_vpc" "default_vpc" {
   }
 }
 
+data "aws_availability_zones" "available_zones" {
+  
+}
+
+resource "aws_default_subnet" "subnet_az1" {
+  availability_zone = data.aws_availability_zones.available_zones.names[0]
+}
+
+resource "aws_default_subnet" "subnet_az2" {
+  availability_zone = data.aws_availability_zones.available_zones.names[1]
+}
+
 resource "aws_security_group" "allow_postgres" {
-  name_prefix = "allow_postgress_"
+  name_prefix = "allow_postgress"
 
   ingress {
     from_port   = 5432

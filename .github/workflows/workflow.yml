@@ -127,7 +127,7 @@ jobs:
           chmod 0500 privatekey.pem
           EC2_HOST=${{ needs.terraform.outputs.ec2host }}
           scp -o StrictHostKeyChecking=no -i privatekey.pem ./api.tar.gz "ec2-user@$EC2_HOST:api.tar.gz"
-          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl restart galaxyworld.service"
+          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && sudo mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl restart galaxyworld.service"
   flyway:
     needs:
       - terraform
