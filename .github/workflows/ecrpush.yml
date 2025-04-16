@@ -63,14 +63,7 @@ jobs:
       - name: Publish for Docker
         run: dotnet publish --configuration Release --no-build --output ./publish
         working-directory: ./GalaxyWorld.Cli
-        
-      - name: Set up DB connection string
-        run: |
-            echo "DB_CONNECTION_STRING=Host=$DB_ENDPOINT;Username=DB_USERNAME;Password=DB_PASSWORD;Database=gwdatabase" >> $GITHUB_ENV
-            
-      - name: Run EF Core Migrations
-        run: |
-           dotnet ef database update --project ./GalaxyWorld.Cli/GalaxyWorld.Cli.csproj --startup-project ./GalaxyWorld.Cli/GalaxyWorld.Cli.csproj --connection "$DB_CONNECTION_STRING"
+     
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
