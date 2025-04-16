@@ -81,12 +81,12 @@ jobs:
         run: |
           dotnet publish -c Release -p:PublishSingleFile=True -o out
           cd out
-          tar czvf api.tar.gz GalaxyWorld.Api.exe appsettings.json local.conf
+          tar czvf api.tar.gz GalaxyWorld.Api appsettings.json local.conf
 
       - name: Build CLI EXE
         working-directory: ./GalaxyWorld.Cli
         run: |
-          dotnet publish -c Release -p:PublishSingleFile=True -o out
+          dotnet publish -c Release -p:PublishSingleFile=True --self-contained true -f net8.0 -r win-x64 -o out
       
       - name: Upload API Artifact for Deployment
         uses: actions/upload-artifact@v4
@@ -126,7 +126,7 @@ jobs:
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > privatekey.pem
           chmod 0500 privatekey.pem
           EC2_HOST=${{ needs.terraform.outputs.ec2host }}
-          scp -o StrictHostKeyChecking=no -i privatekey.pem ./GalaxyWorld.Api.exe "ec2-user@$EC2_HOST:GalaxyWorld.Api.exe"
+          scp -o StrictHostKeyChecking=no -i privatekey.pem ./GalaxyWorld.Api "ec2-user@$EC2_HOST:GalaxyWorld.Api"
           ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "sudo systemctl restart galaxyworld.service"
   flyway:
     needs:
