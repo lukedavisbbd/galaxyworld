@@ -1,12 +1,9 @@
-﻿using System.Text.Json;
-using GalaxyWorld.Cli.Helper;
-using GalaxyWorld.Core.Models;
-using GalaxyWorld.Core.Models.Star;
+﻿using GalaxyWorld.Core.Models;
 using Spectre.Console;
 
-namespace GalaxyWorld.Cli.Util;
+namespace GalaxyWorld.Cli.Helper;
 
-public static class ModelUtil
+public static class ModelHelper
 {
     public static void PrintModel<T>(T model, string[]? excludedProperties = null)
     {
@@ -43,7 +40,7 @@ public static class ModelUtil
             {
                 optional = true;
                 type = type.GenericTypeArguments[0];
-                
+
                 if (!AnsiConsole.Confirm($"Edit {label}?", false))
                 {
                     var none = Activator.CreateInstance(typeof(Optional<>).MakeGenericType(type));
@@ -51,7 +48,7 @@ public static class ModelUtil
                     continue;
                 }
             }
-            
+
             var defaultValue = type.IsValueType ? Activator.CreateInstance(type) : null;
             var result = typeof(InputHelper).GetMethod(nameof(InputHelper.Prompt))?.MakeGenericMethod(type).Invoke(null, [label, defaultValue]);
 

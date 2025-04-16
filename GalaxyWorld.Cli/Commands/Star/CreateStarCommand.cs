@@ -5,7 +5,6 @@ using GalaxyWorld.Cli.Helper;
 using GalaxyWorld.Core.Models.CatalogueEntry;
 using StarModels = GalaxyWorld.Core.Models.Star;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
 
 namespace GalaxyWorld.Cli.Commands.Star;
 
@@ -15,7 +14,7 @@ public class CreateStarCommand : AsyncCommand
     {
         var client = new ApiClient();
 
-        var insert = ModelUtil.PromptModel<StarModels::StarInsert>([nameof(StarModels::StarInsert.CatalogueEntries)]);
+        var insert = ModelHelper.PromptModel<StarModels::StarInsert>([nameof(StarModels::StarInsert.CatalogueEntries)]);
 
         var entries = new List<CatalogueEntryInsertWithStar>();
         
@@ -32,7 +31,7 @@ public class CreateStarCommand : AsyncCommand
         try {
             var star = await client.PostStar(insert);
 
-            ModelUtil.PrintModel(star);
+            ModelHelper.PrintModel(star);
             return 0;
         }
         catch (AppException e)

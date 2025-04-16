@@ -55,7 +55,6 @@ public static class StarEndpoints
                     Status = Status.Success,
                     Star = star,
                 });
-                logger.LogTrace($"inserted star {i}/{inserts.Count}");
             }
             catch (PostgresException e) when (e.ConstraintName != null)
             {

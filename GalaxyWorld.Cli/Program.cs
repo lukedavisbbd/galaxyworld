@@ -3,13 +3,13 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.Commands.Catalogue;
 using GalaxyWorld.Cli.Commands.Star;
 using GalaxyWorld.Cli.Commands.Constellation;
-using GalaxyWorld.Cli.ApiHandler;
-using System.Text.Json;
 using GalaxyWorld.Cli.Commands.Auth;
+using GalaxyWorld.Cli.Commands.EntriesCommands;
+using GalaxyWorld.Cli.ApiHandler;
 
 namespace GalaxyWorld.Cli;
 
-class Program
+public static class Program
 {
     static async Task Main(string[] args)
     {
@@ -80,6 +80,8 @@ class Program
                     .WithDescription("List all constellations");
                 config.AddCommand<GetConstellationByIdCommand>("get")
                     .WithDescription("Fetch a constellation by ID");
+                config.AddCommand<GetConstellationStarsCommand>("stars")
+                    .WithDescription("Fetch all stars in a constellation");
                 config.AddCommand<DrawConstellationCommand>("draw")
                     .WithDescription("Draw a constellation by ID");
                 config.AddCommand<CreateConstellationCommand>("create")
@@ -88,6 +90,20 @@ class Program
                     .WithDescription("Update a constellation by ID");
                 config.AddCommand<DeleteConstellationCommand>("delete")
                     .WithDescription("Delete a constellation by ID");
+            });
+
+            config.AddBranch("entries", config =>
+            {
+                config.AddCommand<GetCatalogueStarEntriesCommand>("get-all")
+                    .WithDescription("Get all star entries for a catalogue");
+                config.AddCommand<GetCatalogueEntryCommand>("get")
+                    .WithDescription("Get a specific entry for catalogue ID and star ID");
+                config.AddCommand<CreateCatalogueEntryCommand>("create")
+                    .WithDescription("Create an entry linking a star to a catalogue");
+                config.AddCommand<UpdateCatalogueEntryCommand>("update")
+                    .WithDescription("Update entry ID or designation for a catalogue entry");
+                config.AddCommand<DeleteCatalogueEntryCommand>("delete")
+                    .WithDescription("Delete a star's entry in a catalogue");
             });
 
             config.AddCommand<LogoutCommand>("logout")

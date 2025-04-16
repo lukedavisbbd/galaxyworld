@@ -1,7 +1,6 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
-using GalaxyWorld.Cli.Util;
 using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Star;

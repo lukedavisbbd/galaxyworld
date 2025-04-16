@@ -20,7 +20,7 @@ public class GetAllConstellationsCommand : AsyncCommand<GetAllConstellationsComm
         [CommandOption("-p|--page <page>")]
         public int Page { get; init; } = 1;
         [CommandOption("-l|--page-length <length>")]
-        public int Length { get; init; } = 10;
+        public int Length { get; init; } = 20;
         [Description("one or more filters of the form: '{PropertyName}.{Operation}.{Value}', where {PropertyName} is the pascal case name of the property, {Operation} is one of Eq, Neq, Gt, Lt, Gte, or Lte, and {Value} is a comparison value. E.g. Origin.Eq.%Ptolemy% for 'constellations with origin containing Ptolemy'")]
         [CommandOption("-f|--filter <length>")]
         public required string[]? Filter { get; init; }

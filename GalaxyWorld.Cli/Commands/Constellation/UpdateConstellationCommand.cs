@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using ConstellationModels = GalaxyWorld.Core.Models.Constellation;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Constellation;
 
@@ -21,10 +21,10 @@ public class UpdateConstellationCommand : AsyncCommand<UpdateConstellationComman
 
         try
         {
-            var patch = ModelUtil.PromptModel<ConstellationModels::ConstellationPatch>();
+            var patch = ModelHelper.PromptModel<ConstellationModels::ConstellationPatch>();
             var constellation = await client.PatchConstellation(settings.Id, patch);
 
-            ModelUtil.PrintModel(constellation);
+            ModelHelper.PrintModel(constellation);
             return 0;
         }
         catch (AppException e)

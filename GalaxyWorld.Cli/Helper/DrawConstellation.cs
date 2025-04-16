@@ -3,7 +3,7 @@ using GalaxyWorld.Core.Models.Star;
 
 namespace GalaxyWorld.Cli.Helper;
 
-internal class DrawConstellation
+public class DrawConstellation
 {
     static string Grey(byte greyness)
     {

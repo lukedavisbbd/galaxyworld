@@ -3,8 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using StarModels = GalaxyWorld.Core.Models.Star;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
-using System.Text.Json;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Star;
 
@@ -22,11 +21,11 @@ public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
 
         try
         {
-            var patch = ModelUtil.PromptModel<StarModels::StarPatch>();
+            var patch = ModelHelper.PromptModel<StarModels::StarPatch>();
 
             var star = await client.PatchStar(settings.Id, patch);
 
-            ModelUtil.PrintModel(star);
+            ModelHelper.PrintModel(star);
 
             return 0;
         }

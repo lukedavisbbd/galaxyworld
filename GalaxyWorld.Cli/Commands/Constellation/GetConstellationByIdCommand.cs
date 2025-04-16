@@ -2,7 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Constellation;
 
@@ -22,7 +22,7 @@ public class GetConstellationByIdCommand : AsyncCommand<GetConstellationByIdComm
         {
             var constellation = await client.GetConstellation(settings.Id);
 
-            ModelUtil.PrintModel(constellation);
+            ModelHelper.PrintModel(constellation);
 
             return 0;
         }

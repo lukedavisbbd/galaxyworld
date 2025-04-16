@@ -1,9 +1,9 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
-using GalaxyWorld.Cli.Util;
 using GalaxyWorld.Cli.Exceptions;
 using StarModels = GalaxyWorld.Core.Models.Star;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Star;
 
@@ -23,7 +23,7 @@ public class GetStarByIdCommand : AsyncCommand<GetStarByIdCommand.Settings>
         {
             var star = await client.GetStar(settings.Id);
 
-            ModelUtil.PrintModel(star);
+            ModelHelper.PrintModel(star);
 
             var catalogues = await client.GetCatalogues();
             var entries = await client.GetStarCatalogueEntries(settings.Id, 0, 999);

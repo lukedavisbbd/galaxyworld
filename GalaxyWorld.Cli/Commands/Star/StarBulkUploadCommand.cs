@@ -1,6 +1,6 @@
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
-using GalaxyWorld.Core.Models.CatalogueEntry;
+using EntryModels = GalaxyWorld.Core.Models.CatalogueEntry;
 using CoreModels = GalaxyWorld.Core.Models;
 using StarModels = GalaxyWorld.Core.Models.Star;
 using ConModels = GalaxyWorld.Core.Models.Constellation;
@@ -8,9 +8,9 @@ using CatModels = GalaxyWorld.Core.Models.Catalogue;
 using GalaxyWorld.Cli.Exceptions;
 using CsvHelper.Configuration;
 using CsvHelper;
-using GalaxyWorld.Cli.Models;
 using System.Globalization;
 using Spectre.Console;
+using GalaxyWorld.Cli.Models;
 
 namespace GalaxyWorld.Cli.Commands.Star;
 
@@ -101,10 +101,24 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             {
                 var stars = await UploadBatch(client, batch, constellations, catalogues);
 
-                var successes = stars.Where(s => s.Status == CoreModels::Status.Success).Count();
-                var failures = stars.Where(s => s.Status == CoreModels::Status.Failure).Count();
-                var failureReasons = stars.Select((star, index) => (star, index)).Where((s) => s.star.Status == CoreModels::Status.Failure)
-                    .Select(s => $"#{s.index + i * BATCH_SIZE}: {s.star.Error}");
+                var successes = stars.Where(s => s.Item1.Status == CoreModels::Status.Success).Count();
+                var failures = stars.Where(s => s.Item1.Status == CoreModels::Status.Failure).Count();
+                var failureReasons = stars.Select((resp, index) => (resp, index)).Where((s) => s.resp.Item1.Status == CoreModels::Status.Failure)
+                    .Select(s =>
+                    {
+                        var catalogueInfo = "";
+                        if (s.resp.Item1.Error!.Contains("Entry ID already taken")) {
+                            var entries = s.resp.Item2
+                                .Where(entry => entry.EntryId != null)
+                                .Select(entry =>
+                                {
+                                    var catSlug = catalogues.First(c => c.CatId == entry.CatId).CatSlug;
+                                    return $"{catSlug}: '{entry.EntryId}'";
+                                });
+                            catalogueInfo = ' ' + string.Join(", ", entries);
+                        }
+                        return $"#{s.index + i * BATCH_SIZE}: {s.resp.Item1.Error}{catalogueInfo}";
+                    });
 
                 totalSuccesses += successes;
                 totalFailures += failures;
@@ -131,7 +145,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
         return (totalSuccesses, totalFailures);
     }
 
-    static async Task<IEnumerable<StarModels::StarBulkResponse>> UploadBatch(ApiClient client, IEnumerable<StarRecord> starRecords, List<ConModels::Constellation> constellations, List<CatModels::Catalogue> catalogues)
+    static async Task<IEnumerable<(StarModels::StarBulkResponse, List<EntryModels::CatalogueEntryInsertWithStar>)>> UploadBatch(ApiClient client, IEnumerable<StarRecord> starRecords, List<ConModels::Constellation> constellations, List<CatModels::Catalogue> catalogues)
     {
         var athygCatId = catalogues.First(c => c.CatSlug == "athyg").CatId;
         var tycho2CatId = catalogues.First(c => c.CatSlug == "tycho2").CatId;
@@ -144,6 +158,8 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
         var bayerCatId = catalogues.First(c => c.CatSlug == "bayer").CatId;
         var flamsteedCatId = catalogues.First(c => c.CatSlug == "flamsteed").CatId;
 
+        var allCatEntries = new List<List<EntryModels::CatalogueEntryInsertWithStar>>();
+
         var starInserts = starRecords.Select(record =>
         {
             record.Constellation = NormaliseNullableString(record.Constellation);
@@ -155,11 +171,13 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 :
                 null;
 
+            record.ProperName = NormaliseNullableString(record.ProperName);
             record.PosSrc = NormaliseNullableString(record.PosSrc) ?? throw new ArgumentNullException();
             record.DistanceSrc = NormaliseNullableString(record.DistanceSrc);
             record.MagnitudeSrc = NormaliseNullableString(record.MagnitudeSrc) ?? throw new ArgumentNullException();
             record.RadialVelocitySrc = NormaliseNullableString(record.RadialVelocitySrc);
             record.ProperMotionSrc = NormaliseNullableString(record.ProperMotionSrc);
+            record.SpectralType = NormaliseNullableString(record.SpectralType);
             record.SpectralTypeSrc = NormaliseNullableString(record.SpectralTypeSrc);
 
             record.Tycho2Id = NormaliseNullableString(record.Tycho2Id);
@@ -177,10 +195,10 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             if (record.FlamsteedDesignation != null && constellation != null)
                 flamsteedDesignation = $"{record.FlamsteedDesignation} {constellation.Genitive}";
 
-            var catEntries = new List<CatalogueEntryInsertWithStar>();
+            var catEntries = new List<EntryModels::CatalogueEntryInsertWithStar>();
             if (record.AthygId.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = athygCatId,
                     EntryId = record.AthygId.ToString()!,
@@ -189,7 +207,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (!string.IsNullOrWhiteSpace(record.Tycho2Id))
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = tycho2CatId,
                     EntryId = record.Tycho2Id,
@@ -198,16 +216,16 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (record.GaiaDr3Id.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = gaiaDr3CatId,
-                    EntryId = record.GaiaDr3Id.ToString()!,
+                    EntryDesignation = record.GaiaDr3Id.ToString()!,
                 };
                 catEntries.Add(catEntry);
             }
             if (record.HygV3Id.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = hygV3CatId,
                     EntryId = record.HygV3Id.ToString()!,
@@ -216,7 +234,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (record.HipparcosId.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = hipparcosCatId,
                     EntryId = record.HipparcosId.ToString()!,
@@ -225,25 +243,25 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (record.HenryDraperId.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = henryDraperCatId,
-                    EntryId = record.HenryDraperId.ToString()!,
+                    EntryDesignation = record.HenryDraperId.ToString()!,
                 };
                 catEntries.Add(catEntry);
             }
             if (record.HarvardYaleId.HasValue)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = harvardYaleCatId,
-                    EntryId = record.HarvardYaleId.ToString()!,
+                    EntryDesignation = record.HarvardYaleId.ToString()!,
                 };
                 catEntries.Add(catEntry);
             }
             if (!string.IsNullOrWhiteSpace(record.GlieseId))
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = glieseCatId,
                     EntryId = record.GlieseId,
@@ -252,7 +270,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (!string.IsNullOrWhiteSpace(record.BayerDesignation))
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = bayerCatId,
                     EntryDesignation = record.BayerDesignation,
@@ -261,7 +279,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             }
             if (flamsteedDesignation != null)
             {
-                var catEntry = new CatalogueEntryInsertWithStar
+                var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatId = flamsteedCatId,
                     EntryDesignation = flamsteedDesignation,
@@ -269,10 +287,12 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 catEntries.Add(catEntry);
             }
 
+            allCatEntries.Add(catEntries);
+
             var starInsert = new StarModels::StarInsert
             {
                 Constellation = constellation?.ConId,
-                ProperName = string.IsNullOrWhiteSpace(record.ProperName) ? null : record.ProperName.Trim(),
+                ProperName = record.ProperName,
                 RightAscension = record.RightAscension,
                 Declination = record.Declination,
                 PosSrc = record.PosSrc,
@@ -303,7 +323,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
 
         var stars = await client.PostStarsBulk(starInserts);
 
-        return stars;
+        return stars.Zip(allCatEntries);
     }
 
     static string? NormaliseNullableString(string? str)

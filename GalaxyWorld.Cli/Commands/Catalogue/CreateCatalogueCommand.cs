@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using CatalogueModels = GalaxyWorld.Core.Models.Catalogue;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Util;
+using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue;
 
@@ -15,10 +15,10 @@ public class CreateCatalogueCommand : AsyncCommand
 
         try
         {
-            var insert = ModelUtil.PromptModel<CatalogueModels::CatalogueInsert>();
+            var insert = ModelHelper.PromptModel<CatalogueModels::CatalogueInsert>();
             var catalogue = await client.PostCatalogue(insert);
 
-            ModelUtil.PrintModel(catalogue);
+            ModelHelper.PrintModel(catalogue);
             return 0;
         }
         catch (AppException e)
