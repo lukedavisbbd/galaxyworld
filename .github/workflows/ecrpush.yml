@@ -59,13 +59,22 @@ jobs:
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }}.amazonaws.com/${{ vars.ecr_repo_name }}:latest
+        # uses: docker/build-push-action@v5
+        # with:
+        #   context: .
+        #   file: ./docker/Dockerfile
+        #   push: true
+        #   tags: |
+        #     ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.region }}.amazonaws.com/${{ vars.ecr_repo_name }}:latest
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ var.ecr_repo_name }}
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       - name: Force Fargate Service Update
         run: |
