@@ -3,13 +3,26 @@
 public static class DbConstants
 {
     private static IDictionary<string, string> ConstraintNames = new Dictionary<string, string> {
+        { "users_google_id_check", "User Google ID is invalid." },
+        { "roles_role_name_check", "Role name may not be empty or start/end with whitespace." },
+
         { "stars_constellation_fkey", "Constellation does not exist." },
+        { "stars_proper_name_check", "Star name may not be empty or start/end with whitespace." },
+        { "stars_pos_src_check", "Star position source may not be empty or start/end with whitespace." },
+        { "stars_distance_src_check", "Star distance source may not be empty or start/end with whitespace." },
+        { "stars_magnitude_src_check", "Star magnitude source may not be empty or start/end with whitespace." },
+        { "stars_radial_velocity_src_check", "Star radial velocity source may not be empty or start/end with whitespace." },
+        { "stars_proper_motion_src_check", "Star proper motion source may not be empty or start/end with whitespace." },
+        { "stars_spectral_type_check", "Star spectral type may not be empty or start/end with whitespace." },
+        { "stars_spectral_type_src_check", "Star spectral type source may not be empty or start/end with whitespace." },
 
         { "catalogues_cat_name_key", "Category name already taken." },
+        { "catalogues_cat_name_check", "Category name may not be empty or start/end with whitespace." },
         { "catalogues_cat_slug_key", "Category slug already taken." },
         { "catalogues_cat_slug_check", "Category slug may only contain lowercase alphanumeric characters and underscores." },
 
         { "constellations_con_name_key", "Constellation name already taken." },
+        { "constellations_con_name_check", "Constellation name may not be empty or start/end with whitespace." },
         { "constellations_iau_abbr_key", "Constellation IAU abbreviation already taken." },
         { "constellations_iau_abbr_check", "Constellation IAU abbreviation must be exactly 3 letters." },
         { "constellations_nasa_abbr_key", "Constellation NASA abbreviation already taken." },
@@ -18,6 +31,8 @@ public static class DbConstants
         { "catalogue_entries_pkey", "Star already in category." },
         { "catalogue_entries_cat_id_fkey", "Category does not exist." },
         { "catalogue_entries_star_id_fkey", "Star does not exist." },
+        { "catalogue_entries_entry_id_check", "Entry ID may not be empty or start/end with whitespace." },
+        { "catalogue_entries_entry_designation_check", "Entry designation may not be empty or start/end with whitespace." },
         { "catalogue_entries_cat_id_entry_id_key", "Entry ID already taken." },
         { "catalogue_entries_check", "Entry must have either a unique ID or a designation." },
     };
@@ -33,10 +48,22 @@ public static class DbConstants
             constraint = constraint.Substring(0, constraint.Length - 4) + " already taken";
 
         if (constraint.EndsWith(" pkey"))
-            constraint = constraint.Substring(0, constraint.Length - 4) + " already exists";
+            constraint = constraint.Substring(0, constraint.Length - 5) + " already exists";
 
         if (constraint.EndsWith(" fkey"))
-            constraint = constraint.Substring(0, constraint.Length - 4) + " mismatch";
+            constraint = constraint.Substring(0, constraint.Length - 5) + " mismatch";
+
+        if (constraint.EndsWith(" check"))
+            constraint = constraint.Substring(0, constraint.Length - 6) + " is invalid";
+
+        if (constraint.EndsWith(" null"))
+            constraint = constraint.Substring(0, constraint.Length - 5) + " must be set";
+
+        if (constraint.EndsWith(" invalid"))
+            constraint = constraint.Substring(0, constraint.Length - 8) + " is invalid";
+
+        if (constraint.EndsWith(" long"))
+            constraint = constraint.Substring(0, constraint.Length - 5) + " is too long";
 
         constraint = constraint.Substring(0, 1).ToUpper() + constraint.Substring(1) + '.';
 

@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
 using System.ComponentModel;
-using GalaxyWorld.Core.Models.CatalogueEntry;
+using EntryModels = GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Core.Models;
 
 namespace GalaxyWorld.Cli.Commands.Catalogue;
@@ -16,7 +16,7 @@ public class GetCatalogueStarsCommand : AsyncCommand<GetCatalogueStarsCommand.Se
         public int Id { get; set; }
         [Description("one of: EntryId, EntryIdDsc, EntryDesignation, EntryDesignationDsc")]
         [CommandOption("-s|--sort <sort>")]
-        public CatalogueEntrySort Sort { get; init; }
+        public EntryModels::CatalogueEntrySort Sort { get; init; }
         [CommandOption("-p|--page <page>")]
         public int Page { get; init; } = 1;
         [CommandOption("-l|--page-length <length>")]
@@ -36,7 +36,7 @@ public class GetCatalogueStarsCommand : AsyncCommand<GetCatalogueStarsCommand.Se
         {
             var page = int.Max(settings.Page, 1);
             var length = int.Max(settings.Length, 1);
-            var filters = (settings.Filter ?? []).Select(filter => Filter<CatalogueEntry>.Parse(filter, null)).ToArray();
+            var filters = (settings.Filter ?? []).Select(filter => Filter<EntryModels::CatalogueEntry>.Parse(filter, null)).ToArray();
             var entries = await client.GetCatalogueStarEntries(settings.Id, (page - 1) * length, length, settings.Sort, filters);
 
             if (entries.Count == 0)

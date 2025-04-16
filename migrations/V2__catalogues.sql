@@ -1,6 +1,6 @@
 CREATE TABLE catalogues (
     cat_id serial primary key,
-    cat_name varchar(32) unique,
+    cat_name varchar(32) unique check (TRIM(cat_name) = cat_name AND LENGTH(cat_name) > 0),
     cat_slug varchar(32) unique check (regexp_like(cat_slug, '^[a-z0-9_]+$'))
 );
 

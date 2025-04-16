@@ -3,7 +3,7 @@ using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
 using GalaxyWorld.Cli.Exceptions;
 
-namespace GalaxyWorld.Cli.Commands.EntriesCommands;
+namespace GalaxyWorld.Cli.Commands.CatalogueEntry;
 
 public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryCommand.Settings>
 {
