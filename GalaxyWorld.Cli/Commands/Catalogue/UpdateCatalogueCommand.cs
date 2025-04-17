@@ -24,6 +24,7 @@ public class UpdateCatalogueCommand : AsyncCommand<UpdateCatalogueCommand.Settin
             var patch = ModelHelper.PromptModel<CatalogueModels::CataloguePatch>();
             var catalogue = await client.PatchCatalogue(settings.Id, patch);
 
+            AnsiConsole.MarkupLine($"[green]Updated Catalogue[/]");
             ModelHelper.PrintModel(catalogue);
 
             return 0;

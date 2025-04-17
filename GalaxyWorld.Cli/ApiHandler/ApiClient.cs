@@ -28,7 +28,7 @@ public class ApiClient
         }
     }
 
-    public const string BASE_URL = "https://localhost:4433";
+    public const string BASE_URL = "http://ec2-13-245-23-146.af-south-1.compute.amazonaws.com/";
 
     public static string? DefaultAuthToken { get; set; }
 

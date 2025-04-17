@@ -21,7 +21,7 @@ jobs:
       TF_VAR_key_name: galaxyworldkey
     defaults:
       run:
-        working-directory: terraform_ec2
+        working-directory: terraform
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" -backend-config="key=${{ secrets.AWS_BUCKET_KEY }}" -backend-config="region=af-south-1"
+        run: terraform init -backend-config="bucket=${{ vars.AWS_BUCKET_NAME }}" -backend-config="key=${{ vars.AWS_BUCKET_KEY }}" -backend-config="region=af-south-1"
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
@@ -71,22 +71,22 @@ jobs:
           mkdir out
           file=out/local.conf
           echo "[Service]" > $file
-          echo "Environment=\"ASPNETCORE_URLS=\\\"http://*:8080\\\"\"" >> $file
-          echo "Environment=\"DBCONNECTIONSTRING=\\\"Server=${{ needs.terraform.outputs.dbhost }};Port=5432;Database=galaxyworld;User Id=${{ secrets.TF_VAR_DB_USERNAME }};Password=${{ secrets.TF_VAR_DB_PASSWORD }};Include Error Detail=true\\\"\"" >> $file
-          echo "Environment=\"AUTH__CLIENTID=\\\"${{ secrets.CLIENT_ID }}\\\"\"" >> $file
-          echo "Environment=\"AUTH__CLIENTSECRET=\\\"${{ secrets.CLIENT_SECRET }}\\\"\"" >> $file
+          echo "Environment=\"ASPNETCORE_URLS=http://*:8080\"" >> $file
+          echo "Environment=\"DBCONNECTIONSTRING=Server=${{ needs.terraform.outputs.dbhost }};Port=5432;Database=galaxyworld;User Id=${{ secrets.TF_VAR_DB_USERNAME }};Password=${{ secrets.TF_VAR_DB_PASSWORD }};Include Error Detail=true\"" >> $file
+          echo "Environment=\"AUTH__CLIENTID=${{ secrets.CLIENT_ID }}\"" >> $file
+          echo "Environment=\"AUTH__CLIENTSECRET=${{ secrets.CLIENT_SECRET }}\"" >> $file
 
       - name: Build API EXE
         working-directory: ./GalaxyWorld.Api
         run: |
           dotnet publish -c Release -p:PublishSingleFile=True -o out
           cd out
-          tar czvf api.tar.gz GalaxyWorld.Api.exe appsettings.json local.conf
+          tar czvf api.tar.gz GalaxyWorld.Api appsettings.json local.conf
 
       - name: Build CLI EXE
         working-directory: ./GalaxyWorld.Cli
         run: |
-          dotnet publish -c Release -p:PublishSingleFile=True -o out
+          dotnet publish -c Release -p:PublishSingleFile=True --self-contained true -f net8.0 -r win-x64 -o out
       
       - name: Upload API Artifact for Deployment
         uses: actions/upload-artifact@v4
@@ -99,8 +99,6 @@ jobs:
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
           name: "Release v${{ env.VERSION }}"
@@ -119,15 +117,15 @@ jobs:
       - name: Download API Artifact for Deployment
         uses: actions/download-artifact@v4
         with:
-          name: Galaxyworld.Api
+          name: GalaxyWorld.Api
       
       - name: Deploy to EC2
         run: |
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > privatekey.pem
           chmod 0500 privatekey.pem
           EC2_HOST=${{ needs.terraform.outputs.ec2host }}
-          scp -o StrictHostKeyChecking=no -i privatekey.pem ./GalaxyWorld.Api.exe "ec2-user@$EC2_HOST:GalaxyWorld.Api.exe"
-          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "sudo systemctl restart galaxyworld.service"
+          scp -o StrictHostKeyChecking=no -i privatekey.pem ./api.tar.gz "ec2-user@$EC2_HOST:api.tar.gz"
+          ssh -o StrictHostKeyChecking=no -i privatekey.pem "ec2-user@$EC2_HOST" "tar xvf api.tar.gz && sudo mv local.conf /etc/systemd/system/galaxyworld.service.d/ && sudo systemctl daemon-reload && sudo systemctl restart galaxyworld.service"
   flyway:
     needs:
       - terraform

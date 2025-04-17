@@ -24,6 +24,7 @@ public class UpdateConstellationCommand : AsyncCommand<UpdateConstellationComman
             var patch = ModelHelper.PromptModel<ConstellationModels::ConstellationPatch>();
             var constellation = await client.PatchConstellation(settings.Id, patch);
 
+            AnsiConsole.MarkupLine($"[green]Updated Constellation[/]");
             ModelHelper.PrintModel(constellation);
             return 0;
         }

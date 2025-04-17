@@ -18,6 +18,7 @@ public class CreateConstellationCommand : AsyncCommand
             var insert = ModelHelper.PromptModel<ConstellationModels::ConstellationInsert>();
             var constellation = await client.PostConstellation(insert);
 
+            AnsiConsole.MarkupLine($"[green]Created Constellation[/]");
             ModelHelper.PrintModel(constellation);
 
             return 0;

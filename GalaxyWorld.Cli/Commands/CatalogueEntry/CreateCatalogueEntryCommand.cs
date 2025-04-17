@@ -25,6 +25,7 @@ public class CreateCatalogueEntryCommand : AsyncCommand<CreateCatalogueEntryComm
         {
             var insert = ModelHelper.PromptModel<CatalogueEntryInsert>();
             
+            AnsiConsole.MarkupLine($"[green]Created Entry[/]");
             var entry = await client.PostCatalogueEntry(settings.CatalogueId, settings.StarId, insert);
 
             ModelHelper.PrintModel(entry);

@@ -33,8 +33,6 @@ public static class ErrorHandlingConfiguration
 
     private static ProblemDetails MapDbError(PostgresException ex)
     {
-        var logger = loggerFactory.CreateLogger<Program>();
-
         if (ex.SqlState == "23502")
         {
             var detail = string.IsNullOrEmpty(ex.ColumnName) ? "Unexpected null value." : DbConstants.MapConstraintName($"{ex.ColumnName}_null");
