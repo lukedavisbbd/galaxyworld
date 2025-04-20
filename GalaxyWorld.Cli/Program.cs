@@ -1,8 +1,8 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Commands.Catalogue;
-using GalaxyWorld.Cli.Commands.Star;
-using GalaxyWorld.Cli.Commands.Constellation;
+using GalaxyWorld.Cli.Commands.Catalogues;
+using GalaxyWorld.Cli.Commands.Stars;
+using GalaxyWorld.Cli.Commands.Constellations;
 using GalaxyWorld.Cli.Commands.Auth;
 using GalaxyWorld.Cli.Commands.CatalogueEntry;
 using GalaxyWorld.Cli.ApiHandler;

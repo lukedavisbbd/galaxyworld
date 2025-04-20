@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
 
-namespace GalaxyWorld.Cli.Commands.Star;
+namespace GalaxyWorld.Cli.Commands.Stars;
 
 public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings>
 {

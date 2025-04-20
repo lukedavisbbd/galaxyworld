@@ -1,13 +1,13 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
-using StarModels = GalaxyWorld.Core.Models.Star;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Core.Models.Star;
 
-namespace GalaxyWorld.Cli.Commands.Star;
+namespace GalaxyWorld.Cli.Commands.Constellations;
 
-public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
+public class DrawConstellationCommand : AsyncCommand<DrawConstellationCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -18,21 +18,18 @@ public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
-
+        
         try
         {
-            var patch = ModelHelper.PromptModel<StarModels::StarPatch>();
+            var constellation = await client.GetConstellation(settings.Id);
+            var stars = await client.GetConstellationStars(settings.Id, 0, 500, StarSort.Magnitude);
 
-            AnsiConsole.MarkupLine($"[green]Updated Star[/]");
-            var star = await client.PatchStar(settings.Id, patch);
-
-            ModelHelper.PrintModel(star);
-
+            DrawConstellation.DrawStars(constellation, stars);
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update constellation."}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
             return 1;
         }
     }

@@ -12,7 +12,7 @@ using System.Globalization;
 using Spectre.Console;
 using GalaxyWorld.Cli.Models;
 
-namespace GalaxyWorld.Cli.Commands.Star;
+namespace GalaxyWorld.Cli.Commands.Stars;
 
 public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings>
 {

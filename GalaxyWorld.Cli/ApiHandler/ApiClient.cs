@@ -47,7 +47,7 @@ public class ApiClient
         }
     }
 
-    private async Task<T> GetAsync<T>(string endpoint)
+    public async Task<T> GetAsync<T>(string endpoint)
     {
         var response = await _httpClient.GetAsync(endpoint);
 
@@ -60,7 +60,7 @@ public class ApiClient
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
-    private async Task<T?> GetDefaultAsync<T>(string endpoint)
+    public async Task<T?> GetDefaultAsync<T>(string endpoint)
     {
         var response = await _httpClient.GetAsync(endpoint);
 
@@ -76,7 +76,7 @@ public class ApiClient
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
-    private async Task<T> PostAsync<T, P>(string endpoint, P payload)
+    public async Task<T> PostAsync<T, P>(string endpoint, P payload)
     {
         var response = await _httpClient.PostAsJsonAsync(endpoint, payload);
 
@@ -90,7 +90,7 @@ public class ApiClient
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
-    private async Task<T> PatchAsync<T, P>(string endpoint, P payload)
+    public async Task<T> PatchAsync<T, P>(string endpoint, P payload)
     {
         var request = new HttpRequestMessage(HttpMethod.Patch, endpoint);
         request.Content = JsonContent.Create(payload);
@@ -104,7 +104,7 @@ public class ApiClient
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
-    private async Task<T> DeleteAsync<T>(string endpoint)
+    public async Task<T> DeleteAsync<T>(string endpoint)
     {
         var response = await _httpClient.DeleteAsync(endpoint);
 
@@ -116,8 +116,8 @@ public class ApiClient
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions) ?? throw new AppException();
     }
 
-    private static string FormatQuery<S, T>(int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
-        where S : Enum
+    public static string FormatQuery<S, T>(int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
+        // where S : Enum
     {
         var list = new List<string>
         {
@@ -134,6 +134,15 @@ public class ApiClient
 
         return query;
     }
+
+    public async Task<List<T>> GetWithQueryAsync<S, T>(string path, int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
+        // where S : Enum
+    {
+        var query = FormatQuery(start, length, sort, filters);
+        Console.WriteLine($"{path}?{query}");
+        return await GetAsync<List<T>>($"{path}?{query}");
+    }
+
 
     // Auth endpoints
 
