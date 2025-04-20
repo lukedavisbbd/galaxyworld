@@ -4,7 +4,7 @@ using GalaxyWorld.Cli.Commands.Catalogues;
 using GalaxyWorld.Cli.Commands.Stars;
 using GalaxyWorld.Cli.Commands.Constellations;
 using GalaxyWorld.Cli.Commands.Auth;
-using GalaxyWorld.Cli.Commands.CatalogueEntry;
+using GalaxyWorld.Cli.Commands.CatalogueEntries;
 using GalaxyWorld.Cli.ApiHandler;
 
 namespace GalaxyWorld.Cli;

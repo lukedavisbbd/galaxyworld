@@ -2,7 +2,6 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Core.Models;
-using GalaxyWorld.Cli.Helper;
 using GalaxyWorld.Cli.Exceptions;
 using System.ComponentModel;
 

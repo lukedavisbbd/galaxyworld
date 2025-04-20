@@ -1,13 +1,11 @@
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
-using GalaxyWorld.Core.Models.CatalogueEntry;
 using GalaxyWorld.Cli.Exceptions;
-using GalaxyWorld.Cli.Helper;
 
-namespace GalaxyWorld.Cli.Commands.CatalogueEntry;
+namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class CreateCatalogueEntryCommand : AsyncCommand<CreateCatalogueEntryCommand.Settings>
+public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -15,25 +13,22 @@ public class CreateCatalogueEntryCommand : AsyncCommand<CreateCatalogueEntryComm
         public int CatalogueId { get; set; }
         [CommandArgument(1, "<star_id>")]
         public int StarId { get; set; }
+        
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
-        
+
         try
         {
-            var insert = ModelHelper.PromptModel<CatalogueEntryInsert>();
-            
-            AnsiConsole.MarkupLine($"[green]Created Entry[/]");
-            var entry = await client.PostCatalogueEntry(settings.CatalogueId, settings.StarId, insert);
-
-            ModelHelper.PrintModel(entry);
+            var result = await client.DeleteCatalogueEntry(settings.CatalogueId, settings.StarId);
+            AnsiConsole.MarkupLine("[green]Catalogue entry deleted successfully.[/]");
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star entry."}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete catalogue entry."}[/]");
             return 1;
         }
     }

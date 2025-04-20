@@ -4,7 +4,7 @@ using GalaxyWorld.Cli.Models;
 
 namespace GalaxyWorld.Cli.Commands.Constellations;
 
-public class GetConstellationStarsCommand : GetStarsByParentIdCommand<StarSort>
+public class GetConstellationStarsCommand : GetStarsByParentIdCommand<Star, StarSort>
 {
     protected override string SubPath => Routes.Constellations;
 }

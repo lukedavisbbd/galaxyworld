@@ -2,10 +2,11 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
 using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Cli.Helper;
 
-namespace GalaxyWorld.Cli.Commands.CatalogueEntry;
+namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryCommand.Settings>
+public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -22,13 +23,15 @@ public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryComm
 
         try
         {
-            var result = await client.DeleteCatalogueEntry(settings.CatalogueId, settings.StarId);
-            AnsiConsole.MarkupLine("[green]Catalogue entry deleted successfully.[/]");
+            var entry = await client.GetCatalogueEntry(settings.CatalogueId, settings.StarId);
+
+            ModelHelper.PrintModel(entry);
+            
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete catalogue entry."}[/]");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
             return 1;
         }
     }
