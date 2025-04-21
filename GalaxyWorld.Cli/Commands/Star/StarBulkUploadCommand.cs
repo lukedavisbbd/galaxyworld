@@ -11,7 +11,6 @@ using CsvHelper;
 using System.Globalization;
 using Spectre.Console;
 using GalaxyWorld.Cli.Models;
-using System.Text.Json;
 using GalaxyWorld.Core.Models;
 
 namespace GalaxyWorld.Cli.Commands.Star;
@@ -64,7 +63,9 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
             var csv = new CsvReader(reader, config);
 
             var records = csv.GetRecords<StarRecord>()
-                .Where((r, i) => i >= settings.SkipNRows);
+                .Where((r, i) => i >= settings.SkipNRows).ToList(); 
+            
+            records.Sort((a, b) => a.Magnitude.CompareTo(b.Magnitude));
 
             try
             {
@@ -112,18 +113,19 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var failureReasons = stars.Select((resp, index) => (resp, index)).Where((s) => s.resp.Item1.Status == CoreModels::Status.Failure)
                     .Select(s =>
                     {
-                        var catalogueInfo = "";
-                        if (s.resp.Item1.Error!.Contains("Entry ID already taken")) {
-                            var entries = s.resp.Item2
-                                .Where(entry => entry.EntryId != null)
-                                .Select(entry =>
-                                {
-                                    var catalogueSlug = catalogues.First(c => c.CatalogueId == entry.CatalogueId).CatalogueSlug;
-                                    return $"{catalogueSlug}: '{entry.EntryId}'";
-                                });
-                            catalogueInfo = ' ' + string.Join(", ", entries);
-                        }
-                        return $"#{s.index + i * BATCH_SIZE}: {s.resp.Item1.Error}{catalogueInfo}";
+                        var entries = s.resp.Item2
+                            .Select(entry =>
+                            {
+                                var catalogueSlug = catalogues.First(c => c.CatalogueId == entry.CatalogueId).CatalogueSlug;
+                                return $"{catalogueSlug}: '{entry.EntryId}'";
+                            });
+                        
+                        var catalogueInfo = string.Join(", ", entries);
+                        
+                        if (string.IsNullOrWhiteSpace(catalogueInfo))
+                            catalogueInfo = "no entries";
+                        
+                        return $"#{s.index + i * BATCH_SIZE}: {s.resp.Item1.Error} ({catalogueInfo})";
                     });
 
                 totalSuccesses += successes;
@@ -206,7 +208,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = athygCatalogueId,
-                    EntryId = record.AthygId.ToString()!,
+                    EntryId = record.AthygId.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -224,7 +226,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = gaiaDr3CatalogueId,
-                    EntryDesignation = record.GaiaDr3Id.ToString()!,
+                    EntryDesignation = record.GaiaDr3Id.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -233,7 +235,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = hygV3CatalogueId,
-                    EntryId = record.HygV3Id.ToString()!,
+                    EntryId = record.HygV3Id.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -242,7 +244,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = hipCatalogueId,
-                    EntryId = record.HipparcosId.ToString()!,
+                    EntryId = record.HipparcosId.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -251,7 +253,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = henryDraperCatalogueId,
-                    EntryDesignation = record.HenryDraperId.ToString()!,
+                    EntryDesignation = record.HenryDraperId.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -260,7 +262,7 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 var catEntry = new EntryModels::CatalogueEntryInsertWithStar
                 {
                     CatalogueId = harvardYaleCatalogueId,
-                    EntryDesignation = record.HarvardYaleId.ToString()!,
+                    EntryDesignation = record.HarvardYaleId.Value.ToString(),
                 };
                 catEntries.Add(catEntry);
             }
@@ -342,8 +344,6 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 VelocityCircular = velocityCircular,
                 CatalogueEntries = catEntries,
             };
-
-            Console.WriteLine($"batch: {JsonSerializer.Serialize(starInsert)}");
 
             return starInsert;
         }).ToList();

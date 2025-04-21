@@ -41,7 +41,7 @@ public static class CatalogueEndpoints
     {
         var entries = await entryService.GetByCatalogue(catalogueId, new Page { Start = 0, Length = 1 }, default, []);
         if (entries.Count() > 0) {
-            return Results.Problem("Catalogue is not empty.");
+            return Results.Problem("Catalogue is not empty.", null, StatusCodes.Status404NotFound, "Bad Request");
         }
 
         var catalogue = await catalogueService.Delete(catalogueId);

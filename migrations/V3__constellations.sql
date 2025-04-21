@@ -89,7 +89,7 @@ INSERT INTO constellations (constellation_name, iau_abbreviation, nasa_abbreviat
     ('Taurus', 'Tau', 'Taur', 'Tauri', 'ancient (Ptolemy)', 'bull'),
     ('Telescopium', 'Tel', 'Tele', 'Telescopii', '1763, Lacaille', 'telescope'),
     ('Triangulum', 'Tri', 'Tria', 'Trianguli', 'ancient (Ptolemy)', 'triangle'),
-    ('Triangulum Australe', 'TrA', 'TrAu', 'Trianguli ', '1603, Uranometria, created by Keyser and de Houtman', 'southern triangle'),
+    ('Triangulum Australe', 'TrA', 'TrAu', 'Trianguli Australis', '1603, Uranometria, created by Keyser and de Houtman', 'southern triangle'),
     ('Tucana', 'Tuc', 'Tucn', 'Tucanae', '1603, Uranometria, created by Keyser and de Houtman', 'toucan'),
     ('Ursa Major', 'UMa', 'UMaj', 'Ursae Majoris', 'ancient (Ptolemy)', 'great bear'),
     ('Ursa Minor', 'UMi', 'UMin', 'Ursae Minoris', 'ancient (Ptolemy)', 'lesser bear'),
