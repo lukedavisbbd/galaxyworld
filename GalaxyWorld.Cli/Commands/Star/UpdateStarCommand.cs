@@ -23,9 +23,9 @@ public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
         {
             var patch = ModelHelper.PromptModel<StarModels::StarPatch>();
 
-            AnsiConsole.MarkupLine("[green]Updated Star[/]");
             var star = await client.PatchStar(settings.Id, patch);
 
+            AnsiConsole.MarkupLine("[green]Updated Star[/]");
             ModelHelper.PrintModel(star);
 
             return 0;

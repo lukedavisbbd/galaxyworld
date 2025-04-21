@@ -32,7 +32,12 @@ public class GetStarByIdCommand : AsyncCommand<GetStarByIdCommand.Settings>
             foreach (var entry in entries)
             {
                 var catalogue = catalogues.First(cat => cat.CatalogueId == entry.CatalogueId);
-                AnsiConsole.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName}:[/] {entry.EntryId} {entry.EntryDesignation}");
+                if (!string.IsNullOrWhiteSpace(entry.EntryId)) {
+                    AnsiConsole.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName} (ID):[/] {entry.EntryId}");
+                }
+                if (!string.IsNullOrWhiteSpace(entry.EntryDesignation)) {
+                    AnsiConsole.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName} (Designation):[/] {entry.EntryDesignation}");
+                }
             }
 
             return 0;
