@@ -20,7 +20,7 @@ public class GetStarPlanetsCommand : Command<GetStarPlanetsCommand.Settings>
 
         try
         {
-            var planetarySystem = client.GetAsync<PlanetarySystem>($"/stars/{settings.Id}/planets").Result;
+            var planetarySystem = client.GetDefaultAsync<PlanetarySystem>($"/stars/{settings.Id}/planets").Result;
 
             if (planetarySystem is null)
             {
