@@ -37,15 +37,15 @@ public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings
                 AnsiConsole.WriteLine();
                 AnsiConsole.MarkupLineInterpolated($"* [bold]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
                 if (planet.Controversial)
-                    AnsiConsole.WriteLine("[yellow]Discovery Disputed[/]");
+                    AnsiConsole.MarkupLine("[yellow]Discovery Disputed[/]");
                 AnsiConsole.WriteLine($"Discovery Method: {planet.DiscoveryMethod}");
                 AnsiConsole.WriteLine($"Discovery Year: {planet.DiscoveryYear}");
                 AnsiConsole.WriteLine($"Discovery Facility: {planet.DiscoveryFacility}");
                 AnsiConsole.WriteLine($"Discovery Telescope: {planet.DiscoveryTelescope}");
-                AnsiConsole.WriteLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
-                AnsiConsole.WriteLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
-                AnsiConsole.WriteLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
-                AnsiConsole.WriteLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
+                AnsiConsole.MarkupLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
+                AnsiConsole.MarkupLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
+                AnsiConsole.MarkupLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
+                AnsiConsole.MarkupLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
 
             }
 
