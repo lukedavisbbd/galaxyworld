@@ -63,7 +63,11 @@ public class LoginCommand : AsyncCommand
     {
         var token = await LoginFromFile();
 
-        if (token != null) return;
+        if (token != null) {
+            ApiClient.DefaultAuthToken = token;
+            AnsiConsole.MarkupLine($"[green]Logged in.[/]");
+            return;
+        }
 
         var server = new Socket(SocketType.Stream, ProtocolType.Tcp);
         server.Bind(new IPEndPoint(IPAddress.Loopback, 0));
@@ -125,6 +129,7 @@ public class LoginCommand : AsyncCommand
         try
         {
             Directory.CreateDirectory(configPath);
+            ApiClient.DefaultAuthToken = token;
             File.WriteAllText(idTokenPath, token);
         }
         catch (IOException) { }
