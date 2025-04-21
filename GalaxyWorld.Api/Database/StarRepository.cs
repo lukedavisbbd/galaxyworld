@@ -26,7 +26,7 @@ public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntr
         parameters.AddDynamicParams(filters.ToParams());
 
         var conn = db.Connection;
-        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars WHERE constellation = @constellation {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
+        var stars = await conn.QueryAsync<Star>($"SELECT * FROM stars WHERE constellation_id = @constellation {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
         return stars;
     }
 
