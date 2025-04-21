@@ -38,8 +38,8 @@ public class ConstellationRepository(DbContext db)
                 meaning
             ) VALUES (
                 @ConstellationName,
-                @IauAbbr,
-                @NasaAbbr,
+                @IauAbbreviation,
+                @NasaAbbreviation,
                 @Genitive,
                 @Origin,
                 @Meaning
