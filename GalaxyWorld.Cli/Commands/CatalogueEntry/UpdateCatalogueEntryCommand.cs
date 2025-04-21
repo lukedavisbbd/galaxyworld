@@ -27,13 +27,13 @@ public class UpdateCatalogueEntryCommand : AsyncCommand<UpdateCatalogueEntryComm
             var patch = ModelHelper.PromptModel<CatalogueEntryPatch>();
             var entry = await client.PatchCatalogueEntry(settings.CatalogueId, settings.StarId, patch);
 
-            AnsiConsole.MarkupLine($"[green]Updated Entry[/]");
+            AnsiConsole.MarkupLine("[green]Updated Entry[/]");
             ModelHelper.PrintModel(entry);
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue entry."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to update catalogue entry."}[/]");
             return 1;
         }
     }

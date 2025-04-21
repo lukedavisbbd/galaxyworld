@@ -51,68 +51,71 @@ public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntr
 
         try
         {
+            var positionCartesianParams = insert.PositionCartesian == null
+                ? "null" :
+                "ARRAY [@PositionCartesianX, @PositionCartesianY, @PositionCartesianZ]";
+            var velocityCartesianParams = insert.VelocityCartesian == null
+                ? "null" :
+                "ARRAY [@VelocityCartesianX, @VelocityCartesianY, @VelocityCartesianZ]";
+            var velocityCircularParams = insert.VelocityCircular == null
+                ? "null" :
+                "ARRAY [@VelocityCircularRa, @VelocityCircularDecl, @VelocityCircularDistance]";
+
             var star = await conn.QueryFirstAsync<Star>(
-                """
+                $"""
                 INSERT INTO stars(
-                    constellation,
+                    constellation_id,
                     proper_name,
                     right_ascension,
                     declination,
-                    pos_src,
                     distance,
-                    x0,
-                    y0,
-                    z0,
-                    distance_src,
+                    position_cartesian,
                     magnitude,
-                    absolute_magnitude,
+                    velocity_circular,
+                    velocity_cartesian,
                     colour_index,
-                    magnitude_src,
-                    radial_velocity,
-                    radial_velocity_src,
-                    proper_motion_right_ascension,
-                    proper_motion_declination,
-                    proper_motion_src,
-                    velocity_x,
-                    velocity_y,
-                    velocity_z,
-                    spectral_type,
-                    spectral_type_src
+                    spectral_type
                 ) VALUES(
-                    @Constellation,
+                    @ConstellationId,
                     @ProperName,
                     @RightAscension,
                     @Declination,
-                    @PosSrc,
                     @Distance,
-                    @X0,
-                    @Y0,
-                    @Z0,
-                    @DistanceSrc,
+                    {positionCartesianParams},
                     @Magnitude,
-                    @AbsoluteMagnitude,
+                    {velocityCircularParams},
+                    {velocityCartesianParams},
                     @ColourIndex,
-                    @MagnitudeSrc,
-                    @RadialVelocity,
-                    @RadialVelocitySrc,
-                    @ProperMotionRightAscension,
-                    @ProperMotionDeclination,
-                    @ProperMotionSrc,
-                    @VelocityX,
-                    @VelocityY,
-                    @VelocityZ,
-                    @SpectralType,
-                    @SpectralTypeSrc
+                    @SpectralType
                 ) RETURNING *
                 """,
-                insert
+                new {
+                    insert.ConstellationId,
+                    insert.ProperName,
+                    insert.RightAscension,
+                    insert.Declination,
+                    insert.Distance,
+                    insert.Magnitude,
+                    insert.ColourIndex,
+                    insert.SpectralType,
+                    insert.CatalogueEntries,
+                    PositionCartesianX = insert.PositionCartesian?.X,
+                    PositionCartesianY = insert.PositionCartesian?.Y,
+                    PositionCartesianZ = insert.PositionCartesian?.Z,
+                    VelocityCircularRa = insert.VelocityCircular?.X,
+                    VelocityCircularDecl = insert.VelocityCircular?.Y,
+                    VelocityCircularDistance = insert.VelocityCircular?.Z,
+                    VelocityCartesianX = insert.VelocityCartesian?.X,
+                    VelocityCartesianY = insert.VelocityCartesian?.Y,
+                    VelocityCartesianZ = insert.VelocityCartesian?.Z,
+                }
             );
 
             if (insert.CatalogueEntries != null)
             {
                 foreach (var entry in insert.CatalogueEntries)
                 {
-                    await catalogueEntryRepo.Insert(entry.CatId, star.StarId, new CatalogueEntryInsert
+                    await catalogueEntryRepo.Insert(entry.CatalogueId, star.StarId, new CatalogueEntryInsert
                     {
                         EntryId = entry.EntryId,
                         EntryDesignation = entry.EntryDesignation,
@@ -148,30 +151,17 @@ public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntr
                 starId,
                 updatedAt = DateTime.Now,
                 
-                Constellation = patch.Constellation.OrDefault(),
+                ConstellationId = patch.ConstellationId.OrDefault(),
                 ProperName = patch.ProperName.OrDefault(),
                 RightAscension = patch.RightAscension.OrDefault(),
                 Declination = patch.Declination.OrDefault(),
-                PosSrc = patch.PosSrc.OrDefault(),
                 Distance = patch.Distance.OrDefault(),
-                X0 = patch.X0.OrDefault(),
-                Y0 = patch.Y0.OrDefault(),
-                Z0 = patch.Z0.OrDefault(),
-                DistanceSrc = patch.DistanceSrc.OrDefault(),
+                PositionCartesian = patch.PositionCartesian.OrDefault(),
                 Magnitude = patch.Magnitude.OrDefault(),
-                AbsoluteMagnitude = patch.AbsoluteMagnitude.OrDefault(),
                 ColourIndex = patch.ColourIndex.OrDefault(),
-                MagnitudeSrc = patch.MagnitudeSrc.OrDefault(),
-                RadialVelocity = patch.RadialVelocity.OrDefault(),
-                RadialVelocitySrc = patch.RadialVelocitySrc.OrDefault(),
-                ProperMotionRightAscension = patch.ProperMotionRightAscension.OrDefault(),
-                ProperMotionDeclination = patch.ProperMotionDeclination.OrDefault(),
-                ProperMotionSrc = patch.ProperMotionSrc.OrDefault(),
-                VelocityX = patch.VelocityX.OrDefault(),
-                VelocityY = patch.VelocityY.OrDefault(),
-                VelocityZ = patch.VelocityZ.OrDefault(),
+                VelocityCartesian = patch.VelocityCartesian.OrDefault(),
+                VelocityCircular = patch.VelocityCircular.OrDefault(),
                 SpectralType = patch.SpectralType.OrDefault(),
-                SpectralTypeSrc = patch.SpectralTypeSrc.OrDefault(),
             }
         );
         return star;

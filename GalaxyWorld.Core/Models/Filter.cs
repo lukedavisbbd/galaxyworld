@@ -8,7 +8,7 @@ namespace GalaxyWorld.Core.Models;
 /// type of the property.
 /// 
 /// Eq and Neq map to LIKE and NOT LIKE respectively if the property type is string. So selections like
-/// ConName.Eq.An%25 will select all constellations starting with "An". '%25' maps to '%', to match a single
+/// ConstellationName.Eq.An%25 will select all constellations starting with "An". '%25' maps to '%', to match a single
 /// character use '_'.
 /// 
 /// Multiple filters are allowed and all must be true for an object to be included in the response.

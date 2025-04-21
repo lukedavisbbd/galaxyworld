@@ -14,15 +14,15 @@ public class PlanetService(HttpClient client, CatalogueService catService, Catal
         var pageAll = new Page { Length = int.MaxValue };
         var catalogues = await catService.Get(pageAll, default, []);
         
-        var hdCatId = catalogues.FirstOrDefault(cat => cat.CatSlug == "hd")?.CatId;
-        var hipCatId = catalogues.FirstOrDefault(cat => cat.CatSlug == "hipparcos")?.CatId;
-        var gaiaCatId = catalogues.FirstOrDefault(cat => cat.CatSlug == "gaia3")?.CatId;
+        var hdCatalogueId = catalogues.FirstOrDefault(cat => cat.CatalogueSlug == "hd")?.CatalogueId;
+        var hipCatalogueId = catalogues.FirstOrDefault(cat => cat.CatalogueSlug == "hip")?.CatalogueId;
+        var gaiaCatalogueId = catalogues.FirstOrDefault(cat => cat.CatalogueSlug == "gaia3")?.CatalogueId;
 
         var entries = await catEntryService.GetByStar(starId, pageAll, default, []);
 
-        var hdEntry = entries.FirstOrDefault(entry => entry.CatId == hdCatId);
-        var hipEntry = entries.FirstOrDefault(entry => entry.CatId == hipCatId);
-        var gaiaEntry = entries.FirstOrDefault(entry => entry.CatId == gaiaCatId);
+        var hdEntry = entries.FirstOrDefault(entry => entry.CatalogueId == hdCatalogueId);
+        var hipEntry = entries.FirstOrDefault(entry => entry.CatalogueId == hipCatalogueId);
+        var gaiaEntry = entries.FirstOrDefault(entry => entry.CatalogueId == gaiaCatalogueId);
 
         var hdId = hdEntry?.EntryId ?? hdEntry?.EntryDesignation;
         var hipId = hipEntry?.EntryId ?? hipEntry?.EntryDesignation;
@@ -43,9 +43,9 @@ public class PlanetService(HttpClient client, CatalogueService catService, Catal
         if (planetRecords.Count == 0)
             return null;
 
-        var numStars = planetRecords[0].NumStars;
-        var numPlanets = planetRecords[0].NumPlanets;
-        var numMoons = planetRecords[0].NumMoons;
+        var numStars = planetRecords[0].SystemNumStars;
+        var numPlanets = planetRecords[0].SystemNumPlanets;
+        var numMoons = planetRecords[0].SystemNumMoons;
 
         var planets = planetRecords.Select(planet => new Planet
         {
@@ -53,9 +53,9 @@ public class PlanetService(HttpClient client, CatalogueService catService, Catal
             SolutionType = planet.SolutionType,
             Controversial = planet.Controverial > 0,
             DiscoveryMethod = planet.DiscoveryMethod,
-            DiscYear = planet.DiscYear,
-            DiscFacility = planet.DiscFacility,
-            DiscTelescope = planet.DiscTelescope,
+            DiscoveryYear = planet.DiscoveryYear,
+            DiscoveryFacility = planet.DiscoveryFacility,
+            DiscoveryTelescope = planet.DiscoveryTelescope,
             RadiusEarth = planet.RadiusEarth,
             RadiusJupiter = planet.RadiusJupiter,
             MassEarth = planet.MassEarth,
@@ -63,9 +63,9 @@ public class PlanetService(HttpClient client, CatalogueService catService, Catal
         });
 
         return new PlanetarySystem {
-            NumStars = numStars,
-            NumPlanets = numPlanets,
-            NumMoons = numMoons,
+            SystemNumStars = numStars,
+            SystemNumPlanets = numPlanets,
+            SystemNumMoons = numMoons,
             Planets = planets.ToList(),
         };
     }

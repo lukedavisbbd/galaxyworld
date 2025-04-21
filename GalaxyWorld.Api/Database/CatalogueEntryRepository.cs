@@ -17,40 +17,40 @@ public class CatalogueEntryRepository(DbContext db)
         return starCatalogues;
     }
 
-    public async Task<IEnumerable<CatalogueEntry>> FetchByCatalogue(int catId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
+    public async Task<IEnumerable<CatalogueEntry>> FetchByCatalogue(int catalogueId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
         var parameters = new DynamicParameters(page);
-        parameters.Add("catId", catId);
+        parameters.Add("catalogueId", catalogueId);
         parameters.AddDynamicParams(filters.ToParams());
 
         var conn = db.Connection;
-        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
+        var starCatalogues = await conn.QueryAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE catalogue_id = @catalogueId {filters.ToSql(FilterPrepend.And)} {sort.ToSql()} LIMIT @Length OFFSET @Start", parameters);
         return starCatalogues;
     }
 
-    public async Task<CatalogueEntry?> FetchOne(int catId, int starId)
+    public async Task<CatalogueEntry?> FetchOne(int catalogueId, int starId)
     {
         var conn = db.Connection;
-        var starCatalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE cat_id = @catId AND star_id = @starId", new
+        var starCatalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>($"SELECT * FROM catalogue_entries WHERE catalogue_id = @catalogueId AND star_id = @starId", new
         {
-            catId,
+            catalogueId,
             starId,
         });
         return starCatalogue;
     }
 
-    public async Task<CatalogueEntry> Insert(int catId, int starId, CatalogueEntryInsert insert)
+    public async Task<CatalogueEntry> Insert(int catalogueId, int starId, CatalogueEntryInsert insert)
     {
         var conn = db.Connection;
         var catalogue = await conn.QueryFirstAsync<CatalogueEntry>(
             """
             INSERT INTO catalogue_entries (
-                cat_id,
+                catalogue_id,
                 star_id,
                 entry_id,
                 entry_designation
             ) VALUES(
-                @catId,
+                @catalogueId,
                 @starId,
                 @EntryId,
                 @EntryDesignation
@@ -58,7 +58,7 @@ public class CatalogueEntryRepository(DbContext db)
             """,
             new
             {
-                catId,
+                catalogueId,
                 starId,
                 insert.EntryId,
                 insert.EntryDesignation,
@@ -67,14 +67,14 @@ public class CatalogueEntryRepository(DbContext db)
         return catalogue;
     }
 
-    public async Task<CatalogueEntry?> Update(int catId, int starId, CatalogueEntryPatch patch)
+    public async Task<CatalogueEntry?> Update(int catalogueId, int starId, CatalogueEntryPatch patch)
     {
         var conn = db.Connection;
         var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>(
-            $"UPDATE catalogue_entries SET {patch.ToSql()} WHERE cat_id = @catId AND star_id = @starId RETURNING *",
+            $"UPDATE catalogue_entries SET {patch.ToSql()} WHERE catalogue_id = @catalogueId AND star_id = @starId RETURNING *",
             new
             {
-                catId,
+                catalogueId,
                 starId,
                 EntryId = patch.EntryId.OrDefault(),
                 EntryDesignation = patch.EntryDesignation.OrDefault(),
@@ -83,13 +83,13 @@ public class CatalogueEntryRepository(DbContext db)
         return catalogue;
     }
 
-    public async Task<CatalogueEntry?> Delete(int catId, int starId)
+    public async Task<CatalogueEntry?> Delete(int catalogueId, int starId)
     {
         var conn = db.Connection;
-        var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>("DELETE FROM catalogue_entries WHERE cat_id = @catId AND star_id = @starId RETURNING *", new
+        var catalogue = await conn.QueryFirstOrDefaultAsync<CatalogueEntry>("DELETE FROM catalogue_entries WHERE catalogue_id = @catalogueId AND star_id = @starId RETURNING *", new
         {
             starId,
-            catId,
+            catalogueId,
         });
         return catalogue;
     }

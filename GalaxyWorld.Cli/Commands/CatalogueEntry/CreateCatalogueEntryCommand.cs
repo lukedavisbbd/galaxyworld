@@ -25,7 +25,7 @@ public class CreateCatalogueEntryCommand : AsyncCommand<CreateCatalogueEntryComm
         {
             var insert = ModelHelper.PromptModel<CatalogueEntryInsert>();
             
-            AnsiConsole.MarkupLine($"[green]Created Entry[/]");
+            AnsiConsole.MarkupLine("[green]Created Entry[/]");
             var entry = await client.PostCatalogueEntry(settings.CatalogueId, settings.StarId, insert);
 
             ModelHelper.PrintModel(entry);
@@ -33,7 +33,7 @@ public class CreateCatalogueEntryCommand : AsyncCommand<CreateCatalogueEntryComm
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star entry."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to create star entry."}[/]");
             return 1;
         }
     }

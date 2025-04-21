@@ -1,8 +1,6 @@
 create table users (
     user_id serial primary key,
     google_id varchar(64) not null unique,
-    created_at timestamp not null default now(),
-    last_logged_in timestamp not null default now(),
     check (regexp_like(google_id, '^[0-9]+$'))
 );
 
@@ -12,8 +10,8 @@ create table roles (
 );
 
 create table user_roles (
-    user_id int not null references users(user_id),
-    role_id int not null references roles(role_id),
+    user_id int not null references users(user_id) on delete cascade on update cascade,
+    role_id int not null references roles(role_id) on delete cascade on update cascade,
     primary key (user_id, role_id)
 );
 

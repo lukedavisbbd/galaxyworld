@@ -14,26 +14,26 @@ public class StarRecord
     public int? FlamsteedDesignation { get; set; }
     public string? Constellation { get; set; }
     public string? ProperName { get; set; }
-    public required double RightAscension { get; set; }
-    public required double Declination { get; set; }
+    public required decimal RightAscension { get; set; }
+    public required decimal Declination { get; set; }
     public required string PosSrc { get; set; }
-    public double? Distance { get; set; }
-    public double? X0 { get; set; }
-    public double? Y0 { get; set; }
-    public double? Z0 { get; set; }
+    public decimal? Distance { get; set; }
+    public decimal? X0 { get; set; }
+    public decimal? Y0 { get; set; }
+    public decimal? Z0 { get; set; }
     public string? DistanceSrc { get; set; }
-    public required double Magnitude { get; set; }
-    public double? AbsoluteMagnitude { get; set; }
-    public double? ColourIndex { get; set; }
+    public required decimal Magnitude { get; set; }
+    public decimal? AbsoluteMagnitude { get; set; }
+    public decimal? ColourIndex { get; set; }
     public required string MagnitudeSrc { get; set; }
-    public double? RadialVelocity { get; set; }
+    public decimal? RadialVelocity { get; set; }
     public string? RadialVelocitySrc { get; set; }
-    public double? ProperMotionRightAscension { get; set; }
-    public double? ProperMotionDeclination { get; set; }
+    public decimal? ProperMotionRightAscension { get; set; }
+    public decimal? ProperMotionDeclination { get; set; }
     public string? ProperMotionSrc { get; set; }
-    public double? VelocityX { get; set; }
-    public double? VelocityY { get; set; }
-    public double? VelocityZ { get; set; }
+    public decimal? VelocityX { get; set; }
+    public decimal? VelocityY { get; set; }
+    public decimal? VelocityZ { get; set; }
     public string? SpectralType { get; set; }
     public string? SpectralTypeSrc { get; set; }
 

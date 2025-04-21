@@ -47,8 +47,8 @@ public class FakeApiClient
 
     public Task<List<Catalogue>> GetCatalogues() => Task.FromResult(new List<Catalogue>
     {
-        new Catalogue { CatId = 1, CatName = "Hipparcos", CatSlug = "hipparcos" },
-        new Catalogue { CatId = 2, CatName = "Tycho", CatSlug = "tycho" }
+        new Catalogue { CatalogueId = 1, CatalogueName = "Hipparcos", CatalogueSlug = "hip" },
+        new Catalogue { CatalogueId = 2, CatalogueName = "Tycho", CatalogueSlug = "tycho" }
     });
 
     public Task<List<CatalogueEntry>> GetStarCatalogueEntries(int starId, int start, int length)
@@ -60,14 +60,14 @@ public class FakeApiClient
                 EntryId = "101",
                 EntryDesignation = "H001",
                 StarId = starId,
-                CatId = 1
+                CatalogueId = 1
             },
             new CatalogueEntry
             {
                 EntryId = "202",
                 EntryDesignation = "T202",
                 StarId = starId,
-                CatId = 2
+                CatalogueId = 2
             }
         });
     }
@@ -90,7 +90,7 @@ public class GetStarByIdCommandShim : AsyncCommand<GetStarByIdCommand.Settings>
         {
             var star = await _client.GetStar(settings.Id);
 
-            _console.MarkupLine($"[green]Star: {star.ProperName}[/]");
+            _console.MarkupLineInterpolated($"[green]Star: {star.ProperName}[/]");
 
             var catalogues = await _client.GetCatalogues();
             var entries = await _client.GetStarCatalogueEntries(settings.Id, 0, 999);
@@ -98,15 +98,15 @@ public class GetStarByIdCommandShim : AsyncCommand<GetStarByIdCommand.Settings>
             _console.MarkupLine("[bold]Catalogue Entries:[/]");
             foreach (var entry in entries)
             {
-                var catalogue = catalogues.First(cat => cat.CatId == entry.CatId);
-                _console.MarkupLine($"[yellow]{catalogue.CatName}:[/] {entry.EntryId} {entry.EntryDesignation}");
+                var catalogue = catalogues.First(cat => cat.CatalogueId == entry.CatalogueId);
+                _console.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName}:[/] {entry.EntryId} {entry.EntryDesignation}");
             }
 
             return 0;
         }
         catch (Exception ex)
         {
-            _console.MarkupLine($"[red]{ex.Message}[/]");
+            _console.MarkupLineInterpolated($"[red]{ex.Message}[/]");
             return 1;
         }
     }

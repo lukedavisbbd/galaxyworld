@@ -32,10 +32,10 @@ public class DrawConstellation
 
     public static void DrawStars(Constellation constellation, List<Star> stars)
     {
-        var raMin = double.MaxValue;
-        var raMax = double.MinValue;
-        var decMin = double.MaxValue;
-        var decMax = double.MinValue;
+        var raMin = decimal.MaxValue;
+        var raMax = decimal.MinValue;
+        var decMin = decimal.MaxValue;
+        var decMax = decimal.MinValue;
 
         foreach (var star in stars)
         {
@@ -55,16 +55,16 @@ public class DrawConstellation
         var width = Console.WindowWidth;
         var height = Console.WindowHeight - 1;
 
-        var newRaDelta = (double)width / height * decDelta / 16;
+        var newRaDelta = (decimal)width / height * decDelta / 16;
         raMin -= (newRaDelta - raDelta) / 2;
         raMax += (newRaDelta - raDelta) / 2;
         raDelta = newRaDelta;
 
         // add 10% space on each side
-        raMin -= raDelta * 0.1;
-        raMax += raDelta * 0.1;
-        decMin -= decDelta * 0.1;
-        decMax += decDelta * 0.1;
+        raMin -= raDelta * 0.1m;
+        raMax += raDelta * 0.1m;
+        decMin -= decDelta * 0.1m;
+        decMax += decDelta * 0.1m;
         raDelta = raMax - raMin;
         decDelta = decMax - decMin;
 
@@ -78,20 +78,20 @@ public class DrawConstellation
 
         foreach (var star in stars)
         {
-            var x = (int)double.Round((star.RightAscension - raMin) / raDelta * width);
-            var y = (int)double.Round((star.Declination - decMin) / decDelta * height);
+            var x = (int)decimal.Round((star.RightAscension - raMin) / raDelta * width);
+            var y = (int)decimal.Round((star.Declination - decMin) / decDelta * height);
             if (x < 0 || y < 0 || x >= width || y >= height) continue;
 
             const string CHARSET = "X*.";
 
             // max is lower than min because a higher magnitude star is dimmer
-            const double BRIGHTNESS_MAX = 0.0;
-            const double BRIGHTNESS_MIN = 8.0;
+            const decimal BRIGHTNESS_MAX = 0.0m;
+            const decimal BRIGHTNESS_MIN = 8.0m;
 
-            var brightness = (double)star.Magnitude;
+            var brightness = (decimal)star.Magnitude;
 
             var lerp = (brightness - BRIGHTNESS_MIN) / (BRIGHTNESS_MAX - BRIGHTNESS_MIN);
-            var i = (int)((1.0 - lerp) * CHARSET.Length);
+            var i = (int)((1.0m - lerp) * CHARSET.Length);
             var greyness = (byte)int.Clamp((int)(lerp * 255), 0, 255);
 
             i = int.Clamp(i, 0, CHARSET.Length - 1);
@@ -111,9 +111,9 @@ public class DrawConstellation
 
         var infoWidth = int.Clamp(width / 3, 24, width);
 
-        var info = WrapString($"Name: {constellation.ConName}", infoWidth) + '\n'
-            + WrapString($"IAU Abbr.: {constellation.IauAbbr}", infoWidth) + '\n'
-            + WrapString($"NASA Abbr.: {constellation.NasaAbbr}", infoWidth) + '\n'
+        var info = WrapString($"Name: {constellation.ConstellationName}", infoWidth) + '\n'
+            + WrapString($"IAU Abbr.: {constellation.IauAbbreviation}", infoWidth) + '\n'
+            + WrapString($"NASA Abbr.: {constellation.NasaAbbreviation}", infoWidth) + '\n'
             + WrapString($"Genitive: {constellation.Genitive}", infoWidth) + '\n'
             + WrapString($"Origin: {constellation.Origin}", infoWidth) + '\n'
             + WrapString($"Meaning: {constellation.Meaning}", infoWidth);

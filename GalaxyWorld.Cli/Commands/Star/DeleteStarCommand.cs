@@ -25,7 +25,7 @@ public class DeleteStarCommand : AsyncCommand<DeleteStarCommand.Settings>
         }
         catch (AppException e) 
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete star."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to delete star."}[/]");
             return 1;
         }
     }

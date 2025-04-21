@@ -2,12 +2,12 @@
 
 public enum ConstellationSort
 {
-    ConName,
-    ConNameDsc,
-    IauAbbr,
-    IauAbbrDsc,
-    NasaAbbr,
-    NasaAbbrDsc,
+    ConstellationName,
+    ConstellationNameDsc,
+    IauAbbreviation,
+    IauAbbreviationDsc,
+    NasaAbbreviation,
+    NasaAbbreviationDsc,
     Genitive,
     GenitiveDsc,
 }

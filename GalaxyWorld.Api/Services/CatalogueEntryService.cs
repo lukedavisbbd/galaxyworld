@@ -11,28 +11,28 @@ public class CatalogueEntryService(CatalogueEntryRepository repo)
         return await repo.FetchByStar(star, page, sort, filters);
     }
 
-    public async Task<IEnumerable<CatalogueEntry>> GetByCatalogue(int catId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
+    public async Task<IEnumerable<CatalogueEntry>> GetByCatalogue(int catalogueId, Page page, CatalogueEntrySort sort, Filter<CatalogueEntry>[] filters)
     {
-        return await repo.FetchByCatalogue(catId, page, sort, filters);
+        return await repo.FetchByCatalogue(catalogueId, page, sort, filters);
     }
 
-    public async Task<CatalogueEntry?> GetOne(int catId, int starId)
+    public async Task<CatalogueEntry?> GetOne(int catalogueId, int starId)
     {
-        return await repo.FetchOne(catId, starId);
+        return await repo.FetchOne(catalogueId, starId);
     }
 
-    public async Task<CatalogueEntry> Create(int catId, int starId, CatalogueEntryInsert insert)
+    public async Task<CatalogueEntry> Create(int catalogueId, int starId, CatalogueEntryInsert insert)
     {
-        return await repo.Insert(catId, starId, insert);
+        return await repo.Insert(catalogueId, starId, insert);
     }
 
-    public async Task<CatalogueEntry?> Patch(int catId, int starId, CatalogueEntryPatch patch)
+    public async Task<CatalogueEntry?> Patch(int catalogueId, int starId, CatalogueEntryPatch patch)
     {
-        return await repo.Update(catId, starId, patch);
+        return await repo.Update(catalogueId, starId, patch);
     }
 
-    public async Task<CatalogueEntry?> Delete(int catId, int starId)
+    public async Task<CatalogueEntry?> Delete(int catalogueId, int starId)
     {
-        return await repo.Delete(catId, starId);
+        return await repo.Delete(catalogueId, starId);
     }
 }

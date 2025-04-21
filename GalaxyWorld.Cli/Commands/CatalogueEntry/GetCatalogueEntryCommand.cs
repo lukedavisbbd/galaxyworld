@@ -31,7 +31,7 @@ public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Se
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
             return 1;
         }
     }

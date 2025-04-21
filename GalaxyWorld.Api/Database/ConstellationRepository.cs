@@ -20,7 +20,7 @@ public class ConstellationRepository(DbContext db)
     public async Task<Constellation?> FetchOne(int conId)
     {
         var conn = db.Connection;
-        var constellation = await conn.QueryFirstOrDefaultAsync<Constellation>("SELECT * FROM constellations WHERE con_id = @conId", new { conId });
+        var constellation = await conn.QueryFirstOrDefaultAsync<Constellation>("SELECT * FROM constellations WHERE constellation_id = @conId", new { conId });
         return constellation;
     }
 
@@ -30,14 +30,14 @@ public class ConstellationRepository(DbContext db)
         var constellation = await conn.QueryFirstAsync<Constellation>(
             """
             INSERT INTO constellations (
-                con_name,
-                iau_abbr,
-                nasa_abbr,
+                constellation_name,
+                iau_abbreviation,
+                nasa_abbreviation,
                 genitive,
                 origin,
                 meaning
             ) VALUES (
-                @ConName,
+                @ConstellationName,
                 @IauAbbr,
                 @NasaAbbr,
                 @Genitive,
@@ -50,23 +50,23 @@ public class ConstellationRepository(DbContext db)
         return constellation;
     }
 
-    public async Task<Constellation?> Update(int conId, ConstellationPatch patch)
+    public async Task<Constellation?> Update(int constellationId, ConstellationPatch patch)
     {
         var conn = db.Connection;
 
         var changes = patch.ToSql();
 
         if (string.IsNullOrEmpty(changes))
-            return await FetchOne(conId);
+            return await FetchOne(constellationId);
 
         var constellation = await conn.QueryFirstOrDefaultAsync<Constellation>(
             "UPDATE constellations SET " +
-            changes + " WHERE con_id = @conId RETURNING *", new
+            changes + " WHERE constellation_id = @constellationId RETURNING *", new
             {
-                conId,
-                ConName = patch.ConName.OrDefault(),
-                IauAbbr = patch.IauAbbr.OrDefault(),
-                NasaAbbr = patch.NasaAbbr.OrDefault(),
+                constellationId,
+                ConstellationName = patch.ConstellationName.OrDefault(),
+                IauAbbreviation = patch.IauAbbreviation.OrDefault(),
+                NasaAbbreviation = patch.NasaAbbreviation.OrDefault(),
                 Genitive = patch.Genitive.OrDefault(),
                 Origin = patch.Origin.OrDefault(),
                 Meaning = patch.Meaning.OrDefault(),
@@ -78,7 +78,7 @@ public class ConstellationRepository(DbContext db)
     public async Task<Constellation?> Delete(int conId)
     {
         var conn = db.Connection;
-        var constellation = await conn.QueryFirstOrDefaultAsync<Constellation>("DELETE FROM constellations WHERE con_id = @conId RETURNING *", new { conId });
+        var constellation = await conn.QueryFirstOrDefaultAsync<Constellation>("DELETE FROM constellations WHERE constellation_id = @conId RETURNING *", new { conId });
         return constellation;
     }
 }

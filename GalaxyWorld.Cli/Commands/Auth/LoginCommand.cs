@@ -29,7 +29,7 @@ public class LoginCommand : AsyncCommand
         }
         catch (AuthenticationException e)
         {
-            AnsiConsole.MarkupLine(e.Message);
+            Console.WriteLine(e.Message);
             return 1;
         }
     }
@@ -141,7 +141,7 @@ public class LoginCommand : AsyncCommand
                 "&redirect_uri=" + callbackUriEncoded +
                 "&client_id=" + CLIENT_ID;
 
-        AnsiConsole.MarkupLine("[blue]If the browser has not opened, please use this link to sign in: [/]" + oauth2RequestUri);
+        AnsiConsole.MarkupLineInterpolated($"[blue]If the browser has not opened, please use this link to sign in:[/] {oauth2RequestUri}");
 
         try
         {

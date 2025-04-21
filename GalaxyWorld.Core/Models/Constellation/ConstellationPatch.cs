@@ -5,11 +5,11 @@ namespace GalaxyWorld.Core.Models.Constellation;
 public class ConstellationPatch
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string> ConName { get; init; } = default;
+    public Optional<string> ConstellationName { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string> IauAbbr { get; init; } = default;
+    public Optional<string> IauAbbreviation { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string> NasaAbbr { get; init; } = default;
+    public Optional<string> NasaAbbreviation { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public Optional<string> Genitive { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

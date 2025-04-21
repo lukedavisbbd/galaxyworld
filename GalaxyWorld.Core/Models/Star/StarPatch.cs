@@ -5,51 +5,25 @@ namespace GalaxyWorld.Core.Models.Star;
 public class StarPatch
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<int?> Constellation { get; init; } = default;
+    public required Optional<int?> ConstellationId { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> ProperName { get; init; } = default;
+    public required Optional<string?> ProperName { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double> RightAscension { get; init; } = default;
+    public required Optional<decimal> RightAscension { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double> Declination { get; init; } = default;
+    public required Optional<decimal> Declination { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string> PosSrc { get; init; } = default;
+    public required Optional<decimal?> Distance { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> Distance { get; init; } = default;
+    public required Optional<Vector?> PositionCartesian { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> X0 { get; init; } = default;
+    public required Optional<decimal> Magnitude { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> Y0 { get; init; } = default;
+    public required Optional<Vector?> VelocityCircular { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> Z0 { get; init; } = default;
+    public required Optional<Vector?> VelocityCartesian { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> DistanceSrc { get; init; } = default;
+    public required Optional<decimal?> ColourIndex { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double> Magnitude { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> AbsoluteMagnitude { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> ColourIndex { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string> MagnitudeSrc { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> RadialVelocity { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> RadialVelocitySrc { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> ProperMotionRightAscension { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> ProperMotionDeclination { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> ProperMotionSrc { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> VelocityX { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> VelocityY { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<double?> VelocityZ { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> SpectralType { get; init; } = default;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Optional<string?> SpectralTypeSrc { get; init; } = default;
+    public required Optional<string?> SpectralType { get; init; }
 }

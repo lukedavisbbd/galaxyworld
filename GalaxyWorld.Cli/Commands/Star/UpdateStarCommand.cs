@@ -23,7 +23,7 @@ public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
         {
             var patch = ModelHelper.PromptModel<StarModels::StarPatch>();
 
-            AnsiConsole.MarkupLine($"[green]Updated Star[/]");
+            AnsiConsole.MarkupLine("[green]Updated Star[/]");
             var star = await client.PatchStar(settings.Id, patch);
 
             ModelHelper.PrintModel(star);
@@ -32,7 +32,7 @@ public class UpdateStarCommand : AsyncCommand<UpdateStarCommand.Settings>
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update constellation."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to update constellation."}[/]");
             return 1;
         }
     }

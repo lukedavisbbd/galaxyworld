@@ -22,7 +22,7 @@ public class CreateStarCommand : AsyncCommand
         {
             entries.Add(new CatalogueEntryInsertWithStar
             {
-                CatId = InputHelper.Prompt<int>("Catalogue ID"),
+                CatalogueId = InputHelper.Prompt<int>("Catalogue ID"),
                 EntryId = InputHelper.Prompt<string>("Catalogue Entry ID (Unique)"),
                 EntryDesignation = InputHelper.Prompt<string>("Catalogue Entry Designation (Non-unique)")
             });
@@ -31,13 +31,13 @@ public class CreateStarCommand : AsyncCommand
         try {
             var star = await client.PostStar(insert);
 
-            AnsiConsole.MarkupLine($"[green]Created Star[/]");
+            AnsiConsole.MarkupLine("[green]Created Star[/]");
             ModelHelper.PrintModel(star);
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create star"}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to create star"}[/]");
             return 1;
         }
     }

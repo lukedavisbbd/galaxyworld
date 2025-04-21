@@ -18,13 +18,13 @@ public class CreateCatalogueCommand : AsyncCommand
             var insert = ModelHelper.PromptModel<CatalogueModels::CatalogueInsert>();
             var catalogue = await client.PostCatalogue(insert);
 
-            AnsiConsole.MarkupLine($"[green]Created Catalogue[/]");
+            AnsiConsole.MarkupLine("[green]Created Catalogue[/]");
             ModelHelper.PrintModel(catalogue);
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create catalogue."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to create catalogue."}[/]");
             return 1;
         }
     }

@@ -25,7 +25,7 @@ public class DeleteCatalogueCommand : AsyncCommand<DeleteCatalogueCommand.Settin
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete catalogue."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to delete catalogue."}[/]");
             return 1;
         }
     }

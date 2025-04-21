@@ -1,14 +1,14 @@
 CREATE TABLE constellations (
-    con_id serial primary key,
-    con_name varchar(64) unique not null check (TRIM(con_name) = con_name AND LENGTH(con_name) > 0),
-    iau_abbr char(3) unique not null check (regexp_like(iau_abbr, '^[a-zA-Z]{3}$')),
-    nasa_abbr char(4) unique not null check (regexp_like(nasa_abbr, '^[a-zA-Z]{4}$')),
+    constellation_id serial primary key,
+    constellation_name varchar(64) unique not null check (TRIM(constellation_name) = constellation_name AND LENGTH(constellation_name) > 0),
+    iau_abbreviation char(3) unique not null check (regexp_like(iau_abbreviation, '^[a-zA-Z]{3}$')),
+    nasa_abbreviation char(4) unique not null check (regexp_like(nasa_abbreviation, '^[a-zA-Z]{4}$')),
     genitive varchar(64) not null,
     origin varchar(255) not null,
     meaning varchar(64) not null
 );
 
-INSERT INTO constellations (con_name, iau_abbr, nasa_abbr, genitive, origin, meaning) VALUES
+INSERT INTO constellations (constellation_name, iau_abbreviation, nasa_abbreviation, genitive, origin, meaning) VALUES
     ('Andromeda', 'And', 'Andr', 'Andromedae', 'ancient (Ptolemy)', 'Andromeda (The chained maiden or princess)'),
     ('Antlia', 'Ant', 'Antl', 'Antliae', '1763, Lacaille', 'air pump'),
     ('Apus', 'Aps', 'Apus', 'Apodis', '1603, Uranometria, created by Keyser and de Houtman', 'Bird-of-paradise/Exotic Bird/Extraordinary Bird'),

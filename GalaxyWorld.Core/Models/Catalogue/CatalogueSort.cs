@@ -2,8 +2,8 @@
 
 public enum CatalogueSort
 {
-    CatName,
-    CatNameDsc,
-    CatSlug,
-    CatSlugDsc,
+    CatalogueName,
+    CatalogueNameDsc,
+    CatalogueSlug,
+    CatalogueSlugDsc,
 }

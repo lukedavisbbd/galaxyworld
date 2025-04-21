@@ -13,11 +13,11 @@ public class PlanetRecord
     [JsonPropertyName("discoverymethod")]
     public required string DiscoveryMethod { get; init; }
     [JsonPropertyName("disc_year")]
-    public required int DiscYear { get; init; }
+    public required int DiscoveryYear { get; init; }
     [JsonPropertyName("disc_facility")]
-    public required string DiscFacility { get; init; }
+    public required string DiscoveryFacility { get; init; }
     [JsonPropertyName("disc_telescope")]
-    public required string DiscTelescope { get; init; }
+    public required string DiscoveryTelescope { get; init; }
     [JsonPropertyName("pl_rade")]
     public required decimal? RadiusEarth { get; init; }
     [JsonPropertyName("pl_radj")]
@@ -27,9 +27,9 @@ public class PlanetRecord
     [JsonPropertyName("pl_massj")]
     public required decimal? MassJupiter { get; init; }
     [JsonPropertyName("sy_snum")]
-    public required int? NumStars { get; init; }
+    public required int? SystemNumStars { get; init; }
     [JsonPropertyName("sy_pnum")]
-    public required int? NumPlanets { get; init; }
+    public required int? SystemNumPlanets { get; init; }
     [JsonPropertyName("sy_mnum")]
-    public required int? NumMoons { get; init; }
+    public required int? SystemNumMoons { get; init; }
 }

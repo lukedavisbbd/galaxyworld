@@ -15,7 +15,7 @@ public static class ModelHelper
                 continue;
 
             var value = prop.GetValue(model)?.ToString() ?? "";
-            AnsiConsole.MarkupLine($"[grey]{FormatHelper.PascalToTitleCase(prop.Name)}:[/] {value}");
+            AnsiConsole.MarkupLineInterpolated($"[grey]{FormatHelper.PascalToTitleCase(prop.Name)}:[/] {value}");
         }
     }
 
@@ -48,14 +48,16 @@ public static class ModelHelper
                     continue;
                 }
             }
+            else
+            {
+                var defaultValue = type.IsValueType ? Activator.CreateInstance(type) : null;
+                var result = typeof(InputHelper).GetMethod(nameof(InputHelper.Prompt))?.MakeGenericMethod(type).Invoke(null, [label, defaultValue]);
 
-            var defaultValue = type.IsValueType ? Activator.CreateInstance(type) : null;
-            var result = typeof(InputHelper).GetMethod(nameof(InputHelper.Prompt))?.MakeGenericMethod(type).Invoke(null, [label, defaultValue]);
+                if (optional)
+                    result = Activator.CreateInstance(typeof(Optional<>).MakeGenericType(type), result);
 
-            if (optional)
-                result = Activator.CreateInstance(typeof(Optional<>).MakeGenericType(type), result);
-
-            prop.SetValue(model, result);
+                prop.SetValue(model, result);
+            }
         }
 
         return model;

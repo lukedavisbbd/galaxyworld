@@ -51,7 +51,7 @@ public class GetAllCataloguesCommandShim : AsyncCommand<GetAllCataloguesCommand.
 
             foreach (var cat in catalogues)
             {
-                table.AddRow(cat.CatId.ToString(), cat.CatName, cat.CatSlug);
+                table.AddRow(cat.CatalogueId.ToString(), cat.CatalogueName, cat.CatalogueSlug);
             }
 
             _console.Write(table);
@@ -60,7 +60,7 @@ public class GetAllCataloguesCommandShim : AsyncCommand<GetAllCataloguesCommand.
         }
         catch (AppException e)
         {
-            _console.MarkupLine($"[red]{e.Message ?? "No catalogues found."}[/]");
+            _console.MarkupLineInterpolated($"[red]{e.Message ?? "No catalogues found."}[/]");
             return 1;
         }
     }
@@ -78,8 +78,8 @@ public class GetAllCataloguesCommandTests
         {
             OnGetCatalogues = (_, _, _, _) => Task.FromResult(new List<Catalogue>
             {
-                new Catalogue { CatId = 1, CatName = "Hipparcos", CatSlug = "hip" },
-                new Catalogue { CatId = 2, CatName = "Tycho", CatSlug = "tyc" }
+                new Catalogue { CatalogueId = 1, CatalogueName = "Hipparcos", CatalogueSlug = "hip" },
+                new Catalogue { CatalogueId = 2, CatalogueName = "Tycho", CatalogueSlug = "tyc" }
             })
         };
 
@@ -88,7 +88,7 @@ public class GetAllCataloguesCommandTests
         {
             Page = 1,
             Length = 20,
-            Sort = CatalogueSort.CatName,
+            Sort = CatalogueSort.CatalogueName,
             Filter = []
         };
 
@@ -116,7 +116,7 @@ public class GetAllCataloguesCommandTests
         {
             Page = 1,
             Length = 10,
-            Sort = CatalogueSort.CatSlug,
+            Sort = CatalogueSort.CatalogueSlug,
             Filter = []
         };
 
@@ -143,7 +143,7 @@ public class GetAllCataloguesCommandTests
         {
             Page = 1,
             Length = 5,
-            Sort = CatalogueSort.CatName,
+            Sort = CatalogueSort.CatalogueName,
             Filter = []
         };
 

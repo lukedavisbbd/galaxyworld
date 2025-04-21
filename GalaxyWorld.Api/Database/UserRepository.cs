@@ -10,7 +10,7 @@ public class UserRepository(DbContext db)
         var conn = db.Connection;
         var user = await conn.QueryFirstAsync<User>(
             "INSERT INTO users(google_id) VALUES (@googleId) " +
-            "ON CONFLICT(google_id) DO UPDATE SET last_logged_in = now() RETURNING *", new
+            "ON CONFLICT(google_id) DO UPDATE SET user_id = users.user_id RETURNING *", new
             {
                 googleId,
             });

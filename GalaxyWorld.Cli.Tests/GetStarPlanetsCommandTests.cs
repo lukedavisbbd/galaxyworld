@@ -50,24 +50,24 @@ public class GetStarPlanetsCommandShim : AsyncCommand<GetStarPlanetsCommand.Sett
             foreach (var planet in planetarySystem.Planets)
             {
                 _console.WriteLine();
-                _console.MarkupLine($"* [bold]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
+                _console.MarkupLineInterpolated($"* [bold]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
                 if (planet.Controversial)
                     _console.WriteLine("[yellow]Discovery Disputed[/]");
                 _console.WriteLine($"Discovery Method: {planet.DiscoveryMethod}");
-                _console.WriteLine($"Discovery Year: {planet.DiscYear}");
-                _console.WriteLine($"Discovery Facility: {planet.DiscFacility}");
-                _console.WriteLine($"Discovery Telescope: {planet.DiscTelescope}");
-                _console.MarkupLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
-                _console.MarkupLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
-                _console.MarkupLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
-                _console.MarkupLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
+                _console.WriteLine($"Discovery Year: {planet.DiscoveryYear}");
+                _console.WriteLine($"Discovery Facility: {planet.DiscoveryFacility}");
+                _console.WriteLine($"Discovery Telescope: {planet.DiscoveryTelescope}");
+                _console.WriteLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
+                _console.WriteLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
+                _console.WriteLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
+                _console.WriteLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
             }
 
             return 0;
         }
         catch (AppException e)
         {
-            _console.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+            _console.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get constellation."}[/]");
             return 1;
         }
     }
@@ -101,9 +101,9 @@ public class GetStarPlanetsCommandTests
                         SolutionType = "Confirmed",
                         Controversial = true,
                         DiscoveryMethod = "Transit",
-                        DiscYear = 2020,
-                        DiscFacility = "SpaceLab",
-                        DiscTelescope = "SkyEye",
+                        DiscoveryYear = 2020,
+                        DiscoveryFacility = "SpaceLab",
+                        DiscoveryTelescope = "SkyEye",
                         RadiusEarth = (decimal?)1.5,
                         RadiusJupiter = null,
                         MassEarth = (decimal?)5.9,
