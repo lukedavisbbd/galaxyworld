@@ -27,7 +27,7 @@ public abstract class GetEntityByIdCommand<T> : Command<GetEntityByIdCommand<T>.
             var result = _apiClient.GetAsync<T>($"/{Path}/{settings.Id}").Result;
             if (result != null)
             {
-                AnsiConsole.MarkupLine($"[green]{typeof(T).Name} Found:[/]");
+                AnsiConsole.MarkupLine($"[bold green]{typeof(T).Name} Found:[/]");
                 ModelHelper.PrintModel(result);
             }
             else
@@ -39,7 +39,7 @@ public abstract class GetEntityByIdCommand<T> : Command<GetEntityByIdCommand<T>.
         }
         catch (AppException ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message ?? "Failed to get "+typeof(T).Name}");
+            AnsiConsole.MarkupLine($"[red]{ex.Message ?? "Failed to get "+typeof(T).Name}[/]");
             return 1;
         }
     }

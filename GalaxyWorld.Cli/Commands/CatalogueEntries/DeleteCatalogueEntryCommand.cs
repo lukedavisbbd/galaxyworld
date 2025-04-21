@@ -2,10 +2,11 @@ using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
 using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Core.Models.CatalogueEntry;
 
 namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryCommand.Settings>
+public class DeleteCatalogueEntryCommand : Command<DeleteCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -16,14 +17,16 @@ public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryComm
         
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override int Execute(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var result = await client.DeleteCatalogueEntry(settings.CatalogueId, settings.StarId);
-            AnsiConsole.MarkupLine("[green]Catalogue entry deleted successfully.[/]");
+            var result = client.DeleteAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}").Result;
+
+            AnsiConsole.MarkupLine("[green]Entry with Catalogue ID {settings.CatalogueId} and Star ID {settings.StarId} deleted successfully.[/]");
+            AnsiConsole.WriteLine();
             return 0;
         }
         catch (AppException e)

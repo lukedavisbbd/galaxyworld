@@ -14,9 +14,10 @@ public static class ModelHelper
             if (excludedProperties.Contains(prop.Name))
                 continue;
 
-            var value = prop.GetValue(model)?.ToString() ?? "";
+            var value = prop.GetValue(model)?.ToString() ?? "[grey]unknown[/]" ;
             AnsiConsole.MarkupLine($"[grey]{FormatHelper.PascalToTitleCase(prop.Name)}:[/] {value}");
         }
+        AnsiConsole.WriteLine();
     }
 
     public static T PromptModel<T>(string[]? excludedProperties = null)
@@ -57,6 +58,7 @@ public static class ModelHelper
 
             prop.SetValue(model, result);
         }
+        AnsiConsole.WriteLine();
 
         return model;
     }

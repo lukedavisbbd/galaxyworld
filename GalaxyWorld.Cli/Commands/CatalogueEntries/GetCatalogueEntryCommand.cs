@@ -3,10 +3,11 @@ using GalaxyWorld.Cli.ApiHandler;
 using Spectre.Console;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Core.Models.CatalogueEntry;
 
 namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Settings>
+public class GetCatalogueEntryCommand : Command<GetCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -17,15 +18,16 @@ public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Se
         
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override int Execute(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var entry = await client.GetCatalogueEntry(settings.CatalogueId, settings.StarId);
+            var result = client.GetAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}").Result;
 
-            ModelHelper.PrintModel(entry);
+            AnsiConsole.MarkupLine($"[bold green]Catalogue Entry Found:[/]");
+            ModelHelper.PrintModel(result);
             
             return 0;
         }

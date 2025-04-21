@@ -24,11 +24,12 @@ public abstract class DeleteEntityByIdCommand<T> : Command<DeleteEntityByIdComma
         {
             var result = _apiClient.DeleteAsync<T>($"/{Path}/{settings.Id}").Result;
             AnsiConsole.MarkupLine($"[green]{typeof(T).Name} with ID {settings.Id} deleted successfully.[/]");
+            AnsiConsole.WriteLine();
             return 0;
         }
         catch (AppException ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message ?? "Failed to delete "+typeof(T).Name}");
+            AnsiConsole.MarkupLine($"[red]{ex.Message ?? "Failed to delete "+typeof(T).Name}[/]");
             return 1;
         }
     }

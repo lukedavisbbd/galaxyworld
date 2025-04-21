@@ -7,7 +7,7 @@ using GalaxyWorld.Cli.Helper;
 
 namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class UpdateCatalogueEntryCommand : AsyncCommand<UpdateCatalogueEntryCommand.Settings>
+public class UpdateCatalogueEntryCommand : Command<UpdateCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -18,17 +18,18 @@ public class UpdateCatalogueEntryCommand : AsyncCommand<UpdateCatalogueEntryComm
         public int StarId { get; set; }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override int Execute(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
             var patch = ModelHelper.PromptModel<CatalogueEntryPatch>();
-            var entry = await client.PatchCatalogueEntry(settings.CatalogueId, settings.StarId, patch);
 
-            AnsiConsole.MarkupLine($"[green]Updated Entry[/]");
-            ModelHelper.PrintModel(entry);
+            var result = client.PatchAsync<CatalogueEntry, CatalogueEntryPatch>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}", patch).Result;
+
+            AnsiConsole.MarkupLine($"[bold green]Updated Entry:[/]");
+            ModelHelper.PrintModel(result);
             return 0;
         }
         catch (AppException e)

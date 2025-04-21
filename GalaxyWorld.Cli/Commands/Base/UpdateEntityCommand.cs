@@ -31,13 +31,13 @@ public abstract class UpdateEntityCommand<TPatch, TResponse> : Command<UpdateEnt
             var patch = BuildPatch();
             var result = _apiClient.PatchAsync<TResponse, TPatch>($"/{Path}/{settings.Id}", patch).Result;
 
-            AnsiConsole.MarkupLine($"[green]Updated {typeof(TResponse).Name}:[/]");
+            AnsiConsole.MarkupLine($"[bold green]Updated {typeof(TResponse).Name}:[/]");
             ModelHelper.PrintModel(result);
             return 0;
         }
         catch (AppException ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message ?? "Failed to update "+typeof(TResponse).Name}");
+            AnsiConsole.MarkupLine($"[red]{ex.Message ?? "Failed to update "+typeof(TResponse).Name}[/]");
             return 1;
         }
     }

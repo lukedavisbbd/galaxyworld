@@ -117,7 +117,6 @@ public class ApiClient
     }
 
     public static string FormatQuery<S, T>(int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
-        // where S : Enum
     {
         var list = new List<string>
         {
@@ -136,10 +135,8 @@ public class ApiClient
     }
 
     public async Task<List<T>> GetWithQueryAsync<S, T>(string path, int start = 0, int length = 100, S sort = default!, CoreModels::Filter<T>[]? filters = null)
-        // where S : Enum
     {
         var query = FormatQuery(start, length, sort, filters);
-        Console.WriteLine($"{path}?{query}");
         return await GetAsync<List<T>>($"{path}?{query}");
     }
 

@@ -13,6 +13,8 @@ public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStar
 
     protected abstract string SubPath { get; }
 
+    protected abstract void Display(IEnumerable<TModel> items, string sortBy);
+
     public class Settings : CommandSettings
     {
         [CommandArgument(0, "<id>")]
@@ -40,7 +42,7 @@ public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStar
             var length = int.Max(settings.Length, 1);
             var filters = (settings.Filter ?? []).Select(filter => Filter<TModel>.Parse(filter, null)).ToArray();
             
-            var results = _apiClient.GetWithQueryAsync(
+            var result = _apiClient.GetWithQueryAsync(
                 $"/{SubPath}/{settings.ParentId}/stars",
                 (page - 1) * length,
                 length,
@@ -48,21 +50,20 @@ public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStar
                 filters
             ).Result;
 
-            if (results == null || results.Count == 0)
+            if (result == null || result.Count == 0)
             {
                 AnsiConsole.MarkupLine($"[yellow]No stars found for {SubPath} ID {settings.ParentId}[/]");
                 return 0;
             }
 
-            AnsiConsole.MarkupLine($"[green]Stars in {SubPath} {settings.ParentId}:[/]");
-            foreach (var result in results)
-                AnsiConsole.MarkupLine(result.ToString());
+            Display(result, settings.Sort.ToString());
 
+            Console.WriteLine($"Page #{page} ({(page - 1) * length} - {page * length - 1})");
             return 0;
         }
         catch (AppException ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message ?? "Failed to get "+typeof(TModel).Name}");
+            AnsiConsole.MarkupLine($"[red]{ex.Message ?? "Failed to get "+typeof(TModel).Name}[/]");
             return 1;
         }
     }

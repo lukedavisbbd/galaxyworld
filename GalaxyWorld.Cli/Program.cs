@@ -1,13 +1,12 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
-using GalaxyWorld.Cli.Commands.Catalogues;
-using GalaxyWorld.Cli.Commands.Stars;
-using GalaxyWorld.Cli.Commands.Constellations;
-using GalaxyWorld.Cli.Commands.Auth;
-using GalaxyWorld.Cli.Commands.CatalogueEntries;
 using GalaxyWorld.Cli.ApiHandler;
-
-namespace GalaxyWorld.Cli;
+using GalaxyWorld.Cli.Commands.Auth;
+using GalaxyWorld.Cli.Commands.Stars;
+using GalaxyWorld.Cli.Commands.Catalogues;
+using GalaxyWorld.Cli.Commands.Constellations;
+using GalaxyWorld.Cli.Commands.CatalogueEntries;
+using Microsoft.Extensions.DependencyInjection;
 
 public static class Program
 {
@@ -15,28 +14,38 @@ public static class Program
     {
         try
         {
+            AnsiConsole.MarkupLine("[bold blue]Welcome to GalaxyWorld CLI![/]");
+            AnsiConsole.MarkupLine("[italic gray]Type 'exit' to leave the shell[/]\n");
+
             var token = await LoginCommand.LoginFromFile();
             ApiClient.DefaultAuthToken = token;
 
-            // if trying to do anything but view the help menu
-            if (args.Length > 0 && args[0].ToLower() != "--help" && args[0].ToLower() != "-h")
+            if (token == null)
             {
-                // trying to login, but already logged in
-                if (args[0] == "login" && token != null)
-                {
-                    AnsiConsole.MarkupLine($"[green]Logged in.[/]");
-                    return;
-                }
-
-                // trying to do something without having logged in
-                if (args[0] != "login" && token == null)
-                {
-                    AnsiConsole.MarkupLine($"[red]Not logged in. Login with the 'login' command.[/]");
-                    return;
-                }
+                AnsiConsole.MarkupLine($"[red]Not logged in. Login with the 'login' command.[/]");
             }
 
-            var app = new CommandApp();
+            // if (args.Length > 0 && args[0].ToLower() != "--help" && args[0].ToLower() != "-h")
+            // {
+            //     if (args[0] == "login" && token != null)
+            //     {
+            //         AnsiConsole.MarkupLine($"[green]Logged in.[/]");
+            //         return;
+            //     }
+
+            //     if (args[0] != "login" && token == null)
+            //     {
+            //         AnsiConsole.MarkupLine($"[red]Not logged in. Login with the 'login' command.[/]");
+            //         return;
+            //     }
+            // }
+
+            var services = new ServiceCollection();
+            services.AddSingleton<ApiClient>();
+
+            var registrar = new TypeRegistrar(services);
+            var app = new CommandApp(registrar);
+
             app.Configure(config =>
             {
                 config.AddBranch("stars", config =>
@@ -108,12 +117,42 @@ public static class Program
 
                 config.AddCommand<LogoutCommand>("logout")
                     .WithDescription("End current session.");
-
                 config.AddCommand<LoginCommand>("login")
                     .WithDescription("Login with Google.");
+                config.ValidateExamples();
             });
 
-            await app.RunAsync(args);
+            while (true)
+            {
+                AnsiConsole.Markup("[bold blue]> [/] ");
+                var input = Console.ReadLine();
+                AnsiConsole.WriteLine();
+
+                if (string.IsNullOrWhiteSpace(input))
+                    continue;
+
+                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    AnsiConsole.MarkupLine("[blue]Goodbye![/]");
+                    break;
+                }
+                else if (input.Equals("clear", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.Clear();
+                    continue;
+                }
+
+                try
+                {
+                    var splitArgs = CommandLineStringSplitter.Split(input).ToArray();
+                    await app.RunAsync(splitArgs);
+
+                }
+                catch (Exception ex)
+                {
+                    AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+                }
+            }
         }
         catch (Exception ex)
         {

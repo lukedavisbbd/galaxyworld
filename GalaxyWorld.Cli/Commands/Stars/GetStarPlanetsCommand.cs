@@ -2,10 +2,11 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
-
+using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Core.Models.Planets;
 namespace GalaxyWorld.Cli.Commands.Stars;
 
-public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings>
+public class GetStarPlanetsCommand : Command<GetStarPlanetsCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -13,13 +14,13 @@ public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings
         public int Id { get; set; }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override int Execute(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var planetarySystem = await client.GetStarPlanets(settings.Id);
+            var planetarySystem = client.GetAsync<PlanetarySystem>($"/stars/{settings.Id}/planets").Result;
 
             if (planetarySystem is null)
             {
@@ -27,28 +28,22 @@ public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings
                 return 0;
             }
 
-            AnsiConsole.MarkupLine("[bold]Planetary System[/]");
-            AnsiConsole.WriteLine($"No. Stars: {planetarySystem.NumStars}");
-            AnsiConsole.WriteLine($"No. Planets: {planetarySystem.NumPlanets}");
-            AnsiConsole.WriteLine($"No. Moons: {planetarySystem.NumMoons}");
+            AnsiConsole.MarkupLine("[bold green]Planetary System[/]");
+            AnsiConsole.MarkupLine($"[grey]No. Stars:[/] {planetarySystem.NumStars}");
+            AnsiConsole.MarkupLine($"[grey]No. Planets:[/] {planetarySystem.NumPlanets}");
+            AnsiConsole.MarkupLine($"[grey]No. Moons:[/] {planetarySystem.NumMoons}");
 
             foreach (var planet in planetarySystem.Planets)
             {
                 AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine($"* [bold]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
+                AnsiConsole.MarkupLine($"* [green]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
                 if (planet.Controversial)
                     AnsiConsole.WriteLine("[yellow]Discovery Disputed[/]");
-                AnsiConsole.WriteLine($"Discovery Method: {planet.DiscoveryMethod}");
-                AnsiConsole.WriteLine($"Discovery Year: {planet.DiscYear}");
-                AnsiConsole.WriteLine($"Discovery Facility: {planet.DiscFacility}");
-                AnsiConsole.WriteLine($"Discovery Telescope: {planet.DiscTelescope}");
-                AnsiConsole.MarkupLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
-                AnsiConsole.MarkupLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
-                AnsiConsole.MarkupLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
-                AnsiConsole.MarkupLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
+
+                ModelHelper.PrintModel(planet);
 
             }
-
+            AnsiConsole.WriteLine();
             return 0;
         }
         catch (AppException e)
@@ -56,10 +51,5 @@ public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings
             AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
             return 1;
         }
-    }
-
-    static string FormatNullable<T>(T? value)
-    {
-        return value == null ? "[grey]unknown[/]" : value.ToString() ?? "";
     }
 }

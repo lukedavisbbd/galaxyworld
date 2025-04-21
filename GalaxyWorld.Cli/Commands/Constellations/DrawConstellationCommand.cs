@@ -4,10 +4,11 @@ using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Cli.Exceptions;
 using GalaxyWorld.Cli.Helper;
 using GalaxyWorld.Core.Models.Star;
+using GalaxyWorld.Core.Models.Constellation;
 
 namespace GalaxyWorld.Cli.Commands.Constellations;
 
-public class DrawConstellationCommand : AsyncCommand<DrawConstellationCommand.Settings>
+public class DrawConstellationCommand : Command<DrawConstellationCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -15,14 +16,14 @@ public class DrawConstellationCommand : AsyncCommand<DrawConstellationCommand.Se
         public int Id { get; set; }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override int Execute(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
         
         try
         {
-            var constellation = await client.GetConstellation(settings.Id);
-            var stars = await client.GetConstellationStars(settings.Id, 0, 500, StarSort.Magnitude);
+            var constellation = client.GetAsync<Constellation>($"/constellations/{settings.Id}").Result;
+            var stars = client.GetWithQueryAsync<StarSort, Star>($"/constellations/{settings.Id}/stars", 0, 500, StarSort.Magnitude, []).Result;
 
             DrawConstellation.DrawStars(constellation, stars);
             return 0;

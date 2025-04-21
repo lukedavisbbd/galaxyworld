@@ -21,13 +21,13 @@ public abstract class CreateEntityCommand<TModel, TResponse> : Command where TMo
             var model = BuildModel();
             var result = _apiClient.PostAsync<TResponse, TModel>($"/{Path}", model).Result;
 
-            AnsiConsole.MarkupLine($"[green]Created {typeof(TResponse).Name}:[/]");
+            AnsiConsole.MarkupLine($"[bold green]Created {typeof(TResponse).Name}:[/]");
             ModelHelper.PrintModel(result);
             return 0;
         }
-        catch (AppException ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message ?? "Failed to create "+typeof(TResponse).Name}");
+            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to create "+typeof(TResponse).Name}[/]");
             return 1;
         }
     }

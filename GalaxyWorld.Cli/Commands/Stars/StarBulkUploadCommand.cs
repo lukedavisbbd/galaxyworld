@@ -11,6 +11,7 @@ using CsvHelper;
 using System.Globalization;
 using Spectre.Console;
 using GalaxyWorld.Cli.Models;
+using GalaxyWorld.Core.Models.Star;
 
 namespace GalaxyWorld.Cli.Commands.Stars;
 
@@ -30,7 +31,6 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
 
         try
         {
-
             StreamReader reader;
 
             try
