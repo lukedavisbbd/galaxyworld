@@ -5,6 +5,7 @@ using GalaxyWorld.Cli.Commands.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using GalaxyWorld.Cli.Commands.Setup;
 using GalaxyWorld.Cli.Helper;
+using GalaxyWorld.Cli.Exceptions;
 
 public static class Program
 {
@@ -50,21 +51,13 @@ public static class Program
                     continue;
                 }
 
-                try
-                {
-                    var splitArgs = CommandLineStringSplitter.Split(input).ToArray();
-                    await app.RunAsync(splitArgs);
-
-                }
-                catch (Exception ex)
-                {
-                    AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
-                }
+                var splitArgs = CommandLineStringSplitter.Split(input).ToArray();
+                await app.RunAsync(splitArgs);
             }
         }
-        catch (Exception ex)
+        catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]Command failed:[/] {ex.Message}");
+            AnsiConsole.MarkupLine($"[red]Command failed:[/] {e.Message}");
         }
     }
 }

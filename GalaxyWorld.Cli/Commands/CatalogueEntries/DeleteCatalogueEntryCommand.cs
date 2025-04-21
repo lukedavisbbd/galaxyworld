@@ -6,7 +6,7 @@ using GalaxyWorld.Core.Models.CatalogueEntry;
 
 namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class DeleteCatalogueEntryCommand : Command<DeleteCatalogueEntryCommand.Settings>
+public class DeleteCatalogueEntryCommand : AsyncCommand<DeleteCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -17,13 +17,13 @@ public class DeleteCatalogueEntryCommand : Command<DeleteCatalogueEntryCommand.S
         
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var result = client.DeleteAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}").Result;
+            var result = await client.DeleteAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}");
 
             AnsiConsole.MarkupLine("[green]Entry with Catalogue ID {settings.CatalogueId} and Star ID {settings.StarId} deleted successfully.[/]");
             AnsiConsole.WriteLine();

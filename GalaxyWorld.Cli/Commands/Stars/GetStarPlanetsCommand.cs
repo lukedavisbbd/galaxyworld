@@ -6,7 +6,7 @@ using GalaxyWorld.Cli.Helper;
 using GalaxyWorld.Core.Models.Planets;
 namespace GalaxyWorld.Cli.Commands.Stars;
 
-public class GetStarPlanetsCommand : Command<GetStarPlanetsCommand.Settings>
+public class GetStarPlanetsCommand : AsyncCommand<GetStarPlanetsCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -14,13 +14,13 @@ public class GetStarPlanetsCommand : Command<GetStarPlanetsCommand.Settings>
         public int Id { get; set; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var planetarySystem = client.GetDefaultAsync<PlanetarySystem>($"/stars/{settings.Id}/planets").Result;
+            var planetarySystem = await client.GetDefaultAsync<PlanetarySystem>($"/stars/{settings.Id}/planets");
 
             if (planetarySystem is null)
             {

@@ -7,7 +7,7 @@ using GalaxyWorld.Core.Models.CatalogueEntry;
 
 namespace GalaxyWorld.Cli.Commands.CatalogueEntries;
 
-public class GetCatalogueEntryCommand : Command<GetCatalogueEntryCommand.Settings>
+public class GetCatalogueEntryCommand : AsyncCommand<GetCatalogueEntryCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -18,13 +18,13 @@ public class GetCatalogueEntryCommand : Command<GetCatalogueEntryCommand.Setting
         
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
 
         try
         {
-            var result = client.GetAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}").Result;
+            var result = await client.GetAsync<CatalogueEntry>($"/catalogues/{settings.CatalogueId}/stars/{settings.StarId}");
 
             AnsiConsole.MarkupLine($"[bold green]Catalogue Entry Found:[/]");
             ModelHelper.PrintModel(result);

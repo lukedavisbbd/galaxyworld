@@ -4,10 +4,11 @@ using GalaxyWorld.Cli.ApiHandler;
 using GalaxyWorld.Core.Models;
 using GalaxyWorld.Cli.Exceptions;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace GalaxyWorld.Cli.Commands.Base;
 
-public abstract class GetEntitiesWithQueryCommand<TModel, TSort> : Command<GetEntitiesWithQueryCommand<TModel, TSort>.Settings>
+public abstract class GetEntitiesWithQueryCommand<TModel, TSort> : AsyncCommand<GetEntitiesWithQueryCommand<TModel, TSort>.Settings>
     where TModel : class
     where TSort : Enum
 {
@@ -33,7 +34,7 @@ public abstract class GetEntitiesWithQueryCommand<TModel, TSort> : Command<GetEn
         public string[]? Filter { get; init; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
@@ -41,13 +42,13 @@ public abstract class GetEntitiesWithQueryCommand<TModel, TSort> : Command<GetEn
             var length = int.Max(settings.Length, 1);
             var filters = (settings.Filter ?? []).Select(filter => Filter<TModel>.Parse(filter, null)).ToArray();
 
-            var result = _apiClient.GetWithQueryAsync(
+            var result = await _apiClient.GetWithQueryAsync(
                 $"/{Path}",
                 (page - 1) * length,
                 length,
                 settings.Sort,
                 filters
-            ).Result;
+            );
 
             if (result == null || result.Count == 0)
             {

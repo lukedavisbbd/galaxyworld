@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace GalaxyWorld.Cli.Commands.Base;
 
-public abstract class DeleteEntityByIdCommand<T> : Command<DeleteEntityByIdCommand<T>.Settings> where T : class
+public abstract class DeleteEntityByIdCommand<T> : AsyncCommand<DeleteEntityByIdCommand<T>.Settings> where T : class
 {
     protected readonly ApiClient _apiClient = new();
     protected abstract string Path { get; }
@@ -18,11 +18,11 @@ public abstract class DeleteEntityByIdCommand<T> : Command<DeleteEntityByIdComma
         public int Id { get; set; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
-            var result = _apiClient.DeleteAsync<T>($"/{Path}/{settings.Id}").Result;
+            var result = await _apiClient.DeleteAsync<T>($"/{Path}/{settings.Id}");
             AnsiConsole.MarkupLine($"[green]{typeof(T).Name} with ID {settings.Id} deleted successfully.[/]");
             AnsiConsole.WriteLine();
             return 0;

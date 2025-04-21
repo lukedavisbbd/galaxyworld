@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace GalaxyWorld.Cli.Commands.Base;
 
-public abstract class GetEntityByIdCommand<T> : Command<GetEntityByIdCommand<T>.Settings> where T : class
+public abstract class GetEntityByIdCommand<T> : AsyncCommand<GetEntityByIdCommand<T>.Settings> where T : class
 {
     protected readonly ApiClient _apiClient = new();
 
@@ -20,11 +20,11 @@ public abstract class GetEntityByIdCommand<T> : Command<GetEntityByIdCommand<T>.
         public int Id { get; set; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
-            var result = _apiClient.GetAsync<T>($"/{Path}/{settings.Id}").Result;
+            var result = await _apiClient.GetAsync<T>($"/{Path}/{settings.Id}");
             if (result != null)
             {
                 AnsiConsole.MarkupLine($"[bold green]{typeof(T).Name} Found:[/]");

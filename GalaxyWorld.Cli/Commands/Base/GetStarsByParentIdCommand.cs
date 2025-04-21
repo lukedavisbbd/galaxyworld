@@ -7,7 +7,7 @@ using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Base;
 
-public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStarsByParentIdCommand<TModel, TSort>.Settings>
+public abstract class GetStarsByParentIdCommand<TModel, TSort> : AsyncCommand<GetStarsByParentIdCommand<TModel, TSort>.Settings>
 {
     protected readonly ApiClient _apiClient = new();
 
@@ -34,7 +34,7 @@ public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStar
         public string[]? Filter { get; init; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
@@ -42,13 +42,13 @@ public abstract class GetStarsByParentIdCommand<TModel, TSort> : Command<GetStar
             var length = int.Max(settings.Length, 1);
             var filters = (settings.Filter ?? []).Select(filter => Filter<TModel>.Parse(filter, null)).ToArray();
             
-            var result = _apiClient.GetWithQueryAsync(
+            var result = await _apiClient.GetWithQueryAsync(
                 $"/{SubPath}/{settings.ParentId}/stars",
                 (page - 1) * length,
                 length,
                 settings.Sort,
                 filters
-            ).Result;
+            );
 
             if (result == null || result.Count == 0)
             {

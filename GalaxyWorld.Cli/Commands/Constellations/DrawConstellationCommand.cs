@@ -8,7 +8,7 @@ using GalaxyWorld.Core.Models.Constellation;
 
 namespace GalaxyWorld.Cli.Commands.Constellations;
 
-public class DrawConstellationCommand : Command<DrawConstellationCommand.Settings>
+public class DrawConstellationCommand : AsyncCommand<DrawConstellationCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -16,14 +16,14 @@ public class DrawConstellationCommand : Command<DrawConstellationCommand.Setting
         public int Id { get; set; }
     }
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var client = new ApiClient();
         
         try
         {
-            var constellation = client.GetAsync<Constellation>($"/constellations/{settings.Id}").Result;
-            var stars = client.GetWithQueryAsync<StarSort, Star>($"/constellations/{settings.Id}/stars", 0, 500, StarSort.Magnitude, []).Result;
+            var constellation = await client.GetAsync<Constellation>($"/constellations/{settings.Id}");
+            var stars = await client.GetWithQueryAsync<StarSort, Star>($"/constellations/{settings.Id}/stars", 0, 500, StarSort.Magnitude, []);
 
             DrawConstellation.DrawStars(constellation, stars);
             return 0;

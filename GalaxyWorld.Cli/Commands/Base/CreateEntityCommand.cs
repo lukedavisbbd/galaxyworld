@@ -6,7 +6,7 @@ using GalaxyWorld.Cli.Exceptions;
 
 namespace GalaxyWorld.Cli.Commands.Base;
 
-public abstract class CreateEntityCommand<TModel, TResponse> : Command where TModel : class where TResponse : class
+public abstract class CreateEntityCommand<TModel, TResponse> : AsyncCommand where TModel : class where TResponse : class
 {
     protected readonly ApiClient _apiClient = new();
 
@@ -14,12 +14,12 @@ public abstract class CreateEntityCommand<TModel, TResponse> : Command where TMo
 
     protected abstract TModel BuildModel();
 
-    public override int Execute(CommandContext context)
+    public override async Task<int> ExecuteAsync(CommandContext context)
     {
         try
         {
             var model = BuildModel();
-            var result = _apiClient.PostAsync<TResponse, TModel>($"/{Path}", model).Result;
+            var result = await _apiClient.PostAsync<TResponse, TModel>($"/{Path}", model);
 
             AnsiConsole.MarkupLine($"[bold green]Created {typeof(TResponse).Name}:[/]");
             ModelHelper.PrintModel(result);
