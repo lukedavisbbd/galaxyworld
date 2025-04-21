@@ -142,8 +142,6 @@ public class StarRepository(DbContext db, CatalogueEntryRepository catalogueEntr
         if (string.IsNullOrEmpty(changes))
             return await FetchOne(starId);
 
-        changes += ", updated_at = @updatedAt";
-
         var star = await conn.QueryFirstOrDefaultAsync<Star>(
             "UPDATE stars SET " +
             changes + " WHERE star_id = @starId RETURNING *", new
