@@ -155,44 +155,8 @@ public class ApiClient
 
     // Star endpoints
 
-    public async Task<List<StarModels::Star>> GetStars(int start = 0, int length = 100, StarModels::StarSort sort = default, CoreModels::Filter<StarModels::Star>[]? filters = null) {
-        var query = FormatQuery(start, length, sort, filters);
-        return await GetAsync<List<StarModels::Star>>($"/stars?{query}");
-    }
-
-    public async Task<StarModels::Star> PostStar(StarModels::StarInsert insert) {
-        return await PostAsync<StarModels::Star, StarModels::StarInsert>($"/stars", insert);
-    }
-
     public async Task<List<StarModels::StarBulkResponse>> PostStarsBulk(IEnumerable<StarModels::StarInsert> inserts) {
         return await PostAsync<List<StarModels::StarBulkResponse>, IEnumerable<StarModels::StarInsert>>($"/stars/bulk", inserts);
-    }
-
-    public async Task<StarModels::Star> GetStar(int starId)
-    {
-        return await GetAsync<StarModels::Star>($"/stars/{starId}");
-    }
-
-    public async Task<PlanetModels::PlanetarySystem?> GetStarPlanets(int starId)
-    {
-        return await GetDefaultAsync<PlanetModels::PlanetarySystem>($"/stars/{starId}/planets");
-    }
-
-    public async Task<StarModels::Star> PatchStar(int starId, StarModels::StarPatch patch) {
-        return await PatchAsync<StarModels::Star, StarModels::StarPatch>($"/stars/{starId}", patch);
-    }
-
-    public async Task<StarModels::Star> DeleteStar(int starId) {
-        return await DeleteAsync<StarModels::Star>($"/stars/{starId}");
-    }
-
-    public async Task<List<EntryModels::CatalogueEntry>> GetStarCatalogueEntries(int starId, int start = 0, int length = 100, EntryModels::CatalogueEntrySort sort = default, CoreModels::Filter<EntryModels::CatalogueEntry>[]? filters = null) {
-        var query = FormatQuery(start, length, sort, filters);
-        return await GetAsync<List<EntryModels::CatalogueEntry>>($"/stars/{starId}/catalogues?{query}");
-    }
-
-    public async Task<EntryModels::CatalogueEntry> DeleteStarCatalogueEntry(int starId, int catId) {
-        return await DeleteAsync<EntryModels::CatalogueEntry>($"/stars/{starId}/catalogues/{catId}");
     }
 
     // Catalogue endpoints
@@ -202,70 +166,10 @@ public class ApiClient
         return await GetAsync<List<CatalogueModels::Catalogue>>($"/catalogues?{query}");
     }
 
-    public async Task<CatalogueModels::Catalogue> PostCatalogue(CatalogueModels::CatalogueInsert insert) {
-        return await PostAsync<CatalogueModels::Catalogue, CatalogueModels::CatalogueInsert>($"/catalogues", insert);
-    }
-
-    public async Task<CatalogueModels::Catalogue> GetCatalogue(int catId) {
-        return await GetAsync<CatalogueModels::Catalogue>($"/catalogues/{catId}");
-    }
-
-    public async Task<CatalogueModels::Catalogue> PatchCatalogue(int catId, CatalogueModels::CataloguePatch patch) {
-        return await PatchAsync<CatalogueModels::Catalogue, CatalogueModels::CataloguePatch>($"/catalogues/{catId}", patch);
-    }
-
-    public async Task<CatalogueModels::Catalogue> DeleteCatalogue(int catId) {
-        return await DeleteAsync<CatalogueModels::Catalogue>($"/catalogues/{catId}");
-    }
-
-    // Catalogue entry endpoints
-
-    public async Task<List<EntryModels::CatalogueEntry>> GetCatalogueStarEntries(int catId, int start = 0, int length = 100, EntryModels::CatalogueEntrySort sort = default, CoreModels::Filter<EntryModels::CatalogueEntry>[]? filters = null) {
-        var query = FormatQuery(start, length, sort, filters);
-        return await GetAsync<List<EntryModels::CatalogueEntry>>($"/catalogues/{catId}/stars?{query}");
-    }
-
-    public async Task<EntryModels::CatalogueEntry> PostCatalogueEntry(int catId, int starId, EntryModels::CatalogueEntryInsert insert) {
-        return await PostAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryInsert>($"/catalogues/{catId}/stars/{starId}", insert);
-    }
-
-    public async Task<EntryModels::CatalogueEntry> GetCatalogueEntry(int catId, int starId) {
-        return await GetAsync<EntryModels::CatalogueEntry>($"/catalogues/{catId}/stars/{starId}");
-    }
-
-    public async Task<EntryModels::CatalogueEntry> PatchCatalogueEntry(int catId, int starId, EntryModels::CatalogueEntryPatch patch) {
-        return await PatchAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryPatch>($"/catalogues/{catId}/stars/{starId}", patch);
-    }
-
-    public async Task<EntryModels::CatalogueEntry> DeleteCatalogueEntry(int catId, int starId) {
-        return await DeleteAsync<EntryModels::CatalogueEntry>($"/catalogues/{catId}/stars/{starId}");
-    }
-
     // Constellation endpoints
 
     public async Task<List<ConstellationModels::Constellation>> GetConstellations(int start = 0, int length = 100, ConstellationModels::ConstellationSort sort = default, CoreModels::Filter<ConstellationModels::Constellation>[]? filters = null) {
         var query = FormatQuery(start, length, sort, filters);
         return await GetAsync<List<ConstellationModels::Constellation>>($"/constellations?{query}");
-    }
-
-    public async Task<ConstellationModels::Constellation> PostConstellation(ConstellationModels::ConstellationInsert insert) {
-        return await PostAsync<ConstellationModels::Constellation, ConstellationModels::ConstellationInsert>($"/constellations", insert);
-    }
-
-    public async Task<ConstellationModels::Constellation> GetConstellation(int conId) {
-        return await GetAsync<ConstellationModels::Constellation>($"/constellations/{conId}");
-    }
-
-    public async Task<List<StarModels::Star>> GetConstellationStars(int conId, int start = 0, int length = 100, StarModels::StarSort sort = default, CoreModels::Filter<StarModels::Star>[]? filters = null) {
-        var query = FormatQuery(start, length, sort, filters);
-        return await GetAsync<List<StarModels::Star>>($"/constellations/{conId}/stars?{query}");
-    }
-
-    public async Task<ConstellationModels::Constellation> PatchConstellation(int conId, ConstellationModels::ConstellationPatch patch) {
-        return await PatchAsync<ConstellationModels::Constellation, ConstellationModels::ConstellationPatch>($"/constellations/{conId}", patch);
-    }
-
-    public async Task<ConstellationModels::Constellation> DeleteConstellation(int conId) {
-        return await DeleteAsync<ConstellationModels::Constellation>($"/constellations/{conId}");
     }
 }
