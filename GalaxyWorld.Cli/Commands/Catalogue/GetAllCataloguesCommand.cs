@@ -14,14 +14,14 @@ public class GetAllCataloguesCommand : AsyncCommand<GetAllCataloguesCommand.Sett
 {
     public class Settings : CommandSettings
     {
-        [Description("one of: CatName, CatNameDsc, CatSlug, CatSlugDsc")]
+        [Description("one of: CatalogueName, CatalogueNameDsc, CatalogueSlug, CatalogueSlugDsc")]
         [CommandOption("-s|--sort <sort>")]
         public CatalogueSort Sort { get; init; }
         [CommandOption("-p|--page <page>")]
         public int Page { get; init; } = 1;
         [CommandOption("-l|--page-length <length>")]
         public int Length { get; init; } = 20;
-        [Description("one or more filters of the form: '{PropertyName}.{Operation}.{Value}', where {PropertyName} is the pascal case name of the property, {Operation} is one of Eq, Neq, Gt, Lt, Gte, or Lte, and {Value} is a comparison value. E.g. CatSlug.Eq.hd")]
+        [Description("one or more filters of the form: '{PropertyName}.{Operation}.{Value}', where {PropertyName} is the pascal case name of the property, {Operation} is one of Eq, Neq, Gt, Lt, Gte, or Lte, and {Value} is a comparison value. E.g. CatalogueSlug.Eq.hd")]
         [CommandOption("-f|--filter <length>")]
         public required string[]? Filter { get; init; }
     }
@@ -47,9 +47,9 @@ public class GetAllCataloguesCommand : AsyncCommand<GetAllCataloguesCommand.Sett
 
             foreach (var catalogue in catalogues)
             {
-                table.AddRow(catalogue.CatId.ToString(), 
-                catalogue.CatName, 
-                catalogue.CatSlug);
+                table.AddRow(catalogue.CatalogueId.ToString(), 
+                catalogue.CatalogueName, 
+                catalogue.CatalogueSlug);
             }
 
             AnsiConsole.Write(table);
@@ -59,7 +59,7 @@ public class GetAllCataloguesCommand : AsyncCommand<GetAllCataloguesCommand.Sett
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "No catalogues found."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "No catalogues found."}[/]");
             return 1;
         }
     }

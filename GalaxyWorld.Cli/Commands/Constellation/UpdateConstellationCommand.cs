@@ -24,13 +24,13 @@ public class UpdateConstellationCommand : AsyncCommand<UpdateConstellationComman
             var patch = ModelHelper.PromptModel<ConstellationModels::ConstellationPatch>();
             var constellation = await client.PatchConstellation(settings.Id, patch);
 
-            AnsiConsole.MarkupLine($"[green]Updated Constellation[/]");
+            AnsiConsole.MarkupLine("[green]Updated Constellation[/]");
             ModelHelper.PrintModel(constellation);
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update constellation."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to update constellation."}[/]");
             return 1;
         }
     }

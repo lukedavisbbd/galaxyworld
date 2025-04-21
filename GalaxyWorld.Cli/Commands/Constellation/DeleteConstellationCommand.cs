@@ -25,7 +25,7 @@ public class DeleteConstellationCommand : AsyncCommand<DeleteConstellationComman
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to delete constellation."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to delete constellation."}[/]");
             return 1;
         }
     }

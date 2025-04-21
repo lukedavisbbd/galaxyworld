@@ -24,14 +24,14 @@ public class UpdateCatalogueCommand : AsyncCommand<UpdateCatalogueCommand.Settin
             var patch = ModelHelper.PromptModel<CatalogueModels::CataloguePatch>();
             var catalogue = await client.PatchCatalogue(settings.Id, patch);
 
-            AnsiConsole.MarkupLine($"[green]Updated Catalogue[/]");
+            AnsiConsole.MarkupLine("[green]Updated Catalogue[/]");
             ModelHelper.PrintModel(catalogue);
 
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to update catalogue."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to update catalogue."}[/]");
             return 1;
         }
     }

@@ -8,6 +8,4 @@ public enum StarSort
     DistanceDsc,
     Magnitude,
     MagnitudeDsc,
-    AbsoluteMagnitude,
-    AbsoluteMagnitudeDsc,
 }

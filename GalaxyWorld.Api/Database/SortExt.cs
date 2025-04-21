@@ -17,8 +17,6 @@ public static class SortExt
             StarSort.DistanceDsc => "ORDER BY distance DESC",
             StarSort.Magnitude => "ORDER BY magnitude",
             StarSort.MagnitudeDsc => "ORDER BY magnitude DESC",
-            StarSort.AbsoluteMagnitude => "ORDER BY absolute_magnitude",
-            StarSort.AbsoluteMagnitudeDsc => "ORDER BY absolute_magnitude DESC",
             _ => "",
         };
     }
@@ -27,12 +25,12 @@ public static class SortExt
     {
         return sort switch
         {
-            ConstellationSort.ConName => "ORDER BY con_name",
-            ConstellationSort.ConNameDsc => "ORDER BY con_name DESC",
-            ConstellationSort.IauAbbr => "ORDER BY iau_abbr",
-            ConstellationSort.IauAbbrDsc => "ORDER BY iau_abbr DESC",
-            ConstellationSort.NasaAbbr => "ORDER BY nasa_abbr",
-            ConstellationSort.NasaAbbrDsc => "ORDER BY nasa_abbr DESC",
+            ConstellationSort.ConstellationName => "ORDER BY constellation_name",
+            ConstellationSort.ConstellationNameDsc => "ORDER BY constellation_name DESC",
+            ConstellationSort.IauAbbreviation => "ORDER BY iau_abbreviation",
+            ConstellationSort.IauAbbreviationDsc => "ORDER BY iau_abbreviation DESC",
+            ConstellationSort.NasaAbbreviation => "ORDER BY nasa_abbreviation",
+            ConstellationSort.NasaAbbreviationDsc => "ORDER BY nasa_abbreviation DESC",
             ConstellationSort.Genitive => "ORDER BY genitive",
             ConstellationSort.GenitiveDsc => "ORDER BY genitive DESC",
             _ => "",
@@ -55,10 +53,10 @@ public static class SortExt
     {
         return sort switch
         {
-            CatalogueSort.CatName => "ORDER BY cat_name",
-            CatalogueSort.CatNameDsc => "ORDER BY cat_name DESC",
-            CatalogueSort.CatSlug => "ORDER BY cat_slug",
-            CatalogueSort.CatSlugDsc => "ORDER BY cat_slug DESC",
+            CatalogueSort.CatalogueName => "ORDER BY catalogue_name",
+            CatalogueSort.CatalogueNameDsc => "ORDER BY catalogue_name DESC",
+            CatalogueSort.CatalogueSlug => "ORDER BY catalogue_slug",
+            CatalogueSort.CatalogueSlugDsc => "ORDER BY catalogue_slug DESC",
             _ => "",
         };
     }

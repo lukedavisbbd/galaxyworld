@@ -17,10 +17,10 @@ public class CatalogueRepository(DbContext db)
         return catalogues;
     }
 
-    public async Task<Catalogue?> FetchOne(int catId)
+    public async Task<Catalogue?> FetchOne(int catalogueId)
     {
         var conn = db.Connection;
-        var catalogue = await conn.QueryFirstOrDefaultAsync<Catalogue>("SELECT * FROM catalogues WHERE cat_id = @catId", new { catId });
+        var catalogue = await conn.QueryFirstOrDefaultAsync<Catalogue>("SELECT * FROM catalogues WHERE catalogue_id = @catalogueId", new { catalogueId });
         return catalogue;
     }
 
@@ -30,11 +30,11 @@ public class CatalogueRepository(DbContext db)
         var catalogue = await conn.QueryFirstAsync<Catalogue>(
             """
             INSERT INTO catalogues(
-                cat_name,
-                cat_slug
+                catalogue_name,
+                catalogue_slug
             ) VALUES(
-                @CatName,
-                @CatSlug
+                @CatalogueName,
+                @CatalogueSlug
             ) RETURNING *
             """,
             insert
@@ -42,31 +42,31 @@ public class CatalogueRepository(DbContext db)
         return catalogue;
     }
 
-    public async Task<Catalogue?> Update(int catId, CataloguePatch patch)
+    public async Task<Catalogue?> Update(int catalogueId, CataloguePatch patch)
     {
         var conn = db.Connection;
 
         var changes = patch.ToSql();
 
         if (string.IsNullOrEmpty(changes))
-            return await FetchOne(catId);
+            return await FetchOne(catalogueId);
 
         var catalogue = await conn.QueryFirstOrDefaultAsync<Catalogue>(
             "UPDATE catalogues SET " +
-            changes + " WHERE cat_id = @catId RETURNING *", new
+            changes + " WHERE catalogue_id = @catalogueId RETURNING *", new
             {
-                catId,
-                CatName = patch.CatName.OrDefault(),
-                CatSlug = patch.CatSlug.OrDefault(),
+                catalogueId,
+                CatalogueName = patch.CatalogueName.OrDefault(),
+                CatalogueSlug = patch.CatalogueSlug.OrDefault(),
             }
         );
         return catalogue;
     }
 
-    public async Task<Catalogue?> Delete(int catId)
+    public async Task<Catalogue?> Delete(int catalogueId)
     {
         var conn = db.Connection;
-        var catalogue = await conn.QueryFirstOrDefaultAsync<Catalogue>("DELETE FROM catalogues WHERE cat_id = @catId RETURNING *", new { catId });
+        var catalogue = await conn.QueryFirstOrDefaultAsync<Catalogue>("DELETE FROM catalogues WHERE catalogue_id = @catalogueId RETURNING *", new { catalogueId });
         return catalogue;
     }
 }

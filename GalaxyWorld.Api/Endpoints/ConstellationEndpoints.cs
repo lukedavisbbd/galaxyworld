@@ -25,9 +25,12 @@ public static class ConstellationEndpoints
         return Results.Ok(constellation);
     }
 
-    public static async Task<IResult> GetConstellationStars(StarService service, [FromQuery] Filter<Star>[] filter, int conId, int start = 0, int length = 100, StarSort sort = default)
+    public static async Task<IResult> GetConstellationStars(ConstellationService constellationService, StarService starService, [FromQuery] Filter<Star>[] filter, int conId, int start = 0, int length = 100, StarSort sort = default)
     {
-        var stars = await service.GetByConstellation(conId, new Page
+        if (await constellationService.GetOne(conId) == null)
+            return Results.NotFound();
+        
+        var stars = await starService.GetByConstellation(conId, new Page
         {
             Start = start,
             Length = length,

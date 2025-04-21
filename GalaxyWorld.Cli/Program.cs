@@ -24,14 +24,14 @@ public static class Program
                 // trying to login, but already logged in
                 if (args[0] == "login" && token != null)
                 {
-                    AnsiConsole.MarkupLine($"[green]Logged in.[/]");
+                    AnsiConsole.MarkupLine("[green]Logged in.[/]");
                     return;
                 }
 
                 // trying to do something without having logged in
                 if (args[0] != "login" && token == null)
                 {
-                    AnsiConsole.MarkupLine($"[red]Not logged in. Login with the 'login' command.[/]");
+                    AnsiConsole.MarkupLine("[red]Not logged in. Login with the 'login' command.[/]");
                     return;
                 }
             }
@@ -117,7 +117,7 @@ public static class Program
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Command failed:[/] {ex.Message}");
+            AnsiConsole.MarkupLineInterpolated($"[red]Command failed:[/] {ex.Message}");
         }
     }
 }

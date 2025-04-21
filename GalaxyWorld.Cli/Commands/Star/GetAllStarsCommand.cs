@@ -56,7 +56,7 @@ public class GetAllStarsCommand : AsyncCommand<GetAllStarsCommand.Settings>
             {
                 table.AddRow(
                     star.StarId.ToString(),
-                    star.Constellation.ToString() ?? "",
+                    star.ConstellationId.ToString() ?? "",
                     star.ProperName ?? "",
                     star.Distance.ToString() ?? "",
                     star.Magnitude.ToString(),
@@ -71,7 +71,7 @@ public class GetAllStarsCommand : AsyncCommand<GetAllStarsCommand.Settings>
         }
         catch (AppException e) 
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get stars list."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get stars list."}[/]");
             return 1;
         }
     }

@@ -17,9 +17,9 @@ public static class CatalogueEndpoints
         }, sort, filter));
     }
 
-    public static async Task<IResult> GetCatalogue(CatalogueService service, int catId)
+    public static async Task<IResult> GetCatalogue(CatalogueService service, int catalogueId)
     {
-        var catalogue = await service.GetOne(catId);
+        var catalogue = await service.GetOne(catalogueId);
         if (catalogue == null) return Results.NotFound();
         return Results.Ok(catalogue);
     }
@@ -30,16 +30,21 @@ public static class CatalogueEndpoints
         return Results.Ok(catalogue);
     }
     
-    public static async Task<IResult> PatchCatalogue(CatalogueService service, int catId, CataloguePatch patch)
+    public static async Task<IResult> PatchCatalogue(CatalogueService service, int catalogueId, CataloguePatch patch)
     {
-        var catalogue = await service.Patch(catId, patch);
+        var catalogue = await service.Patch(catalogueId, patch);
         if (catalogue == null) return Results.NotFound();
         return Results.Ok(catalogue);
     }
 
-    public static async Task<IResult> DeleteCatalogue(CatalogueService service, int catId)
+    public static async Task<IResult> DeleteCatalogue(CatalogueEntryService entryService, CatalogueService catalogueService, int catalogueId)
     {
-        var catalogue = await service.Delete(catId);
+        var entries = await entryService.GetByCatalogue(catalogueId, new Page { Start = 0, Length = 1 }, default, []);
+        if (entries.Count() > 0) {
+            return Results.Problem("Catalogue is not empty.");
+        }
+
+        var catalogue = await catalogueService.Delete(catalogueId);
         if (catalogue == null) return Results.NotFound();
         return Results.Ok(catalogue);
     }
@@ -50,7 +55,7 @@ public static class CatalogueEndpoints
             .Produces<IEnumerable<Catalogue>>()
             .RequireAuthorization();
 
-        routes.MapGet("/catalogues/{catId:int}", GetCatalogue)
+        routes.MapGet("/catalogues/{catalogueId:int}", GetCatalogue)
             .Produces<Catalogue>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization();
@@ -60,12 +65,12 @@ public static class CatalogueEndpoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
         
-        routes.MapPatch("/catalogues/{catId:int}", PatchCatalogue)
+        routes.MapPatch("/catalogues/{catalogueId:int}", PatchCatalogue)
             .Produces<Catalogue>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);
 
-        routes.MapDelete("/catalogues/{catId:int}", DeleteCatalogue)
+        routes.MapDelete("/catalogues/{catalogueId:int}", DeleteCatalogue)
             .Produces<Catalogue>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName);

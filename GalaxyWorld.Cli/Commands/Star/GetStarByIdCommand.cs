@@ -28,18 +28,18 @@ public class GetStarByIdCommand : AsyncCommand<GetStarByIdCommand.Settings>
             var catalogues = await client.GetCatalogues();
             var entries = await client.GetStarCatalogueEntries(settings.Id, 0, 999);
 
-            AnsiConsole.MarkupLine($"[bold]Catalogue Entries:[/]");
+            AnsiConsole.MarkupLine("[bold]Catalogue Entries:[/]");
             foreach (var entry in entries)
             {
-                var catalogue = catalogues.First(cat => cat.CatId == entry.CatId);
-                AnsiConsole.MarkupLine($"[yellow]{catalogue.CatName}:[/] {entry.EntryId} {entry.EntryDesignation}");
+                var catalogue = catalogues.First(cat => cat.CatalogueId == entry.CatalogueId);
+                AnsiConsole.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName}:[/] {entry.EntryId} {entry.EntryDesignation}");
             }
 
             return 0;
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get constellation."}[/]");
             return 1;
         }
     }

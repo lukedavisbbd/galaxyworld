@@ -8,20 +8,28 @@ namespace GalaxyWorld.API.Endpoints;
 
 public static class CatalogueEntryEndpoints
 {
-    public static async Task<IResult> GetCatalogueEntries(CatalogueEntryService service, int catId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
+    public static async Task<IResult> GetCatalogueEntries(CatalogueService catalogueService, CatalogueEntryService entryService, int catalogueId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
     {
-        var entries = await service.GetByCatalogue(catId, new Page
+        if (await catalogueService.GetOne(catalogueId) == null)
+            return Results.NotFound();
+        
+        var entries = await entryService.GetByCatalogue(catalogueId, new Page
         {
             Start = start,
             Length = length,
         }, sort, filter);
+        
         if (entries == null) return Results.NotFound();
+        
         return Results.Ok(entries);
     }
 
-    public static async Task<IResult> GetStarEntries(CatalogueEntryService service, int starId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
+    public static async Task<IResult> GetStarEntries(StarService starService, CatalogueEntryService entryService, int starId, [FromQuery] Filter<CatalogueEntry>[] filter, int start = 0, int length = 100, CatalogueEntrySort sort = default)
     {
-        var star = await service.GetByStar(starId, new Page
+        if (await starService.GetOne(starId) == null)
+            return Results.NotFound();
+        
+        var star = await entryService.GetByStar(starId, new Page
         {
             Start = start,
             Length = length,
@@ -30,29 +38,34 @@ public static class CatalogueEntryEndpoints
         return Results.Ok(star);
     }
 
-    public static async Task<IResult> PostEntry(CatalogueEntryService service, int catId, int starId, CatalogueEntryInsert insert)
+    public static async Task<IResult> PostEntry(CatalogueService catalogueService, StarService starService, CatalogueEntryService entryService, int catalogueId, int starId, CatalogueEntryInsert insert)
     {
-        var entry = await service.Create(catId, starId, insert);
+        if (await catalogueService.GetOne(catalogueId) == null)
+            return Results.NotFound();
+        if (await starService.GetOne(starId) == null)
+            return Results.NotFound();
+        
+        var entry = await entryService.Create(catalogueId, starId, insert);
         return Results.Ok(entry);
     }
 
-    public static async Task<IResult> GetEntry(CatalogueEntryService service, int catId, int starId)
+    public static async Task<IResult> GetEntry(CatalogueEntryService service, int catalogueId, int starId)
     {
-        var entries = await service.GetOne(catId, starId);
+        var entries = await service.GetOne(catalogueId, starId);
         if (entries == null) return Results.NotFound();
         return Results.Ok(entries);
     }
 
-    public static async Task<IResult> PatchEntry(CatalogueEntryService service, int catId, int starId, CatalogueEntryPatch patch)
+    public static async Task<IResult> PatchEntry(CatalogueEntryService service, int catalogueId, int starId, CatalogueEntryPatch patch)
     {
-        var entry = await service.Patch(catId, starId, patch);
+        var entry = await service.Patch(catalogueId, starId, patch);
         if (entry == null) return Results.NotFound();
         return Results.Ok(entry);
     }
 
-    public static async Task<IResult> DeleteEntry(CatalogueEntryService service, int catId, int starId)
+    public static async Task<IResult> DeleteEntry(CatalogueEntryService service, int catalogueId, int starId)
     {
-        var entry = await service.Delete(catId, starId);
+        var entry = await service.Delete(catalogueId, starId);
         if (entry == null) return Results.NotFound();
         return Results.Ok(entry);
     }
@@ -62,7 +75,7 @@ public static class CatalogueEntryEndpoints
         const string CATALOGUE_TAG = "CatalogueEndpoints";
         const string STAR_TAG = "StarEndpoints";
 
-        routes.MapGet("/catalogues/{catId:int}/stars", GetCatalogueEntries)
+        routes.MapGet("/catalogues/{catalogueId:int}/stars", GetCatalogueEntries)
             .Produces<IEnumerable<CatalogueEntry>>()
             .RequireAuthorization()
             .WithTags(CATALOGUE_TAG);
@@ -71,47 +84,47 @@ public static class CatalogueEntryEndpoints
             .RequireAuthorization()
             .WithTags(STAR_TAG);
 
-        routes.MapGet("/catalogues/{catId:int}/stars/{starId:int}", GetEntry)
+        routes.MapGet("/catalogues/{catalogueId:int}/stars/{starId:int}", GetEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization()
             .WithTags(CATALOGUE_TAG);
-        routes.MapGet("/stars/{starId:int}/catalogues/{catId:int}", GetEntry)
+        routes.MapGet("/stars/{starId:int}/catalogues/{catalogueId:int}", GetEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization()
             .WithTags(STAR_TAG);
 
-        routes.MapPost("/catalogues/{catId:int}/stars/{starId:int}", PostEntry)
+        routes.MapPost("/catalogues/{catalogueId:int}/stars/{starId:int}", PostEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)
             .WithTags(CATALOGUE_TAG);
-        routes.MapPost("/stars/{starId:int}/catalogues/{catId:int}", PostEntry)
+        routes.MapPost("/stars/{starId:int}/catalogues/{catalogueId:int}", PostEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)
             .WithTags(STAR_TAG);
 
-        routes.MapPatch("/catalogues/{catId:int}/stars/{starId:int}", PatchEntry)
+        routes.MapPatch("/catalogues/{catalogueId:int}/stars/{starId:int}", PatchEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)
             .WithTags(CATALOGUE_TAG);
-        routes.MapPatch("/stars/{starId:int}/catalogues/{catId:int}", PatchEntry)
+        routes.MapPatch("/stars/{starId:int}/catalogues/{catalogueId:int}", PatchEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)
             .WithTags(STAR_TAG);
 
-        routes.MapDelete("/catalogues/{catId:int}/stars/{starId:int}", DeleteEntry)
+        routes.MapDelete("/catalogues/{catalogueId:int}/stars/{starId:int}", DeleteEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)
             .WithTags(CATALOGUE_TAG);
-        routes.MapDelete("/stars/{starId:int}/catalogues/{catId:int}", DeleteEntry)
+        routes.MapDelete("/stars/{starId:int}/catalogues/{catalogueId:int}", DeleteEntry)
             .Produces<CatalogueEntry>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization(RoleRequirement.RoleAdmin.PolicyName)

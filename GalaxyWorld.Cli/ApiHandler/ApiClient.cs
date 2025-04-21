@@ -28,7 +28,7 @@ public class ApiClient
         }
     }
 
-    public const string BASE_URL = "http://ec2-13-245-23-146.af-south-1.compute.amazonaws.com/";
+    public const string BASE_URL = "https://localhost:4433";
 
     public static string? DefaultAuthToken { get; set; }
 
@@ -185,8 +185,8 @@ public class ApiClient
         return await GetAsync<List<EntryModels::CatalogueEntry>>($"/stars/{starId}/catalogues?{query}");
     }
 
-    public async Task<EntryModels::CatalogueEntry> DeleteStarCatalogueEntry(int starId, int catId) {
-        return await DeleteAsync<EntryModels::CatalogueEntry>($"/stars/{starId}/catalogues/{catId}");
+    public async Task<EntryModels::CatalogueEntry> DeleteStarCatalogueEntry(int starId, int catalogueId) {
+        return await DeleteAsync<EntryModels::CatalogueEntry>($"/stars/{starId}/catalogues/{catalogueId}");
     }
 
     // Catalogue endpoints
@@ -200,39 +200,39 @@ public class ApiClient
         return await PostAsync<CatalogueModels::Catalogue, CatalogueModels::CatalogueInsert>($"/catalogues", insert);
     }
 
-    public async Task<CatalogueModels::Catalogue> GetCatalogue(int catId) {
-        return await GetAsync<CatalogueModels::Catalogue>($"/catalogues/{catId}");
+    public async Task<CatalogueModels::Catalogue> GetCatalogue(int catalogueId) {
+        return await GetAsync<CatalogueModels::Catalogue>($"/catalogues/{catalogueId}");
     }
 
-    public async Task<CatalogueModels::Catalogue> PatchCatalogue(int catId, CatalogueModels::CataloguePatch patch) {
-        return await PatchAsync<CatalogueModels::Catalogue, CatalogueModels::CataloguePatch>($"/catalogues/{catId}", patch);
+    public async Task<CatalogueModels::Catalogue> PatchCatalogue(int catalogueId, CatalogueModels::CataloguePatch patch) {
+        return await PatchAsync<CatalogueModels::Catalogue, CatalogueModels::CataloguePatch>($"/catalogues/{catalogueId}", patch);
     }
 
-    public async Task<CatalogueModels::Catalogue> DeleteCatalogue(int catId) {
-        return await DeleteAsync<CatalogueModels::Catalogue>($"/catalogues/{catId}");
+    public async Task<CatalogueModels::Catalogue> DeleteCatalogue(int catalogueId) {
+        return await DeleteAsync<CatalogueModels::Catalogue>($"/catalogues/{catalogueId}");
     }
 
     // Catalogue entry endpoints
 
-    public async Task<List<EntryModels::CatalogueEntry>> GetCatalogueStarEntries(int catId, int start = 0, int length = 100, EntryModels::CatalogueEntrySort sort = default, CoreModels::Filter<EntryModels::CatalogueEntry>[]? filters = null) {
+    public async Task<List<EntryModels::CatalogueEntry>> GetCatalogueStarEntries(int catalogueId, int start = 0, int length = 100, EntryModels::CatalogueEntrySort sort = default, CoreModels::Filter<EntryModels::CatalogueEntry>[]? filters = null) {
         var query = FormatQuery(start, length, sort, filters);
-        return await GetAsync<List<EntryModels::CatalogueEntry>>($"/catalogues/{catId}/stars?{query}");
+        return await GetAsync<List<EntryModels::CatalogueEntry>>($"/catalogues/{catalogueId}/stars?{query}");
     }
 
-    public async Task<EntryModels::CatalogueEntry> PostCatalogueEntry(int catId, int starId, EntryModels::CatalogueEntryInsert insert) {
-        return await PostAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryInsert>($"/catalogues/{catId}/stars/{starId}", insert);
+    public async Task<EntryModels::CatalogueEntry> PostCatalogueEntry(int catalogueId, int starId, EntryModels::CatalogueEntryInsert insert) {
+        return await PostAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryInsert>($"/catalogues/{catalogueId}/stars/{starId}", insert);
     }
 
-    public async Task<EntryModels::CatalogueEntry> GetCatalogueEntry(int catId, int starId) {
-        return await GetAsync<EntryModels::CatalogueEntry>($"/catalogues/{catId}/stars/{starId}");
+    public async Task<EntryModels::CatalogueEntry> GetCatalogueEntry(int catalogueId, int starId) {
+        return await GetAsync<EntryModels::CatalogueEntry>($"/catalogues/{catalogueId}/stars/{starId}");
     }
 
-    public async Task<EntryModels::CatalogueEntry> PatchCatalogueEntry(int catId, int starId, EntryModels::CatalogueEntryPatch patch) {
-        return await PatchAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryPatch>($"/catalogues/{catId}/stars/{starId}", patch);
+    public async Task<EntryModels::CatalogueEntry> PatchCatalogueEntry(int catalogueId, int starId, EntryModels::CatalogueEntryPatch patch) {
+        return await PatchAsync<EntryModels::CatalogueEntry, EntryModels::CatalogueEntryPatch>($"/catalogues/{catalogueId}/stars/{starId}", patch);
     }
 
-    public async Task<EntryModels::CatalogueEntry> DeleteCatalogueEntry(int catId, int starId) {
-        return await DeleteAsync<EntryModels::CatalogueEntry>($"/catalogues/{catId}/stars/{starId}");
+    public async Task<EntryModels::CatalogueEntry> DeleteCatalogueEntry(int catalogueId, int starId) {
+        return await DeleteAsync<EntryModels::CatalogueEntry>($"/catalogues/{catalogueId}/stars/{starId}");
     }
 
     // Constellation endpoints

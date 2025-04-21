@@ -28,7 +28,7 @@ public class GetConstellationByIdCommand : AsyncCommand<GetConstellationByIdComm
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "Failed to get constellation."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get constellation."}[/]");
             return 1;
         }
     }

@@ -14,7 +14,7 @@ public class GetAllConstellationsCommand : AsyncCommand<GetAllConstellationsComm
 {
     public class Settings : CommandSettings
     {
-        [Description("one of: ConName, ConNameDsc, IauAbbr, IauAbbrDsc, NasaAbbr, NasaAbbrDsc, Genitive, GenitiveDsc")]
+        [Description("one of: ConstellationName, ConstellationNameDsc, IauAbbr, IauAbbrDsc, NasaAbbr, NasaAbbrDsc, Genitive, GenitiveDsc")]
         [CommandOption("-s|--sort <sort>")]
         public ConstellationSort Sort { get; init; }
         [CommandOption("-p|--page <page>")]
@@ -47,10 +47,10 @@ public class GetAllConstellationsCommand : AsyncCommand<GetAllConstellationsComm
 
             foreach (var constellation in constellations)
             {
-                table.AddRow(constellation.ConId.ToString(), 
-                constellation.ConName, 
-                constellation.IauAbbr, 
-                constellation.NasaAbbr, 
+                table.AddRow(constellation.ConstellationId.ToString(), 
+                constellation.ConstellationName, 
+                constellation.IauAbbreviation, 
+                constellation.NasaAbbreviation,
                 constellation.Genitive, 
                 constellation.Origin, 
                 constellation.Meaning);
@@ -63,7 +63,7 @@ public class GetAllConstellationsCommand : AsyncCommand<GetAllConstellationsComm
         }
         catch (AppException e)
         {
-            AnsiConsole.MarkupLine($"[red]{e.Message ?? "No constellations found."}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{e.Message ?? "No constellations found."}[/]");
             return 1;
         }
     }

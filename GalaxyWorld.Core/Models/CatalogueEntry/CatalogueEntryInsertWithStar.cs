@@ -2,7 +2,7 @@
 
 public class CatalogueEntryInsertWithStar
 {
-    public required int CatId { get; init; }
+    public required int CatalogueId { get; init; }
     public string? EntryId { get; init; }
     public string? EntryDesignation { get; init; }
 }
