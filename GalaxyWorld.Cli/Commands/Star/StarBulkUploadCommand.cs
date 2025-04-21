@@ -343,8 +343,6 @@ public class StarBulkUploadCommand : AsyncCommand<StarBulkUploadCommand.Settings
                 CatalogueEntries = catEntries,
             };
 
-            Console.WriteLine($"batch: {JsonSerializer.Serialize(starInsert)}");
-
             return starInsert;
         }).ToList();
 
