@@ -5,25 +5,25 @@ namespace GalaxyWorld.Core.Models.Star;
 public class StarPatch
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<int?> ConstellationId { get; init; }
+    public Optional<int?> ConstellationId { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<string?> ProperName { get; init; }
+    public Optional<string?> ProperName { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<decimal> RightAscension { get; init; }
+    public Optional<decimal> RightAscension { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<decimal> Declination { get; init; }
+    public Optional<decimal> Declination { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<decimal?> Distance { get; init; }
+    public Optional<decimal?> Distance { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<Vector?> PositionCartesian { get; init; }
+    public Optional<Vector?> PositionCartesian { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<decimal> Magnitude { get; init; }
+    public Optional<decimal> Magnitude { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<Vector?> VelocityCircular { get; init; }
+    public Optional<Vector?> VelocityCircular { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<Vector?> VelocityCartesian { get; init; }
+    public Optional<Vector?> VelocityCartesian { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<decimal?> ColourIndex { get; init; }
+    public Optional<decimal?> ColourIndex { get; init; } = default;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public required Optional<string?> SpectralType { get; init; }
+    public Optional<string?> SpectralType { get; init; } = default;
 }
