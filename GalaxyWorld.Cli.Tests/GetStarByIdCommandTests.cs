@@ -1,6 +1,5 @@
 using Xunit;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Spectre.Console;
@@ -18,31 +17,16 @@ public class FakeApiClient
     {
         StarId = id,
         ProperName = "Vega",
-        Constellation = 1,
-        RightAscension = 14.73,
-        Declination = 19.18,
-        PosSrc = "Hip",
-        X0 = 0.1,
-        Y0 = 0.2,
-        Z0 = 0.3,
-        Distance = 7.68,
-        DistanceSrc = "Hip",
-        AbsoluteMagnitude = 0.5,
-        ColourIndex = 0.3,
-        Magnitude = 0.03,
-        MagnitudeSrc = "Vis",
-        RadialVelocity = -20.2,
-        RadialVelocitySrc = "GAIA",
-        ProperMotionRightAscension = 0.1,
-        ProperMotionDeclination = 0.1,
-        ProperMotionSrc = "GAIA",
-        VelocityX = 0.1,
-        VelocityY = 0.1,
-        VelocityZ = 0.1,
-        SpectralType = "A0V",
-        SpectralTypeSrc = "SimBad",
-        CreatedAt = DateTime.UtcNow,
-        UpdatedAt = DateTime.UtcNow
+        ConstellationId = 1,
+        RightAscension = 14.73m,
+        Declination = 19.18m,
+        Distance = 7.68m,
+        PositionCartesian = null,
+        Magnitude = 0.03m,
+        VelocityCircular = null,
+        VelocityCartesian = null,
+        ColourIndex = 0.3m,
+        SpectralType = "A0V"
     });
 
     public Task<List<Catalogue>> GetCatalogues() => Task.FromResult(new List<Catalogue>
@@ -89,17 +73,24 @@ public class GetStarByIdCommandShim : AsyncCommand<GetStarByIdCommand.Settings>
         try
         {
             var star = await _client.GetStar(settings.Id);
-
             _console.MarkupLineInterpolated($"[green]Star: {star.ProperName}[/]");
 
             var catalogues = await _client.GetCatalogues();
             var entries = await _client.GetStarCatalogueEntries(settings.Id, 0, 999);
 
             _console.MarkupLine("[bold]Catalogue Entries:[/]");
+
             foreach (var entry in entries)
             {
                 var catalogue = catalogues.First(cat => cat.CatalogueId == entry.CatalogueId);
-                _console.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName}:[/] {entry.EntryId} {entry.EntryDesignation}");
+                if (!string.IsNullOrWhiteSpace(entry.EntryId))
+                {
+                    _console.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName} (ID):[/] {entry.EntryId}");
+                }
+                if (!string.IsNullOrWhiteSpace(entry.EntryDesignation))
+                {
+                    _console.MarkupLineInterpolated($"[yellow]{catalogue.CatalogueName} (Designation):[/] {entry.EntryDesignation}");
+                }
             }
 
             return 0;
@@ -131,8 +122,10 @@ public class GetStarByIdCommandTests
 
         // Assert
         Assert.Contains("Catalogue Entries", output);
-        Assert.Contains("Hipparcos", output);
-        Assert.Contains("Tycho", output);
+        Assert.Contains("Hipparcos (ID): 101", output);
+        Assert.Contains("Hipparcos (Designation): H001", output);
+        Assert.Contains("Tycho (ID): 202", output);
+        Assert.Contains("Tycho (Designation): T202", output);
         Assert.Equal(0, result);
     }
 }

@@ -43,24 +43,24 @@ public class GetStarPlanetsCommandShim : AsyncCommand<GetStarPlanetsCommand.Sett
             }
 
             _console.MarkupLine("[bold]Planetary System[/]");
-            _console.WriteLine($"No. Stars: {planetarySystem.NumStars}");
-            _console.WriteLine($"No. Planets: {planetarySystem.NumPlanets}");
-            _console.WriteLine($"No. Moons: {planetarySystem.NumMoons}");
+            _console.WriteLine($"No. Stars: {planetarySystem.SystemNumStars}");
+            _console.WriteLine($"No. Planets: {planetarySystem.SystemNumPlanets}");
+            _console.WriteLine($"No. Moons: {planetarySystem.SystemNumMoons}");
 
             foreach (var planet in planetarySystem.Planets)
             {
                 _console.WriteLine();
                 _console.MarkupLineInterpolated($"* [bold]{planet.PlanetName}[/] [grey]({planet.SolutionType})[/]");
                 if (planet.Controversial)
-                    _console.WriteLine("[yellow]Discovery Disputed[/]");
+                    _console.MarkupLine("[yellow]Discovery Disputed[/]");
                 _console.WriteLine($"Discovery Method: {planet.DiscoveryMethod}");
                 _console.WriteLine($"Discovery Year: {planet.DiscoveryYear}");
                 _console.WriteLine($"Discovery Facility: {planet.DiscoveryFacility}");
                 _console.WriteLine($"Discovery Telescope: {planet.DiscoveryTelescope}");
-                _console.WriteLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
-                _console.WriteLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
-                _console.WriteLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
-                _console.WriteLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
+                _console.MarkupLine($"Radius (Earth Radii): {FormatNullable(planet.RadiusEarth)}");
+                _console.MarkupLine($"Radius (Jupiter Radii): {FormatNullable(planet.RadiusJupiter)}");
+                _console.MarkupLine($"Mass (Earth Masses): {FormatNullable(planet.MassEarth)}");
+                _console.MarkupLine($"Mass (Jupiter Masses): {FormatNullable(planet.MassJupiter)}");
             }
 
             return 0;
@@ -72,7 +72,7 @@ public class GetStarPlanetsCommandShim : AsyncCommand<GetStarPlanetsCommand.Sett
         }
     }
 
-    static string FormatNullable<T>(T? value)
+    private static string FormatNullable<T>(T? value) where T : struct
     {
         return value == null ? "[grey]unknown[/]" : value.ToString() ?? "";
     }
@@ -90,9 +90,9 @@ public class GetStarPlanetsCommandTests
         {
             OnGetStarPlanets = id => Task.FromResult<PlanetarySystem?>(new PlanetarySystem
             {
-                NumStars = 1,
-                NumPlanets = 2,
-                NumMoons = 5,
+                SystemNumStars = 1,
+                SystemNumPlanets = 2,
+                SystemNumMoons = 5,
                 Planets = new List<Planet>
                 {
                     new Planet
@@ -104,9 +104,9 @@ public class GetStarPlanetsCommandTests
                         DiscoveryYear = 2020,
                         DiscoveryFacility = "SpaceLab",
                         DiscoveryTelescope = "SkyEye",
-                        RadiusEarth = (decimal?)1.5,
+                        RadiusEarth = 1.5m,
                         RadiusJupiter = null,
-                        MassEarth = (decimal?)5.9,
+                        MassEarth = 5.9m,
                         MassJupiter = null
                     }
                 }
@@ -122,6 +122,8 @@ public class GetStarPlanetsCommandTests
         Assert.Contains("Planetary System", output);
         Assert.Contains("TestPlanet", output);
         Assert.Contains("Discovery Disputed", output);
+        Assert.Contains("Radius (Earth Radii): 1.5", output);
+        Assert.Contains("Mass (Earth Masses): 5.9", output);
         Assert.Equal(0, result);
     }
 

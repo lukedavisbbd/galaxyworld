@@ -1,0 +1,157 @@
+using Xunit;
+using System.Threading.Tasks;
+using Spectre.Console.Cli;
+using Spectre.Console;
+using Spectre.Console.Testing;
+using GalaxyWorld.Cli.Commands.Catalogue;
+using GalaxyWorld.Core.Models.CatalogueEntry;
+using GalaxyWorld.Cli.Exceptions;
+using GalaxyWorld.Core.Models;
+using System.Collections.Generic;
+
+public class FakeApiClient_CatalogueStars
+{
+    public Func<int, int, int, CatalogueEntrySort, Filter<CatalogueEntry>[]?, Task<List<CatalogueEntry>>>? OnGetCatalogueStarEntries;
+
+    public Task<List<CatalogueEntry>> GetCatalogueStarEntries(int id, int start, int length, CatalogueEntrySort sort, Filter<CatalogueEntry>[]? filters)
+    {
+        return OnGetCatalogueStarEntries?.Invoke(id, start, length, sort, filters) ?? Task.FromResult(new List<CatalogueEntry>());
+    }
+}
+
+public class GetCatalogueStarsCommandShim : AsyncCommand<GetCatalogueStarsCommand.Settings>
+{
+    private readonly FakeApiClient_CatalogueStars _client;
+    private readonly IAnsiConsole _console;
+
+    public GetCatalogueStarsCommandShim(FakeApiClient_CatalogueStars client, IAnsiConsole console)
+    {
+        _client = client;
+        _console = console;
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, GetCatalogueStarsCommand.Settings settings)
+    {
+        try
+        {
+            var page = int.Max(settings.Page, 1);
+            var length = int.Max(settings.Length, 1);
+            var filters = (settings.Filter ?? []).Select(filter => Filter<CatalogueEntry>.Parse(filter, null)).ToArray();
+            var entries = await _client.GetCatalogueStarEntries(settings.Id, (page - 1) * length, length, settings.Sort, filters);
+
+            if (entries.Count == 0)
+            {
+                _console.MarkupLine("[yellow]No entries found.[/]");
+                return 0;
+            }
+
+            var table = new Table().Title("[bold]Catalogue Entries[/]").AddColumns("Star ID", "Entry ID", "Entry Designation");
+            foreach (var entry in entries)
+            {
+                table.AddRow(entry.StarId.ToString(), entry.EntryId ?? "", entry.EntryDesignation ?? "");
+            }
+
+            _console.Write(table);
+            _console.WriteLine($"Page #{page} ({(page - 1) * length} - {page * length - 1})");
+            return 0;
+        }
+        catch (AppException e)
+        {
+            _console.MarkupLineInterpolated($"[red]{e.Message ?? "Failed to get catalogue."}[/]");
+            return 1;
+        }
+    }
+}
+
+public class GetCatalogueStarsCommandTests
+{
+    [Fact]
+    public async Task Should_PrintCatalogueEntries_WhenEntriesExist()
+    {
+        var testConsole = new TestConsole();
+        AnsiConsole.Console = testConsole;
+
+        var fakeClient = new FakeApiClient_CatalogueStars
+        {
+            OnGetCatalogueStarEntries = (id, start, length, sort, filters) => Task.FromResult(new List<CatalogueEntry>
+            {
+                new CatalogueEntry { StarId = 1, EntryId = "X1", EntryDesignation = "Vega-A" },
+                new CatalogueEntry { StarId = 2, EntryId = "X2", EntryDesignation = "Altair-B" }
+            })
+        };
+
+        var command = new GetCatalogueStarsCommandShim(fakeClient, testConsole);
+        var settings = new GetCatalogueStarsCommand.Settings
+        {
+            Id = 99,
+            Page = 1,
+            Length = 2,
+            Sort = CatalogueEntrySort.EntryId,
+            Filter = []
+        };
+
+        var result = await command.ExecuteAsync((CommandContext?)null, settings);
+        var output = testConsole.Output;
+
+        Assert.Contains("Catalogue Entries", output);
+        Assert.Contains("Vega-A", output);
+        Assert.Contains("Altair-B", output);
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public async Task Should_PrintNoEntries_WhenEmpty()
+    {
+        var testConsole = new TestConsole();
+        AnsiConsole.Console = testConsole;
+
+        var fakeClient = new FakeApiClient_CatalogueStars
+        {
+            OnGetCatalogueStarEntries = (_, _, _, _, _) => Task.FromResult(new List<CatalogueEntry>())
+        };
+
+        var command = new GetCatalogueStarsCommandShim(fakeClient, testConsole);
+        var settings = new GetCatalogueStarsCommand.Settings
+        {
+            Id = 42,
+            Page = 1,
+            Length = 10,
+            Sort = CatalogueEntrySort.EntryDesignation,
+            Filter = []
+        };
+
+        var result = await command.ExecuteAsync((CommandContext?)null, settings);
+        var output = testConsole.Output;
+
+        Assert.Contains("No entries found", output);
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public async Task Should_PrintError_WhenAppExceptionThrown()
+    {
+        var testConsole = new TestConsole();
+        AnsiConsole.Console = testConsole;
+
+        var fakeClient = new FakeApiClient_CatalogueStars
+        {
+            OnGetCatalogueStarEntries = (_, _, _, _, _) => throw new AppException("Backend failure")
+        };
+
+        var command = new GetCatalogueStarsCommandShim(fakeClient, testConsole);
+        var settings = new GetCatalogueStarsCommand.Settings
+        {
+            Id = 777,
+            Page = 1,
+            Length = 5,
+            Sort = CatalogueEntrySort.EntryIdDsc,
+            Filter = []
+        };
+
+        var result = await command.ExecuteAsync((CommandContext?)null, settings);
+        var output = testConsole.Output;
+
+        Assert.Contains("Backend failure", output);
+        Assert.Equal(1, result);
+    }
+}
