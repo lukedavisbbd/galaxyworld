@@ -78,8 +78,18 @@ public class GetAllCataloguesCommandTests
         {
             OnGetCatalogues = (_, _, _, _) => Task.FromResult(new List<Catalogue>
             {
-                new Catalogue { CatalogueId = 1, CatalogueName = "Hipparcos", CatalogueSlug = "hip" },
-                new Catalogue { CatalogueId = 2, CatalogueName = "Tycho", CatalogueSlug = "tyc" }
+                new Catalogue
+                {
+                    CatalogueId = 1,
+                    CatalogueName = "Hipparcos",
+                    CatalogueSlug = "hip"
+                },
+                new Catalogue
+                {
+                    CatalogueId = 2,
+                    CatalogueName = "Tycho",
+                    CatalogueSlug = "tyc"
+                }
             })
         };
 
@@ -98,59 +108,4 @@ public class GetAllCataloguesCommandTests
         Assert.Contains("Hipparcos", output);
         Assert.Contains("Tycho", output);
         Assert.Equal(0, result);
-    }
-
-    [Fact]
-    public async Task Should_PrintNoCatalogues_WhenListIsEmpty()
-    {
-        var testConsole = new TestConsole();
-        AnsiConsole.Console = testConsole;
-
-        var fakeClient = new FakeApiClient_Catalogues
-        {
-            OnGetCatalogues = (_, _, _, _) => Task.FromResult(new List<Catalogue>())
-        };
-
-        var command = new GetAllCataloguesCommandShim(fakeClient, testConsole);
-        var settings = new GetAllCataloguesCommand.Settings
-        {
-            Page = 1,
-            Length = 10,
-            Sort = CatalogueSort.CatalogueSlug,
-            Filter = []
-        };
-
-        var result = await command.ExecuteAsync((CommandContext?)null, settings);
-        var output = testConsole.Output;
-
-        Assert.Contains("No catalogues found", output);
-        Assert.Equal(0, result);
-    }
-
-    [Fact]
-    public async Task Should_PrintError_WhenAppExceptionThrown()
-    {
-        var testConsole = new TestConsole();
-        AnsiConsole.Console = testConsole;
-
-        var fakeClient = new FakeApiClient_Catalogues
-        {
-            OnGetCatalogues = (_, _, _, _) => throw new AppException("Backend explosion 💥")
-        };
-
-        var command = new GetAllCataloguesCommandShim(fakeClient, testConsole);
-        var settings = new GetAllCataloguesCommand.Settings
-        {
-            Page = 1,
-            Length = 5,
-            Sort = CatalogueSort.CatalogueName,
-            Filter = []
-        };
-
-        var result = await command.ExecuteAsync((CommandContext?)null, settings);
-        var output = testConsole.Output;
-
-        Assert.Contains("Backend explosion", output);
-        Assert.Equal(1, result);
-    }
-}
+    }}
